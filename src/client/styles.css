@@ -2,9 +2,93 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Self-hosted fonts (Heritage Minimalist design system). Served from /public so
+ * they satisfy the strict CSP (font-src 'self'); no dependency on Google Fonts.
+ * Latin subset only. Bodoni Moda = headlines, Hanken Grotesk = body/labels.
+ */
+@font-face {
+  font-family: 'Bodoni Moda';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/bodoni-moda-500.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Bodoni Moda';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/bodoni-moda-600.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Bodoni Moda';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/bodoni-moda-700.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Bodoni Moda';
+  font-style: italic;
+  font-weight: 300 600;
+  font-display: swap;
+  src: url('/fonts/bodoni-moda-italic-500.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Hanken Grotesk';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/hanken-grotesk-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Hanken Grotesk';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/hanken-grotesk-500.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Hanken Grotesk';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/hanken-grotesk-600.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Hanken Grotesk';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/hanken-grotesk-700.woff2') format('woff2');
+}
+
 /* Hide Alpine-controlled elements until Alpine initializes. */
 [x-cloak] {
   display: none !important;
+}
+
+/*
+ * Heritage Minimalist component utilities (ported from the Stitch design).
+ *  - ambient-shadow: warm, diffused terracotta-tinted lift (not a hard shadow).
+ *  - jharoka-arch: arched top edge echoing the architectural heritage motif.
+ *  - hero-shader: WebGL canvas sits behind hero content; only painted when JS
+ *    is present (the module is in the client bundle), so no-JS shows the
+ *    surface colour underneath.
+ */
+.ambient-shadow {
+  box-shadow: 0 20px 40px -10px rgba(130, 59, 24, 0.05);
+}
+.jharoka-arch {
+  border-top-left-radius: 50%;
+  border-top-right-radius: 50%;
+}
+.hero-shader {
+  display: none;
+}
+.js .hero-shader {
+  display: block;
 }
 
 /*

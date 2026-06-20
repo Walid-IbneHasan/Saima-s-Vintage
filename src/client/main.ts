@@ -1,6 +1,7 @@
 // Progressive enhancement only — the storefront must work without this bundle.
 import Alpine from 'alpinejs';
 import htmx from 'htmx.org';
+import { initHeroShader } from './hero-shader';
 
 declare global {
   interface Window {
@@ -18,6 +19,9 @@ Alpine.start();
 // Signal JS availability so CSS can opt into animations; without this class
 // everything stays visible (the storefront is fully usable with JS disabled).
 document.documentElement.classList.add('js');
+
+// Hero background shader (no-op unless the home hero canvas is present).
+initHeroShader();
 
 const prefersReducedMotion = window.matchMedia(
   '(prefers-reduced-motion: reduce)',
