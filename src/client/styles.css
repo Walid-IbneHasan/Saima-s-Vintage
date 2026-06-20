@@ -1,0 +1,119 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Hide Alpine-controlled elements until Alpine initializes. */
+[x-cloak] {
+  display: none !important;
+}
+
+/*
+ * Price-range slider — progressive enhancement. The JS slider is shown only
+ * when JS is present (`.js` on <html>); without JS the number inputs remain.
+ */
+.price-slider {
+  display: none;
+}
+.js .price-slider {
+  display: block;
+}
+.js .price-fallback {
+  display: none;
+}
+
+/*
+ * Dual-handle range: two <input type="range"> stacked in the same box. The
+ * input itself ignores pointer events so clicks fall through to whichever
+ * thumb is underneath; only the thumbs are interactive.
+ */
+.price-range {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 1.25rem;
+  margin: 0;
+  background: transparent;
+  pointer-events: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.price-range:focus {
+  outline: none;
+}
+.price-range::-webkit-slider-runnable-track,
+.price-range::-moz-range-track {
+  background: transparent;
+  border: none;
+}
+.price-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  pointer-events: auto;
+  height: 1rem;
+  width: 1rem;
+  border-radius: 9999px;
+  background: #ffffff;
+  border: 2px solid #b45309; /* amber-700 */
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.2);
+  cursor: pointer;
+  margin-top: 0;
+}
+.price-range::-moz-range-thumb {
+  pointer-events: auto;
+  height: 1rem;
+  width: 1rem;
+  border-radius: 9999px;
+  background: #ffffff;
+  border: 2px solid #b45309;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.2);
+  cursor: pointer;
+}
+.price-range:focus-visible::-webkit-slider-thumb {
+  outline: 2px solid #b45309;
+  outline-offset: 2px;
+}
+
+/*
+ * Motion & 3D polish — progressive and accessible:
+ *  - Animations apply ONLY when JS is present (`.js` on <html>) AND the user
+ *    has not requested reduced motion. Without JS, all content is fully
+ *    visible (SSR-first), so the storefront works with JavaScript disabled.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  /* Scroll-reveal: hidden only once JS opts in, then revealed on intersection. */
+  .js [data-reveal] {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .js [data-reveal].is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Hero entrance (pure CSS — runs even without JS, harmless). */
+  .hero-fade {
+    animation: hero-fade-up 0.8s ease both;
+  }
+  @keyframes hero-fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* Lightweight CSS 3D tilt on hover (no Three.js, no JS). */
+  .tilt-3d {
+    transition: transform 0.45s ease, box-shadow 0.45s ease;
+    will-change: transform;
+  }
+  .tilt-3d:hover {
+    transform: perspective(900px) rotateY(-6deg) rotateX(3deg) scale(1.02);
+    box-shadow: 0 30px 60px -20px rgb(0 0 0 / 0.25);
+  }
+}

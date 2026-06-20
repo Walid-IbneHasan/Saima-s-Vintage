@@ -1,0 +1,38 @@
+{% extends "admin/layout.njk" %}
+
+{% block content %}
+<div class="grid grid-cols-2 gap-4 md:grid-cols-4">
+  <div class="rounded-lg bg-white p-5 shadow-sm">
+    <p class="text-sm text-stone-500">Revenue (paid)</p>
+    <p class="mt-1 text-2xl font-semibold">{{ stats.revenue | money }}</p>
+  </div>
+  <div class="rounded-lg bg-white p-5 shadow-sm">
+    <p class="text-sm text-stone-500">Paid orders</p>
+    <p class="mt-1 text-2xl font-semibold">{{ stats.paidOrders }}</p>
+  </div>
+  <div class="rounded-lg bg-white p-5 shadow-sm">
+    <p class="text-sm text-stone-500">Awaiting payment</p>
+    <p class="mt-1 text-2xl font-semibold">{{ stats.awaitingPayment }}</p>
+  </div>
+  <div class="rounded-lg bg-white p-5 shadow-sm">
+    <p class="text-sm text-stone-500">Payment review</p>
+    <p class="mt-1 text-2xl font-semibold">{{ stats.pendingReview }}</p>
+  </div>
+</div>
+
+<div class="mt-8 rounded-lg bg-white p-6 shadow-sm">
+  <h2 class="text-base font-medium">Top products</h2>
+  <table class="mt-3 w-full text-left text-sm">
+    <thead class="text-xs uppercase text-stone-500">
+      <tr><th class="py-2">Product</th><th>Qty sold</th><th>Revenue</th></tr>
+    </thead>
+    <tbody>
+      {% for p in stats.topProducts %}
+        <tr class="border-t border-stone-100"><td class="py-2">{{ p.name }}</td><td>{{ p.quantity }}</td><td>{{ p.revenue | money }}</td></tr>
+      {% else %}
+        <tr><td colspan="3" class="py-6 text-center text-stone-400">No sales yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

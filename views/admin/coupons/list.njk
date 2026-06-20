@@ -1,0 +1,42 @@
+{% extends "admin/layout.njk" %}
+
+{% block content %}
+<div class="mb-4 flex items-center justify-between">
+  <p class="text-sm text-stone-500">{{ coupons.length }} coupon(s)</p>
+  <a href="/admin/coupons/new" class="rounded bg-stone-900 px-4 py-2 text-sm text-white hover:bg-stone-700">New coupon</a>
+</div>
+
+<div class="overflow-x-auto rounded-lg bg-white shadow-sm">
+  <table class="w-full text-left text-sm">
+    <thead class="border-b border-stone-200 text-xs uppercase text-stone-500">
+      <tr>
+        <th class="px-4 py-3">Code</th>
+        <th class="px-4 py-3">Type</th>
+        <th class="px-4 py-3">Value</th>
+        <th class="px-4 py-3">Used</th>
+        <th class="px-4 py-3">Active</th>
+        <th class="px-4 py-3"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in coupons %}
+      <tr class="border-b border-stone-100">
+        <td class="px-4 py-3 font-mono">{{ c.code }}</td>
+        <td class="px-4 py-3">{{ c.type }}</td>
+        <td class="px-4 py-3">{% if c.type == 'PERCENT' %}{{ c.value }}%{% else %}{{ c.value | money }}{% endif %}</td>
+        <td class="px-4 py-3">{{ c.usedCount }}{% if c.usageLimit %} / {{ c.usageLimit }}{% endif %}</td>
+        <td class="px-4 py-3">{% if c.isActive %}<span class="text-green-700">Yes</span>{% else %}<span class="text-stone-400">No</span>{% endif %}</td>
+        <td class="px-4 py-3 text-right">
+          <form action="/admin/coupons/{{ c.id }}/delete" method="post" class="inline" onsubmit="return confirm('Delete coupon?')">
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+            <button class="text-red-600 hover:underline">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" class="px-4 py-8 text-center text-stone-400">No coupons yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,11 @@
+{% if meta.totalPages > 1 %}
+<nav class="mt-10 flex items-center justify-center gap-3 text-sm" aria-label="Pagination">
+  {% if meta.hasPrev %}
+    <a class="rounded border border-stone-300 px-3 py-1.5 hover:border-stone-400" href="{{ basePath }}page={{ meta.page - 1 }}">Previous</a>
+  {% endif %}
+  <span class="text-stone-500">Page {{ meta.page }} of {{ meta.totalPages }}</span>
+  {% if meta.hasNext %}
+    <a class="rounded border border-stone-300 px-3 py-1.5 hover:border-stone-400" href="{{ basePath }}page={{ meta.page + 1 }}">Next</a>
+  {% endif %}
+</nav>
+{% endif %}

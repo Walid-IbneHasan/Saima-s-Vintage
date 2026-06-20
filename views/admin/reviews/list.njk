@@ -1,0 +1,43 @@
+{% extends "admin/layout.njk" %}
+
+{% block content %}
+<p class="mb-4 text-sm text-stone-500">{{ meta.total }} review(s)</p>
+<div class="overflow-x-auto rounded-lg bg-white shadow-sm">
+  <table class="w-full text-left text-sm">
+    <thead class="border-b border-stone-200 text-xs uppercase text-stone-500">
+      <tr>
+        <th class="px-4 py-3">Product</th>
+        <th class="px-4 py-3">Rating</th>
+        <th class="px-4 py-3">Review</th>
+        <th class="px-4 py-3">Author</th>
+        <th class="px-4 py-3">Date</th>
+        <th class="px-4 py-3"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in reviews %}
+      <tr class="border-b border-stone-100 align-top">
+        <td class="px-4 py-3"><a href="/p/{{ r.product.slug }}" class="text-amber-700 hover:underline">{{ r.product.name }}</a></td>
+        <td class="px-4 py-3 text-amber-600">{% for i in range(0, r.rating) %}★{% endfor %}</td>
+        <td class="px-4 py-3">
+          {% if r.title %}<p class="font-medium">{{ r.title }}</p>{% endif %}
+          <p class="text-stone-600">{{ r.body }}</p>
+          {% if not r.customerId %}<span class="text-xs text-stone-400">(admin/seed)</span>{% endif %}
+        </td>
+        <td class="px-4 py-3">{{ r.authorName }}</td>
+        <td class="px-4 py-3 text-stone-500">{{ r.createdAt | date }}</td>
+        <td class="px-4 py-3 text-right">
+          <form action="/admin/reviews/{{ r.id }}/delete" method="post" onsubmit="return confirm('Delete this review?')">
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+            <button class="text-red-600 hover:underline">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" class="px-4 py-8 text-center text-stone-400">No reviews yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% include "partials/pagination.njk" %}
+{% endblock %}

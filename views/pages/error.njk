@@ -1,0 +1,9 @@
+{% extends "layouts/base.njk" %}
+
+{% block content %}
+<section class="mx-auto flex max-w-xl flex-col items-center px-4 py-24 text-center">
+  <p class="font-serif text-6xl text-stone-300">{{ status }}</p>
+  <h1 class="mt-4 text-2xl font-medium">{{ message }}</h1>
+  <a href="/" class="mt-8 rounded-full bg-stone-900 px-6 py-3 text-sm text-white">Back to home</a>
+</section>
+{% endblock %}

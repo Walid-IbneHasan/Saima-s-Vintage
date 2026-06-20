@@ -1,0 +1,23 @@
+{% extends "admin/layout.njk" %}
+
+{% block content %}
+<div class="grid grid-cols-2 gap-4 md:grid-cols-4">
+  <div class="rounded-lg bg-white p-5 shadow-sm">
+    <p class="text-sm text-stone-500">Products</p>
+    <p class="mt-1 text-3xl font-semibold">{{ stats.products }}</p>
+  </div>
+  <div class="rounded-lg bg-white p-5 shadow-sm">
+    <p class="text-sm text-stone-500">Categories</p>
+    <p class="mt-1 text-3xl font-semibold">{{ stats.categories }}</p>
+  </div>
+  <div class="rounded-lg bg-white p-5 shadow-sm">
+    <p class="text-sm text-stone-500">Orders</p>
+    <p class="mt-1 text-3xl font-semibold">{{ stats.orders }}</p>
+  </div>
+  <div class="rounded-lg bg-white p-5 shadow-sm">
+    <p class="text-sm text-stone-500">Low stock variants</p>
+    <p class="mt-1 text-3xl font-semibold">{{ stats.lowStock }}</p>
+  </div>
+</div>
+<p class="mt-6 text-sm text-stone-500">Signed in as {{ user.name }} ({{ user.role }})</p>
+{% endblock %}

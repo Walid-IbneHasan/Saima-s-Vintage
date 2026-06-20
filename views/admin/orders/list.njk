@@ -1,0 +1,41 @@
+{% extends "admin/layout.njk" %}
+{% from "partials/order-status.njk" import statusBadge %}
+
+{% block content %}
+<div class="mb-4 flex flex-wrap items-center gap-2 text-xs">
+  <a href="/admin/orders" class="rounded-full border px-3 py-1 {% if not activeStatus %}bg-stone-900 text-white{% else %}border-stone-300 hover:border-stone-400{% endif %}">All</a>
+  {% for s in statuses %}
+    <a href="/admin/orders?status={{ s }}" class="rounded-full border px-3 py-1 {% if activeStatus == s %}bg-stone-900 text-white{% else %}border-stone-300 hover:border-stone-400{% endif %}">{{ s }}</a>
+  {% endfor %}
+</div>
+
+<div class="overflow-x-auto rounded-lg bg-white shadow-sm">
+  <table class="w-full text-left text-sm">
+    <thead class="border-b border-stone-200 text-xs uppercase text-stone-500">
+      <tr>
+        <th class="px-4 py-3">Order</th>
+        <th class="px-4 py-3">Date</th>
+        <th class="px-4 py-3">Customer</th>
+        <th class="px-4 py-3">Items</th>
+        <th class="px-4 py-3">Total</th>
+        <th class="px-4 py-3">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for o in orders %}
+      <tr class="border-b border-stone-100 hover:bg-stone-50">
+        <td class="px-4 py-3"><a href="/admin/orders/{{ o.id }}" class="font-medium text-amber-700 hover:underline">{{ o.orderNumber }}</a></td>
+        <td class="px-4 py-3 text-stone-500">{{ o.createdAt | date }}</td>
+        <td class="px-4 py-3">{{ o.customer.name or o.email }}</td>
+        <td class="px-4 py-3">{{ o._count.items }}</td>
+        <td class="px-4 py-3">{{ o.grandTotal | money(o.currency) }}</td>
+        <td class="px-4 py-3">{{ statusBadge(o.status) }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" class="px-4 py-8 text-center text-stone-400">No orders found.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% include "partials/pagination.njk" %}
+{% endblock %}

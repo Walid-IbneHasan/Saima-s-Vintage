@@ -1,0 +1,39 @@
+{% extends "admin/layout.njk" %}
+
+{% block content %}
+{% set action = "/admin/categories/" + category.id if category else "/admin/categories" %}
+<form action="{{ action }}" method="post" class="max-w-xl space-y-5">
+  <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+  <div class="rounded-lg bg-white p-6 shadow-sm">
+    <label class="block text-sm font-medium">Name
+      <input name="name" required value="{{ category.name or '' }}" class="mt-1 w-full rounded border-stone-300" />
+    </label>
+    <label class="mt-4 block text-sm font-medium">Slug (optional)
+      <input name="slug" value="{{ category.slug or '' }}" placeholder="auto from name" class="mt-1 w-full rounded border-stone-300" />
+    </label>
+    <label class="mt-4 block text-sm font-medium">Parent
+      <select name="parentId" class="mt-1 w-full rounded border-stone-300">
+        <option value="">— none —</option>
+        {% for p in parents %}
+          <option value="{{ p.id }}" {% if category and category.parentId == p.id %}selected{% endif %}>{{ p.name }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label class="mt-4 block text-sm font-medium">Description
+      <textarea name="description" rows="3" class="mt-1 w-full rounded border-stone-300">{{ category.description or '' }}</textarea>
+    </label>
+    <div class="mt-4 grid grid-cols-2 items-end gap-4">
+      <label class="block text-sm font-medium">Sort order
+        <input name="sortOrder" type="number" value="{{ category.sortOrder or 0 }}" class="mt-1 w-full rounded border-stone-300" />
+      </label>
+      <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="isActive" {% if category.isActive %}checked{% endif %} /> Active (visible)</label>
+    </div>
+  </div>
+  <div class="flex gap-3">
+    <button type="submit" class="rounded bg-stone-900 px-5 py-2.5 text-sm text-white hover:bg-stone-700">
+      {{ 'Save changes' if category else 'Create category' }}
+    </button>
+    <a href="/admin/categories" class="rounded border border-stone-300 px-5 py-2.5 text-sm">Cancel</a>
+  </div>
+</form>
+{% endblock %}

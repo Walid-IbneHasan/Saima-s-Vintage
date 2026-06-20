@@ -1,0 +1,35 @@
+{% extends "layouts/base.njk" %}
+
+{% block content %}
+<div class="mx-auto max-w-6xl px-4 py-10">
+  <nav class="mb-3 text-sm text-stone-500">
+    <a href="/" class="hover:text-amber-700">Home</a>
+    {% if category.parent %} / <a href="/c/{{ category.parent.slug }}" class="hover:text-amber-700">{{ category.parent.name }}</a>{% endif %}
+    / <span class="text-stone-700">{{ category.name }}</span>
+  </nav>
+
+  <h1 class="font-serif text-3xl">{{ category.name }}</h1>
+  {% if category.description %}
+    <p class="mt-2 max-w-2xl text-stone-600">{{ category.description }}</p>
+  {% endif %}
+
+  {% if category.children.length %}
+    <div class="mt-4 flex flex-wrap gap-2">
+      {% for sub in category.children %}
+        <a href="/c/{{ sub.slug }}" class="rounded-full border border-stone-300 px-3 py-1 text-sm hover:border-amber-600 hover:text-amber-700">{{ sub.name }}</a>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <div class="mt-6">{% include "partials/product-filters.njk" %}</div>
+
+  {% if products.length %}
+    <div class="mt-8 grid grid-cols-2 gap-6 md:grid-cols-4">
+      {% for p in products %}{% include "partials/product-card.njk" %}{% endfor %}
+    </div>
+    {% include "partials/pagination.njk" %}
+  {% else %}
+    <p class="mt-8 text-stone-500">No products in this category yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

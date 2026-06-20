@@ -1,0 +1,33 @@
+<footer class="mt-16 border-t border-stone-200 bg-white">
+  <div class="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-10 md:flex-row md:justify-between">
+    <div>
+      <p class="font-serif text-lg">{{ appName }}</p>
+      <p class="mt-1 max-w-xs text-sm text-stone-500">
+        Curated vintage finds, one of a kind. Shipped across Bangladesh.
+      </p>
+    </div>
+    <div class="text-sm">
+      <p class="mb-2 font-medium text-stone-700">Shop</p>
+      <ul class="space-y-1 text-stone-500">
+        <li><a href="/search" class="hover:text-amber-700">All products</a></li>
+        <li><a href="/cart" class="hover:text-amber-700">Cart</a></li>
+      </ul>
+    </div>
+    <div class="text-sm">
+      <p class="mb-2 font-medium text-stone-700">Newsletter</p>
+      <form action="/newsletter" method="post" class="flex gap-2">
+        <input
+          type="email"
+          name="email"
+          required
+          placeholder="you@email.com"
+          class="rounded border border-stone-300 px-3 py-1.5 text-sm focus:border-amber-600 focus:outline-none"
+        />
+        <button type="submit" class="rounded bg-stone-900 px-3 py-1.5 text-sm text-white">Join</button>
+      </form>
+    </div>
+  </div>
+  <div class="border-t border-stone-100 py-4 text-center text-xs text-stone-400">
+    &copy; {{ currentYear }} {{ appName }}. All rights reserved.
+  </div>
+</footer>

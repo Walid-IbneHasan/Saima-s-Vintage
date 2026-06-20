@@ -1,0 +1,83 @@
+{% extends "layouts/base.njk" %}
+
+{% block content %}
+<section class="bg-gradient-to-b from-amber-50 to-stone-50">
+  <div class="mx-auto grid max-w-6xl gap-8 px-4 py-20 md:grid-cols-2 md:items-center">
+    <div class="hero-fade">
+      <p class="mb-3 text-sm font-medium uppercase tracking-widest text-amber-700">Curated · Vintage · One of a kind</p>
+      <h1 class="font-serif text-4xl leading-tight text-stone-900 md:text-5xl">
+        Timeless pieces, hand-picked by Saima.
+      </h1>
+      <p class="mt-4 max-w-md text-stone-600">
+        Each item is unique and limited to a single piece. When it's gone, it's gone.
+      </p>
+      <div class="mt-8 flex gap-3">
+        <a href="/search" class="rounded-full bg-stone-900 px-6 py-3 text-sm font-medium text-white hover:bg-stone-700">
+          Shop the collection
+        </a>
+        <a href="/pages/about" class="rounded-full border border-stone-300 px-6 py-3 text-sm font-medium hover:border-stone-400">
+          Our story
+        </a>
+      </div>
+    </div>
+    {% set heroProduct = featured[0] %}
+    <a href="{% if heroProduct %}/p/{{ heroProduct.slug }}{% else %}/search{% endif %}"
+       class="tilt-3d relative block aspect-[4/5] overflow-hidden rounded-2xl bg-gradient-to-br from-stone-200 to-amber-100">
+      {% if heroProduct and heroProduct.image %}
+        <img src="{{ heroProduct.image.url }}" alt="{{ heroProduct.image.alt or heroProduct.name }}"
+             class="h-full w-full object-cover" />
+      {% else %}
+        <img src="https://picsum.photos/seed/sv-hero/800/1000" alt="Vintage collection"
+             class="h-full w-full object-cover" />
+      {% endif %}
+      {% if heroProduct %}
+        <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/55 to-transparent p-4">
+          <p class="text-sm font-medium text-white">{{ heroProduct.name }}</p>
+          <p class="text-sm text-white/90">
+            {{ heroProduct.pricing.current | money(heroProduct.currency) }}
+            {% if heroProduct.pricing.onSale %}
+              <span class="ml-1 text-white/70 line-through">{{ heroProduct.pricing.regular | money(heroProduct.currency) }}</span>
+            {% endif %}
+          </p>
+        </div>
+      {% endif %}
+    </a>
+  </div>
+</section>
+
+<section class="mx-auto max-w-6xl px-4 py-16">
+  <h2 class="font-serif text-2xl">Featured finds</h2>
+  {% if featured.length %}
+    <div class="mt-6 grid grid-cols-2 gap-6 md:grid-cols-4" data-reveal>
+      {% for p in featured %}{% include "partials/product-card.njk" %}{% endfor %}
+    </div>
+  {% else %}
+    <p class="mt-4 text-stone-500">New arrivals coming soon.</p>
+  {% endif %}
+</section>
+
+<section class="mx-auto max-w-6xl px-4 pb-16">
+  <h2 class="font-serif text-2xl">Shop by category</h2>
+  <div class="mt-6 grid grid-cols-2 gap-6 md:grid-cols-3">
+    {% for category in categories %}
+      <a href="/c/{{ category.slug }}" class="group block overflow-hidden rounded-xl border border-stone-200 bg-white transition hover:shadow-lg">
+        <div class="aspect-[4/3] overflow-hidden bg-stone-200">
+          {% if category.imageUrl %}
+            <img src="{{ category.imageUrl }}" alt="{{ category.name }}" loading="lazy"
+                 class="h-full w-full object-cover transition duration-300 group-hover:scale-105" />
+          {% endif %}
+        </div>
+        <div class="flex items-center justify-between gap-2 p-4">
+          <div>
+            <p class="font-serif text-lg text-stone-900">{{ category.name }}</p>
+            {% if category.description %}
+              <p class="mt-0.5 line-clamp-1 text-sm text-stone-500">{{ category.description }}</p>
+            {% endif %}
+          </div>
+          <span class="shrink-0 text-sm font-medium text-amber-700 group-hover:underline">View more →</span>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

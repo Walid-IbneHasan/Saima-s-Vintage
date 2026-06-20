@@ -1,0 +1,33 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+public/build/
+
+# env & secrets
+.env
+.env.*
+!.env.example
+
+# logs
+logs/
+*.log
+npm-debug.log*
+
+# uploads (user content — back up separately, never commit)
+storage/uploads/
+public/uploads/
+
+# prisma
+prisma/*.db
+
+# os / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.tsbuildinfo
+
+# tests
+coverage/

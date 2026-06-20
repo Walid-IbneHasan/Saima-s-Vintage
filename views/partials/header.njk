@@ -1,0 +1,91 @@
+<header class="border-b border-stone-200 bg-white" x-data="{ open: false }">
+  <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4">
+    <a href="/" class="font-serif text-2xl tracking-tight text-stone-900">
+      {{ appName }}
+    </a>
+
+    <nav class="hidden items-center gap-6 text-sm md:flex" aria-label="Primary">
+      <a href="/" class="hover:text-amber-700">Home</a>
+      <div class="relative" x-data="{ shop: false }" @mouseenter="shop = true" @mouseleave="shop = false">
+        <a href="/products" class="inline-flex items-center gap-1 hover:text-amber-700" @click="shop = !shop">
+          Shop <span class="text-xs">▾</span>
+        </a>
+        {# pt-2 (not mt-2) keeps the hover area continuous so the menu doesn't close in the gap #}
+        <div x-show="shop" x-cloak class="absolute left-0 top-full z-30 pt-2">
+          <div class="w-[36rem] rounded-xl border border-stone-200 bg-white p-5 shadow-xl">
+            <div class="grid grid-cols-3 gap-x-6 gap-y-4">
+              {% for cat in navCategories() %}
+                <div>
+                  <a href="/c/{{ cat.slug }}" class="block text-sm font-medium text-stone-900 hover:text-amber-700">{{ cat.name }}</a>
+                  {% if cat.children.length %}
+                    <div class="mt-1.5 space-y-1">
+                      {% for sub in cat.children %}
+                        <a href="/c/{{ sub.slug }}" class="block text-xs text-stone-500 hover:text-amber-700">{{ sub.name }}</a>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                </div>
+              {% endfor %}
+            </div>
+            <a href="/products" class="mt-4 block border-t border-stone-100 pt-3 text-sm font-medium text-amber-700 hover:underline">Shop all products →</a>
+          </div>
+        </div>
+      </div>
+      <a href="/products?onSale=1" class="font-medium text-amber-700 hover:text-amber-800">Sale</a>
+      <a href="/pages/about" class="hover:text-amber-700">About</a>
+    </nav>
+
+    <div class="flex items-center gap-4">
+      <form action="/search" method="get" class="hidden md:block">
+        <input
+          type="search"
+          name="q"
+          placeholder="Search vintage…"
+          class="w-48 rounded-full border border-stone-300 px-4 py-1.5 text-sm focus:border-amber-600 focus:outline-none"
+        />
+      </form>
+      <a href="/cart" class="relative text-sm hover:text-amber-700" aria-label="Cart">Cart</a>
+      {% if currentCustomer %}
+        <a href="/account" class="hidden text-sm hover:text-amber-700 sm:inline">Account</a>
+        <form action="/logout" method="post" class="hidden sm:block">
+          <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+          <button class="text-sm text-stone-500 hover:text-amber-700">Log out</button>
+        </form>
+      {% else %}
+        <a href="/login" class="hidden text-sm hover:text-amber-700 sm:inline">Log in</a>
+        <a href="/register" class="hidden rounded-full bg-stone-900 px-3 py-1.5 text-sm text-white hover:bg-stone-700 sm:inline-block">Register</a>
+      {% endif %}
+      <button
+        type="button"
+        class="md:hidden"
+        @click="open = !open"
+        aria-label="Toggle menu"
+      >☰</button>
+    </div>
+  </div>
+
+  <div x-show="open" x-cloak class="max-h-[70vh] overflow-y-auto border-t border-stone-200 bg-white md:hidden">
+    <nav class="flex flex-col gap-1 px-4 py-3 text-sm">
+      <a href="/" class="py-1">Home</a>
+      <a href="/products" class="py-1">Shop all</a>
+      <a href="/products?onSale=1" class="py-1 font-medium text-amber-700">Sale</a>
+      {% for cat in navCategories() %}
+        <a href="/c/{{ cat.slug }}" class="py-1 font-medium">{{ cat.name }}</a>
+        {% for sub in cat.children %}
+          <a href="/c/{{ sub.slug }}" class="py-0.5 pl-4 text-stone-500">{{ sub.name }}</a>
+        {% endfor %}
+      {% endfor %}
+      <a href="/pages/about" class="mt-1 py-1">About</a>
+      {% if currentCustomer %}
+        <a href="/account" class="border-t border-stone-100 pt-2 py-1 font-medium">My account</a>
+        <form action="/logout" method="post">
+          <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+          <button class="py-1 text-left text-stone-500">Log out</button>
+        </form>
+      {% else %}
+        <a href="/login" class="border-t border-stone-100 pt-2 py-1">Log in</a>
+        <a href="/register" class="py-1 font-medium text-amber-700">Register</a>
+      {% endif %}
+    </nav>
+  </div>
+</header>

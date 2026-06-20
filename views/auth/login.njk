@@ -1,0 +1,29 @@
+{% extends "layouts/base.njk" %}
+
+{% block content %}
+<div class="mx-auto max-w-md px-4 py-16">
+  <h1 class="font-serif text-3xl">Log in</h1>
+  {% if reset %}<p class="mt-4 rounded bg-green-50 px-3 py-2 text-sm text-green-700">Your password was reset. Please log in.</p>{% endif %}
+  {% if oauthError %}<p class="mt-4 rounded bg-red-50 px-3 py-2 text-sm text-red-700">Google sign-in failed. Please try again.</p>{% endif %}
+  {% if error %}<p class="mt-4 rounded bg-red-50 px-3 py-2 text-sm text-red-700">{{ error }}</p>{% endif %}
+
+  <form action="/login" method="post" class="mt-6 space-y-4">
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+    <label class="block text-sm font-medium">Email
+      <input name="email" type="email" required value="{{ values.email or '' }}" class="mt-1 w-full rounded border-stone-300" />
+    </label>
+    <label class="block text-sm font-medium">Password
+      <input name="password" type="password" required class="mt-1 w-full rounded border-stone-300" />
+    </label>
+    <div class="text-right"><a href="/forgot" class="text-sm text-amber-700 hover:underline">Forgot password?</a></div>
+    <button class="w-full rounded-full bg-stone-900 px-6 py-3 text-white hover:bg-stone-700">Log in</button>
+  </form>
+
+  {% if googleEnabled %}
+    <div class="my-5 flex items-center gap-3 text-xs text-stone-400"><span class="h-px flex-1 bg-stone-200"></span>or<span class="h-px flex-1 bg-stone-200"></span></div>
+    <a href="/auth/google" class="flex w-full items-center justify-center gap-2 rounded-full border border-stone-300 px-6 py-3 text-sm hover:border-stone-400">Continue with Google</a>
+  {% endif %}
+
+  <p class="mt-6 text-sm text-stone-500">New here? <a href="/register" class="text-amber-700 hover:underline">Create an account</a></p>
+</div>
+{% endblock %}

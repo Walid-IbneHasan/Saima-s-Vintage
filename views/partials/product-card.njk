@@ -1,0 +1,17 @@
+<a href="/p/{{ p.slug }}" class="group block">
+  <div class="aspect-square overflow-hidden rounded-lg bg-stone-200">
+    {% if p.image %}
+      <img src="{{ p.image.url }}" alt="{{ p.image.alt or p.name }}" loading="lazy"
+           class="h-full w-full object-cover transition duration-300 group-hover:scale-105" />
+    {% endif %}
+  </div>
+  <p class="mt-2 text-sm text-stone-800">{{ p.name }}</p>
+  <div class="flex flex-wrap items-center gap-2 text-sm">
+    <span>{{ p.pricing.current | money(p.currency) }}</span>
+    {% if p.pricing.onSale %}
+      <span class="text-stone-400 line-through">{{ p.pricing.regular | money(p.currency) }}</span>
+      <span class="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">-{{ p.pricing.discountPercent }}%</span>
+    {% endif %}
+  </div>
+  {% if not p.inStock %}<p class="mt-0.5 text-xs font-medium text-red-600">Sold out</p>{% endif %}
+</a>

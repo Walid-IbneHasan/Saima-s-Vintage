@@ -1,0 +1,7 @@
+{% macro statusBadge(status) -%}
+{%- set cls = 'bg-stone-100 text-stone-600' -%}
+{%- if status in ['PAID', 'PROCESSING', 'SHIPPED', 'DELIVERED'] -%}{%- set cls = 'bg-green-100 text-green-800' -%}
+{%- elif status in ['AWAITING_PAYMENT', 'PAYMENT_REVIEW'] -%}{%- set cls = 'bg-amber-100 text-amber-800' -%}
+{%- elif status in ['FAILED', 'CANCELLED', 'EXPIRED'] -%}{%- set cls = 'bg-red-100 text-red-700' -%}{%- endif -%}
+<span class="rounded-full px-2 py-0.5 text-xs font-medium {{ cls }}">{{ status }}</span>
+{%- endmacro %}

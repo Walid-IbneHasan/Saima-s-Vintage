@@ -1,0 +1,48 @@
+import { Module } from '@nestjs/common';
+import { RolesGuard } from '../../common/guards/roles.guard';
+import { SessionAuthGuard } from '../../common/guards/session-auth.guard';
+import { AnalyticsModule } from '../analytics/analytics.module';
+import { CatalogModule } from '../catalog/catalog.module';
+import { AdminAnalyticsController } from './admin-analytics.controller';
+import { AdminAuthController } from './admin-auth.controller';
+import { AdminCategoriesController } from './admin-categories.controller';
+import { AdminCategoriesService } from './admin-categories.service';
+import { AdminCouponsController } from './admin-coupons.controller';
+import { AdminCouponsService } from './admin-coupons.service';
+import { AdminDashboardController } from './admin-dashboard.controller';
+import { AdminOrdersController } from './admin-orders.controller';
+import { AdminOrdersService } from './admin-orders.service';
+import { AdminProductsController } from './admin-products.controller';
+import { AdminProductsService } from './admin-products.service';
+import { AdminReviewsController } from './admin-reviews.controller';
+import { AdminReviewsService } from './admin-reviews.service';
+import { AuditService } from './audit.service';
+import { AuthService } from './auth.service';
+import { UploadsService } from './uploads.service';
+
+@Module({
+  imports: [CatalogModule, AnalyticsModule],
+  controllers: [
+    AdminAuthController,
+    AdminDashboardController,
+    AdminProductsController,
+    AdminCategoriesController,
+    AdminCouponsController,
+    AdminOrdersController,
+    AdminReviewsController,
+    AdminAnalyticsController,
+  ],
+  providers: [
+    AuthService,
+    AuditService,
+    UploadsService,
+    AdminProductsService,
+    AdminCategoriesService,
+    AdminCouponsService,
+    AdminOrdersService,
+    AdminReviewsService,
+    SessionAuthGuard,
+    RolesGuard,
+  ],
+})
+export class AdminModule {}
