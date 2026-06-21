@@ -1,9 +1,9 @@
 <header class="sticky top-0 z-50 border-b border-outline/10 bg-surface/80 backdrop-blur-md" x-data="{ open: false }">
   <div class="mx-auto flex h-20 max-w-container-max items-center justify-between gap-4 px-margin-mobile md:h-24 md:px-margin-desktop">
     <div class="flex items-center gap-8">
-      <a href="/" class="font-display-lg text-headline-md leading-none text-primary">{{ appName }}</a>
+      <a href="/" class="font-display-lg text-2xl leading-none text-primary lg:text-headline-md">{{ appName }}</a>
 
-      <nav class="hidden items-center gap-6 md:flex" aria-label="Primary">
+      <nav class="hidden items-center gap-6 lg:flex" aria-label="Primary">
         <div class="relative" x-data="{ shop: false }" @mouseenter="shop = true" @mouseleave="shop = false">
           <a href="/products" class="inline-flex items-center gap-1 font-label-md text-label-md uppercase tracking-widest text-on-surface-variant transition-colors hover:text-primary" @click="shop = !shop">
             Shop
@@ -35,15 +35,15 @@
       </nav>
     </div>
 
-    <div class="flex items-center gap-4 text-primary">
+    <div class="flex items-center gap-3 text-primary md:gap-4">
       {# Inline search (desktop): plain GET form, works without JS. #}
-      <form action="/search" method="get" class="hidden items-center border-b border-outline-variant pb-1 md:flex">
+      <form action="/search" method="get" class="hidden items-center border-b border-outline-variant pb-1 lg:flex">
         <svg class="mr-2 h-5 w-5 text-on-surface-variant" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3" stroke-linecap="round"/></svg>
         <input type="search" name="q" placeholder="Search heritage pieces…"
                class="w-48 border-none bg-transparent p-0 text-body-md text-on-surface placeholder:text-on-surface-variant/50 focus:ring-0" />
       </form>
 
-      <a href="/search" class="transition-all duration-300 hover:opacity-70 md:hidden" aria-label="Search">
+      <a href="/search" class="transition-all duration-300 hover:opacity-70 lg:hidden" aria-label="Search">
         <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3" stroke-linecap="round"/></svg>
       </a>
 
@@ -66,13 +66,13 @@
         <a href="/register" class="hidden rounded bg-primary px-4 py-2 font-label-md text-label-md uppercase tracking-widest text-on-primary transition-colors hover:bg-on-primary-fixed-variant sm:inline-block">Register</a>
       {% endif %}
 
-      <button type="button" class="md:hidden" @click="open = !open" aria-label="Toggle menu">
+      <button type="button" class="lg:hidden" @click="open = !open" aria-label="Toggle menu">
         <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/></svg>
       </button>
     </div>
   </div>
 
-  <div x-show="open" x-cloak class="max-h-[70vh] overflow-y-auto border-t border-outline/10 bg-surface-container-lowest md:hidden">
+  <div x-show="open" x-cloak class="max-h-[70vh] overflow-y-auto border-t border-outline/10 bg-surface-container-lowest lg:hidden">
     <nav class="flex flex-col gap-1 px-margin-mobile py-3 text-sm">
       <a href="/" class="py-1 text-on-surface">Home</a>
       <a href="/products" class="py-1 text-on-surface">Shop all</a>

@@ -7,41 +7,45 @@
   {% if cart.items.length %}
     <div class="mt-8 space-y-4">
       {% for item in cart.items %}
-        <div class="flex items-center gap-4 rounded-lg border border-outline/10 bg-surface-container-lowest p-4 ambient-shadow">
-          <a href="/p/{{ item.productSlug }}" class="h-20 w-20 shrink-0 overflow-hidden rounded bg-surface-container-low">
-            {% if item.image %}<img src="{{ item.image.url }}" alt="{{ item.image.alt or item.productName }}" class="h-full w-full object-cover" />{% endif %}
-          </a>
-          <div class="flex-1">
-            <a href="/p/{{ item.productSlug }}" class="font-headline-md text-body-lg text-on-surface hover:text-primary">{{ item.productName }}</a>
-            <p class="text-sm text-on-surface-variant">{{ item.variantName }}</p>
-            <p class="flex flex-wrap items-center gap-2 text-sm">
-              <span class="text-on-surface">{{ item.unitPrice | money(cart.currency) }}</span>
-              {% if item.onSale %}
-                <span class="text-on-surface-variant line-through">{{ item.regularPrice | money(cart.currency) }}</span>
+        <div class="rounded-lg border border-outline/10 bg-surface-container-lowest p-4 ambient-shadow">
+          <div class="flex items-start gap-4">
+            <a href="/p/{{ item.productSlug }}" class="h-20 w-20 shrink-0 overflow-hidden rounded bg-surface-container-low">
+              {% if item.image %}<img src="{{ item.image.url }}" alt="{{ item.image.alt or item.productName }}" class="h-full w-full object-cover" />{% endif %}
+            </a>
+            <div class="min-w-0 flex-1">
+              <a href="/p/{{ item.productSlug }}" class="font-headline-md text-body-lg text-on-surface hover:text-primary">{{ item.productName }}</a>
+              <p class="text-sm text-on-surface-variant">{{ item.variantName }}</p>
+              <p class="flex flex-wrap items-center gap-2 text-sm">
+                <span class="text-on-surface">{{ item.unitPrice | money(cart.currency) }}</span>
+                {% if item.onSale %}
+                  <span class="text-on-surface-variant line-through">{{ item.regularPrice | money(cart.currency) }}</span>
+                {% endif %}
+              </p>
+              {% if not item.allowBackorder and item.stock <= 0 %}
+                <p class="text-xs font-medium text-error">No longer in stock</p>
               {% endif %}
-            </p>
-            {% if not item.allowBackorder and item.stock <= 0 %}
-              <p class="text-xs font-medium text-error">No longer in stock</p>
-            {% endif %}
+            </div>
+            <div class="shrink-0 text-right font-label-md text-label-md text-on-surface">{{ item.lineTotal | money }}</div>
           </div>
-          <form action="/cart/items/{{ item.id }}" method="post" class="flex items-center gap-2">
-            <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-            <input type="number" name="quantity" value="{{ item.quantity }}" min="0"
-                   class="w-16 rounded border border-outline/30 bg-surface px-2 py-1.5 text-sm text-on-surface focus:border-primary focus:ring-0" />
-            <button class="rounded border border-outline px-3 py-1.5 font-label-sm text-label-sm uppercase tracking-wider text-on-surface transition-colors hover:border-primary hover:text-primary">Update</button>
-          </form>
-          <div class="w-24 text-right font-label-md text-label-md text-on-surface">{{ item.lineTotal | money }}</div>
-          <form action="/cart/items/{{ item.id }}/delete" method="post">
-            <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-            <button class="text-sm text-error hover:underline">Remove</button>
-          </form>
+          <div class="mt-3 flex flex-wrap items-center gap-3 border-t border-outline/10 pt-3">
+            <form action="/cart/items/{{ item.id }}" method="post" class="flex items-center gap-2">
+              <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+              <input type="number" name="quantity" value="{{ item.quantity }}" min="0"
+                     class="w-16 rounded border border-outline/30 bg-surface px-2 py-1.5 text-sm text-on-surface focus:border-primary focus:ring-0" />
+              <button class="rounded border border-outline px-3 py-1.5 font-label-sm text-label-sm uppercase tracking-wider text-on-surface transition-colors hover:border-primary hover:text-primary">Update</button>
+            </form>
+            <form action="/cart/items/{{ item.id }}/delete" method="post" class="ml-auto">
+              <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+              <button class="text-sm text-error hover:underline">Remove</button>
+            </form>
+          </div>
         </div>
       {% endfor %}
     </div>
 
-    <div class="mt-8 flex items-center justify-between border-t border-outline/20 pt-6">
+    <div class="mt-8 flex flex-col gap-4 border-t border-outline/20 pt-6 sm:flex-row sm:items-center sm:justify-between">
       <a href="/products" class="font-label-md text-label-md uppercase tracking-widest text-on-surface-variant transition-colors hover:text-primary">← Continue shopping</a>
-      <div class="text-right">
+      <div class="sm:text-right">
         <p class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Subtotal</p>
         <p class="font-display-lg text-headline-md text-on-surface">{{ cart.subtotal | money }}</p>
         <a href="/checkout" class="mt-3 inline-flex items-center justify-center rounded bg-primary px-8 py-3 font-label-md text-label-md uppercase tracking-widest text-on-primary transition-colors hover:bg-on-primary-fixed-variant">

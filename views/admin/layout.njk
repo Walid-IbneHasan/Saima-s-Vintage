@@ -21,7 +21,7 @@
         <a href="/" class="block rounded px-3 py-2 text-on-surface-variant hover:bg-primary-container/40 hover:text-primary">View store ↗</a>
       </nav>
     </aside>
-    <div class="flex-1">
+    <div class="min-w-0 flex-1">
       <header class="flex items-center justify-between border-b border-outline/10 bg-surface-container-lowest px-6 py-3">
         <h1 class="font-display-lg text-headline-md text-on-surface">{{ title }}</h1>
         <form action="/admin/logout" method="post">
@@ -29,7 +29,17 @@
           <button class="text-sm text-on-surface-variant hover:text-primary">Log out</button>
         </form>
       </header>
-      <main class="p-6">{% block content %}{% endblock %}</main>
+      {# Mobile nav: horizontal scroll strip (no JS — admin doesn't load Alpine). #}
+      <nav class="flex gap-1 overflow-x-auto border-b border-outline/10 bg-surface-container-lowest px-4 py-2 text-sm md:hidden">
+        <a href="/admin" class="whitespace-nowrap rounded px-3 py-1.5 text-on-surface-variant hover:text-primary">Dashboard</a>
+        <a href="/admin/products" class="whitespace-nowrap rounded px-3 py-1.5 text-on-surface-variant hover:text-primary">Products</a>
+        <a href="/admin/orders" class="whitespace-nowrap rounded px-3 py-1.5 text-on-surface-variant hover:text-primary">Orders</a>
+        <a href="/admin/categories" class="whitespace-nowrap rounded px-3 py-1.5 text-on-surface-variant hover:text-primary">Categories</a>
+        <a href="/admin/coupons" class="whitespace-nowrap rounded px-3 py-1.5 text-on-surface-variant hover:text-primary">Coupons</a>
+        <a href="/admin/reviews" class="whitespace-nowrap rounded px-3 py-1.5 text-on-surface-variant hover:text-primary">Reviews</a>
+        <a href="/admin/analytics" class="whitespace-nowrap rounded px-3 py-1.5 text-on-surface-variant hover:text-primary">Analytics</a>
+      </nav>
+      <main class="p-4 md:p-6">{% block content %}{% endblock %}</main>
     </div>
   </body>
 </html>

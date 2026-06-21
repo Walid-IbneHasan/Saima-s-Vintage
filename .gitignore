@@ -31,3 +31,6 @@ Thumbs.db
 
 # tests
 coverage/
+
+# Local responsive-QA screenshots
+_shots/
