@@ -6,6 +6,7 @@
   {# Base gradient is always painted; the WebGL shader (JS-only) layers over it. #}
   <div class="absolute inset-0 -z-10 bg-gradient-to-br from-surface via-surface to-tertiary-fixed/50"></div>
   <canvas id="hero-shader" class="hero-shader pointer-events-none absolute inset-0 -z-10 h-full w-full"></canvas>
+  {% include "partials/hero-decor.njk" %}
 
   <div class="mx-auto grid w-full max-w-container-max grid-cols-1 items-center gap-12 px-margin-mobile py-20 md:px-margin-desktop lg:grid-cols-2">
     <div class="flex max-w-2xl flex-col items-start gap-6 rounded border border-outline/10 bg-surface/40 p-8 shadow-[0_20px_40px_-15px_rgba(130,59,24,0.05)] backdrop-blur-sm hero-fade">

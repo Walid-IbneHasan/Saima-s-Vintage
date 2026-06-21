@@ -218,3 +218,38 @@ summary:focus-visible,
     box-shadow: 0 30px 60px -20px rgb(0 0 0 / 0.25);
   }
 }
+
+/*
+ * Hero decorative motifs (Lippan mandalas / Jharoka arches). Compositor-only
+ * animation: the outer .hero-motif drifts (translate) while the inner .hero-spin
+ * rotates — split across two elements so the transforms never conflict, and
+ * both run on the GPU (translate3d / rotate) for smooth, low-cost motion even
+ * on low-end devices. Per-element variety comes from CSS custom properties set
+ * inline. Animations run ONLY when the user has not requested reduced motion;
+ * otherwise the motifs are simply static decoration. No JS required.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .hero-motif {
+    animation: hero-drift var(--dur, 24s) ease-in-out infinite;
+    animation-delay: var(--delay, 0s);
+    will-change: transform;
+  }
+  @keyframes hero-drift {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0);
+    }
+    50% {
+      transform: translate3d(var(--dx, 10px), var(--dy, -16px), 0);
+    }
+  }
+  .hero-spin {
+    animation: hero-spin var(--spin, 80s) linear infinite;
+    will-change: transform;
+  }
+  @keyframes hero-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+}
