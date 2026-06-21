@@ -49,6 +49,16 @@ export class CartService {
     return cart;
   }
 
+  /** Cheap sum of item quantities for the header cart badge (no full view build). */
+  async count(cart: Cart | null): Promise<number> {
+    if (!cart) return 0;
+    const agg = await this.prisma.cartItem.aggregate({
+      where: { cartId: cart.id },
+      _sum: { quantity: true },
+    });
+    return agg._sum.quantity ?? 0;
+  }
+
   async addItem(cart: Cart, variantId: string, quantity: number): Promise<void> {
     if (quantity < 1) throw new ConflictException('Quantity must be at least 1');
 

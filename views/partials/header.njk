@@ -47,8 +47,9 @@
         <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3" stroke-linecap="round"/></svg>
       </a>
 
-      <a href="/cart" class="transition-all duration-300 hover:opacity-70" aria-label="Cart">
+      <a href="/cart" class="relative transition-all duration-300 hover:opacity-70" aria-label="Cart{% if cartCount %} ({{ cartCount }} item{% if cartCount != 1 %}s{% endif %}){% endif %}">
         <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 7h12l-1 13H7L6 7z" stroke-linejoin="round"/><path d="M9 7a3 3 0 016 0" stroke-linecap="round"/></svg>
+        {% if cartCount %}<span class="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold leading-none text-on-primary">{{ cartCount }}</span>{% endif %}
       </a>
 
       {% if currentCustomer %}
@@ -66,13 +67,13 @@
         <a href="/register" class="hidden rounded bg-primary px-4 py-2 font-label-md text-label-md uppercase tracking-widest text-on-primary transition-colors hover:bg-on-primary-fixed-variant sm:inline-block">Register</a>
       {% endif %}
 
-      <button type="button" class="lg:hidden" @click="open = !open" aria-label="Toggle menu">
+      <button type="button" class="lg:hidden" @click="open = !open" aria-label="Toggle menu" aria-controls="mobile-menu" :aria-expanded="open ? 'true' : 'false'">
         <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/></svg>
       </button>
     </div>
   </div>
 
-  <div x-show="open" x-cloak class="max-h-[70vh] overflow-y-auto border-t border-outline/10 bg-surface-container-lowest lg:hidden">
+  <div id="mobile-menu" x-show="open" x-cloak class="max-h-[70vh] overflow-y-auto border-t border-outline/10 bg-surface-container-lowest lg:hidden">
     <nav class="flex flex-col gap-1 px-margin-mobile py-3 text-sm">
       <a href="/" class="py-1 text-on-surface">Home</a>
       <a href="/products" class="py-1 text-on-surface">Shop all</a>

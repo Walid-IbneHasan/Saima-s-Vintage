@@ -41,7 +41,7 @@
         <td class="px-4 py-3 text-right">
           <a href="/admin/products/{{ p.id }}/edit" class="text-primary hover:underline">Edit</a>
           <form action="/admin/products/{{ p.id }}/delete" method="post" class="ml-3 inline"
-                onsubmit="return confirm('Delete this product?')">
+                data-confirm="Delete this product?">
             <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
             <button class="text-error hover:underline">Delete</button>
           </form>

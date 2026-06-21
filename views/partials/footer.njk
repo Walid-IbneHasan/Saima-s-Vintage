@@ -3,7 +3,7 @@
     <div class="flex flex-col justify-between md:col-span-2">
       <div>
         <h2 class="font-headline-lg text-headline-lg text-on-tertiary-fixed-variant">{{ appName }}</h2>
-        <p class="mt-4 max-w-sm text-body-md text-on-tertiary-fixed-variant/80">
+        <p class="mt-4 max-w-sm text-body-md text-on-tertiary-fixed-variant">
           Curated vintage treasures and one-of-a-kind finds, hand-picked by Saima. Shipped across Bangladesh.
         </p>
         {# Newsletter — restyled; note: /newsletter has no backend yet (flagged). #}
@@ -14,7 +14,7 @@
           <button type="submit" class="shrink-0 rounded bg-primary px-4 py-2 font-label-md text-label-md uppercase tracking-widest text-on-primary transition-colors hover:bg-on-primary-fixed-variant">Join</button>
         </form>
       </div>
-      <p class="mt-8 text-body-md text-on-tertiary-fixed-variant/80">
+      <p class="mt-8 text-body-md text-on-tertiary-fixed-variant">
         &copy; {{ currentYear }} {{ appName }}. All rights reserved.
       </p>
     </div>
@@ -22,10 +22,10 @@
     <div>
       <h3 class="mb-6 font-label-md text-label-md uppercase tracking-widest text-on-tertiary-fixed-variant">Explore</h3>
       <ul class="space-y-4 text-body-md">
-        <li><a href="/products" class="text-on-tertiary-fixed-variant/80 transition-colors hover:text-primary">Shop all</a></li>
-        <li><a href="/products?onSale=1" class="text-on-tertiary-fixed-variant/80 transition-colors hover:text-primary">Sale</a></li>
+        <li><a href="/products" class="text-on-tertiary-fixed-variant transition-colors hover:text-primary">Shop all</a></li>
+        <li><a href="/products?onSale=1" class="text-on-tertiary-fixed-variant transition-colors hover:text-primary">Sale</a></li>
         {% for cat in navCategories() %}{% if loop.index0 < 3 %}
-          <li><a href="/c/{{ cat.slug }}" class="text-on-tertiary-fixed-variant/80 transition-colors hover:text-primary">{{ cat.name }}</a></li>
+          <li><a href="/c/{{ cat.slug }}" class="text-on-tertiary-fixed-variant transition-colors hover:text-primary">{{ cat.name }}</a></li>
         {% endif %}{% endfor %}
       </ul>
     </div>
@@ -33,9 +33,9 @@
     <div>
       <h3 class="mb-6 font-label-md text-label-md uppercase tracking-widest text-on-tertiary-fixed-variant">Support</h3>
       <ul class="space-y-4 text-body-md">
-        <li><a href="/pages/about" class="text-on-tertiary-fixed-variant/80 transition-colors hover:text-primary">Our story</a></li>
-        <li><a href="/search" class="text-on-tertiary-fixed-variant/80 transition-colors hover:text-primary">Search</a></li>
-        <li><a href="/cart" class="text-on-tertiary-fixed-variant/80 transition-colors hover:text-primary">Cart</a></li>
+        <li><a href="/pages/about" class="text-on-tertiary-fixed-variant transition-colors hover:text-primary">Our story</a></li>
+        <li><a href="/search" class="text-on-tertiary-fixed-variant transition-colors hover:text-primary">Search</a></li>
+        <li><a href="/cart" class="text-on-tertiary-fixed-variant transition-colors hover:text-primary">Cart</a></li>
       </ul>
     </div>
   </div>

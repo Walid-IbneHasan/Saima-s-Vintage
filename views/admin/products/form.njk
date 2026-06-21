@@ -102,7 +102,7 @@
           <label class="text-xs text-on-surface-variant">Stock<input name="stock" type="number" value="{{ v.stock }}" class="mt-1 block w-20 rounded border border-outline/30 bg-surface px-2 py-1 text-xs text-on-surface focus:border-primary focus:ring-0" /></label>
           <button class="rounded border border-outline px-3 py-2 font-label-md text-label-md uppercase tracking-widest text-on-surface hover:border-primary hover:text-primary">Save</button>
         </form>
-        <form action="/admin/products/{{ product.id }}/variants/{{ v.id }}/delete" method="post" onsubmit="return confirm('Delete variant?')">
+        <form action="/admin/products/{{ product.id }}/variants/{{ v.id }}/delete" method="post" data-confirm="Delete variant?">
           <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
           <button class="rounded px-2 py-2 text-xs text-error hover:underline">Delete</button>
         </form>

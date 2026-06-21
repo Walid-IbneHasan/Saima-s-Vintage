@@ -27,7 +27,7 @@
         <td class="px-4 py-3 text-right">
           <a href="/admin/categories/{{ c.id }}/edit" class="text-primary hover:underline">Edit</a>
           <form action="/admin/categories/{{ c.id }}/delete" method="post" class="ml-3 inline"
-                onsubmit="return confirm('Delete this category?')">
+                data-confirm="Delete this category?">
             <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
             <button class="text-error hover:underline">Delete</button>
           </form>

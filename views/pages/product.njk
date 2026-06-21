@@ -10,19 +10,34 @@
   </nav>
 
   <div class="grid gap-10 md:grid-cols-2 lg:gap-16">
-    <div>
-      <div class="aspect-[4/5] overflow-hidden rounded-lg bg-surface-container-low ambient-shadow">
+    {# Gallery: click a thumbnail to swap the main image (Alpine); the main image
+       links to the full-size file. No-JS: main shows the first image and each
+       thumbnail is a real link that opens the full image in a new tab. #}
+    <div x-data="{ sel: '', pick(u) { this.sel = u; this.$refs.main.src = u; this.$refs.mainlink.href = u; } }"
+         x-init="sel = $refs.main ? $refs.main.src : ''">
+      <a x-ref="mainlink" href="{% if product.images.length %}{{ product.images[0].url }}{% else %}#{% endif %}"
+         {% if product.images.length %}target="_blank" rel="noopener"{% endif %}
+         class="block aspect-[4/5] overflow-hidden rounded-lg bg-surface-container-low ambient-shadow">
         {% if product.images.length %}
-          <img src="{{ product.images[0].url }}" alt="{{ product.images[0].alt or product.name }}"
+          <img x-ref="main" src="{{ product.images[0].url }}" alt="{{ product.images[0].alt or product.name }}"
+               {% if product.images[0].width %}width="{{ product.images[0].width }}" height="{{ product.images[0].height }}"{% endif %}
                class="h-full w-full object-cover" />
+        {% else %}
+          <div class="flex h-full w-full items-center justify-center">
+            <p class="font-label-md text-label-md uppercase tracking-widest text-on-surface-variant">No image available</p>
+          </div>
         {% endif %}
-      </div>
+      </a>
       {% if product.images.length > 1 %}
-        <div class="mt-3 grid grid-cols-4 gap-2">
+        <div class="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
           {% for img in product.images %}
-            <div class="aspect-square overflow-hidden rounded bg-surface-container-low">
+            <a href="{{ img.url }}" target="_blank" rel="noopener"
+               @click.prevent="pick($el.href)"
+               :class="sel === $el.href ? 'ring-2 ring-primary ring-offset-2 ring-offset-surface' : 'opacity-80 hover:opacity-100'"
+               class="block aspect-square overflow-hidden rounded bg-surface-container-low transition"
+               aria-label="View image {{ loop.index }}">
               <img src="{{ img.url }}" alt="{{ img.alt or product.name }}" loading="lazy" class="h-full w-full object-cover" />
-            </div>
+            </a>
           {% endfor %}
         </div>
       {% endif %}
@@ -30,6 +45,13 @@
 
     <div>
       <h1 class="font-display-lg text-headline-lg leading-tight text-on-surface">{{ product.name }}</h1>
+      {% if reviewStats.count %}
+        {% set filledStars = reviewStats.average | round | int %}
+        <a href="#reviews" class="mt-2 inline-flex items-center gap-2 text-sm text-on-surface-variant transition-colors hover:text-primary">
+          <span class="text-primary" aria-hidden="true">{% for i in range(0, filledStars) %}★{% endfor %}<span class="text-outline-variant">{% for i in range(filledStars, 5) %}★{% endfor %}</span></span>
+          <span>{{ reviewStats.average }} · {{ reviewStats.count }} review{% if reviewStats.count != 1 %}s{% endif %}</span>
+        </a>
+      {% endif %}
       {% if product.brand or product.condition %}
         <p class="mt-2 font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">
           {% if product.brand %}{{ product.brand }}{% endif %}
@@ -42,7 +64,7 @@
         <p class="font-headline-md text-headline-md text-primary">{{ pricing.current | money(product.currency) }}</p>
         {% if pricing.onSale %}
           <p class="text-lg text-on-surface-variant line-through">{{ pricing.regular | money(product.currency) }}</p>
-          <span class="rounded-full bg-primary-container px-3 py-1 font-label-sm text-label-sm uppercase tracking-wider text-on-primary-container">-{{ pricing.discountPercent }}% off</span>
+          <span class="rounded-full bg-primary-container px-3 py-1 font-label-md text-label-md uppercase tracking-wider text-on-primary-container">-{{ pricing.discountPercent }}% off</span>
         {% endif %}
       </div>
       {% if product.shortDescription %}
@@ -65,7 +87,11 @@
         {% elif product.variants.length == 1 %}
           <input type="hidden" name="variantId" value="{{ product.variants[0].id }}" />
         {% endif %}
-        <input type="hidden" name="quantity" value="1" />
+        <div>
+          <label for="quantity" class="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Quantity</label>
+          <input id="quantity" type="number" name="quantity" value="1" min="1"
+                 class="mt-1 w-24 rounded border border-outline/30 bg-surface px-3 py-2.5 text-body-md text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/30" />
+        </div>
         <button type="submit" {% if not inStock %}disabled{% endif %}
                 class="w-full rounded bg-primary px-6 py-3.5 font-label-md text-label-md uppercase tracking-widest text-on-primary transition-colors hover:bg-on-primary-fixed-variant disabled:cursor-not-allowed disabled:bg-surface-container-high disabled:text-on-surface-variant">
           {% if inStock %}Add to cart{% else %}Sold out{% endif %}

@@ -70,6 +70,23 @@
 }
 
 /*
+ * Visible keyboard focus across interactive elements (accessibility). Applies
+ * only to keyboard focus (:focus-visible), so mouse clicks stay clean. CSP-safe
+ * (pure CSS) and global, so no per-template churn.
+ */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid #823b18; /* primary (terracotta) */
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/*
  * Heritage Minimalist component utilities (ported from the Stitch design).
  *  - ambient-shadow: warm, diffused terracotta-tinted lift (not a hard shadow).
  *  - jharoka-arch: arched top edge echoing the architectural heritage motif.

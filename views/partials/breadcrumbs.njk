@@ -1,0 +1,18 @@
+{# Reusable breadcrumb trail. Pass a list of { name, path }; the last entry is
+   rendered as the current page (no link). Semantic <nav><ol> for a11y/SEO. #}
+{% macro breadcrumbs(crumbs) %}
+<nav aria-label="Breadcrumb" class="mb-4 text-sm text-on-surface-variant">
+  <ol class="flex flex-wrap items-center gap-1.5">
+    {% for c in crumbs %}
+      <li class="flex items-center gap-1.5">
+        {% if not loop.last and c.path %}
+          <a href="{{ c.path }}" class="transition-colors hover:text-primary">{{ c.name }}</a>
+          <span aria-hidden="true" class="text-on-surface-variant/60">/</span>
+        {% else %}
+          <span class="text-on-surface" aria-current="page">{{ c.name }}</span>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ol>
+</nav>
+{% endmacro %}

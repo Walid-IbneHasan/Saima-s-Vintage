@@ -23,6 +23,15 @@ document.documentElement.classList.add('js');
 // Hero background shader (no-op unless the home hero canvas is present).
 initHeroShader();
 
+// Confirm destructive actions without inline handlers (CSP blocks inline
+// `onsubmit`). Any <form data-confirm="message"> prompts before submitting.
+document.addEventListener('submit', (event) => {
+  const form = event.target;
+  if (form instanceof HTMLFormElement && form.dataset.confirm) {
+    if (!window.confirm(form.dataset.confirm)) event.preventDefault();
+  }
+});
+
 const prefersReducedMotion = window.matchMedia(
   '(prefers-reduced-motion: reduce)',
 ).matches;

@@ -83,7 +83,7 @@
           {{ actionButton(order.id, 'delivered', 'Mark delivered', 'bg-primary text-on-primary', csrfToken) }}
         {% endif %}
         {% if order.status not in ['CANCELLED', 'REFUNDED', 'PARTIALLY_REFUNDED', 'FAILED', 'EXPIRED', 'DELIVERED'] %}
-          <form action="/admin/orders/{{ order.id }}/cancel" method="post" onsubmit="return confirm('Cancel this order and restock its items?')">
+          <form action="/admin/orders/{{ order.id }}/cancel" method="post" data-confirm="Cancel this order and restock its items?">
             <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
             <button class="w-full rounded border border-error px-4 py-2 font-label-md text-label-md uppercase tracking-widest text-error hover:bg-error-container hover:text-on-error-container">Cancel &amp; restock</button>
           </form>
