@@ -138,7 +138,7 @@
   width: 1rem;
   border-radius: 9999px;
   background: #ffffff;
-  border: 2px solid #b45309; /* amber-700 */
+  border: 2px solid #823b18; /* primary (terracotta) */
   box-shadow: 0 1px 2px rgb(0 0 0 / 0.2);
   cursor: pointer;
   margin-top: 0;
@@ -149,12 +149,12 @@
   width: 1rem;
   border-radius: 9999px;
   background: #ffffff;
-  border: 2px solid #b45309;
+  border: 2px solid #823b18;
   box-shadow: 0 1px 2px rgb(0 0 0 / 0.2);
   cursor: pointer;
 }
 .price-range:focus-visible::-webkit-slider-thumb {
-  outline: 2px solid #b45309;
+  outline: 2px solid #823b18;
   outline-offset: 2px;
 }
 

@@ -1,32 +1,35 @@
 {% extends "layouts/base.njk" %}
 
 {% block content %}
-<div class="mx-auto max-w-md px-4 py-16">
-  <h1 class="font-serif text-3xl">Verify your email</h1>
-  {% if sent or needVerify %}
-    <p class="mt-4 rounded bg-amber-50 px-3 py-2 text-sm text-amber-800">We sent a 6-digit code to <strong>{{ email }}</strong>. Enter it below to activate your account.</p>
-  {% endif %}
-  {% if resent %}<p class="mt-4 rounded bg-green-50 px-3 py-2 text-sm text-green-700">A new code has been sent.</p>{% endif %}
-  {% if error %}<p class="mt-4 rounded bg-red-50 px-3 py-2 text-sm text-red-700">{{ error }}</p>{% endif %}
+<div class="mx-auto flex min-h-[70vh] max-w-md flex-col justify-center px-margin-mobile py-16">
+  <div class="rounded-lg border border-outline/10 bg-surface-container-lowest p-8 ambient-shadow">
+    <h1 class="font-display-lg text-headline-lg text-on-surface">Verify your email</h1>
+    {% if sent or needVerify %}
+      <p class="mt-4 rounded bg-secondary-container/40 px-4 py-3 text-sm text-on-surface">We sent a 6-digit code to <strong>{{ email }}</strong>. Enter it below to activate your account.</p>
+    {% endif %}
+    {% if resent %}<p class="mt-4 rounded bg-secondary-container/40 px-4 py-3 text-sm text-on-surface">A new code has been sent.</p>{% endif %}
+    {% if error %}<p class="mt-4 rounded bg-error-container px-4 py-3 text-sm text-on-error-container">{{ error }}</p>{% endif %}
 
-  <form action="/verify" method="post" class="mt-6 space-y-4">
-    <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-    <input type="hidden" name="email" value="{{ email }}" />
-    <label class="block text-sm font-medium">Verification code
-      <input name="code" inputmode="numeric" maxlength="6" required autofocus
-             class="mt-1 w-full rounded border-stone-300 tracking-[0.4em]" />
-    </label>
-    <button class="w-full rounded-full bg-stone-900 px-6 py-3 text-white hover:bg-stone-700">Verify</button>
-  </form>
+    <form action="/verify" method="post" class="mt-6 space-y-4">
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+      <input type="hidden" name="email" value="{{ email }}" />
+      <label class="block">
+        <span class="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Verification code</span>
+        <input name="code" inputmode="numeric" maxlength="6" required autofocus
+               class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2.5 text-body-md tracking-[0.4em] text-on-surface placeholder:text-on-surface-variant/50 focus:border-primary focus:ring-0" />
+      </label>
+      <button class="w-full rounded bg-primary px-6 py-3 font-label-md text-label-md uppercase tracking-widest text-on-primary transition-colors hover:bg-on-primary-fixed-variant">Verify</button>
+    </form>
 
-  <form action="/verify/resend" method="post" class="mt-3">
-    <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-    <input type="hidden" name="email" value="{{ email }}" />
-    <button class="text-sm text-amber-700 hover:underline">Resend code</button>
-  </form>
+    <form action="/verify/resend" method="post" class="mt-3">
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+      <input type="hidden" name="email" value="{{ email }}" />
+      <button class="text-sm text-primary hover:underline">Resend code</button>
+    </form>
 
-  <p class="mt-5 border-t border-stone-100 pt-4 text-sm text-stone-500">
-    Used the wrong email or didn't get a code? <a href="/register" class="text-amber-700 hover:underline">Re-register</a>.
-  </p>
+    <p class="mt-5 border-t border-outline/10 pt-4 text-sm text-on-surface-variant">
+      Used the wrong email or didn't get a code? <a href="/register" class="text-primary hover:underline">Re-register</a>.
+    </p>
+  </div>
 </div>
 {% endblock %}

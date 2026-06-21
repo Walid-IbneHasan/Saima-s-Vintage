@@ -2,13 +2,13 @@
 
 {% block content %}
 <div class="mb-4 flex items-center justify-between">
-  <p class="text-sm text-stone-500">{{ coupons.length }} coupon(s)</p>
-  <a href="/admin/coupons/new" class="rounded bg-stone-900 px-4 py-2 text-sm text-white hover:bg-stone-700">New coupon</a>
+  <p class="text-sm text-on-surface-variant">{{ coupons.length }} coupon(s)</p>
+  <a href="/admin/coupons/new" class="rounded bg-primary px-4 py-2 font-label-md text-label-md uppercase tracking-widest text-on-primary hover:bg-on-primary-fixed-variant">New coupon</a>
 </div>
 
-<div class="overflow-x-auto rounded-lg bg-white shadow-sm">
+<div class="overflow-x-auto rounded-lg border border-outline/10 bg-surface-container-lowest">
   <table class="w-full text-left text-sm">
-    <thead class="border-b border-stone-200 text-xs uppercase text-stone-500">
+    <thead class="border-b border-outline/20 text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider">
       <tr>
         <th class="px-4 py-3">Code</th>
         <th class="px-4 py-3">Type</th>
@@ -20,21 +20,21 @@
     </thead>
     <tbody>
       {% for c in coupons %}
-      <tr class="border-b border-stone-100">
+      <tr class="border-b border-outline/10 hover:bg-surface-container-low text-sm text-on-surface">
         <td class="px-4 py-3 font-mono">{{ c.code }}</td>
         <td class="px-4 py-3">{{ c.type }}</td>
         <td class="px-4 py-3">{% if c.type == 'PERCENT' %}{{ c.value }}%{% else %}{{ c.value | money }}{% endif %}</td>
         <td class="px-4 py-3">{{ c.usedCount }}{% if c.usageLimit %} / {{ c.usageLimit }}{% endif %}</td>
-        <td class="px-4 py-3">{% if c.isActive %}<span class="text-green-700">Yes</span>{% else %}<span class="text-stone-400">No</span>{% endif %}</td>
+        <td class="px-4 py-3">{% if c.isActive %}<span class="rounded-full bg-secondary-container px-3 py-1 font-label-sm text-label-sm uppercase tracking-wider text-on-secondary-container">Yes</span>{% else %}<span class="rounded-full bg-tertiary-fixed px-3 py-1 font-label-sm text-label-sm uppercase tracking-wider text-on-tertiary-fixed-variant">No</span>{% endif %}</td>
         <td class="px-4 py-3 text-right">
           <form action="/admin/coupons/{{ c.id }}/delete" method="post" class="inline" onsubmit="return confirm('Delete coupon?')">
             <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-            <button class="text-red-600 hover:underline">Delete</button>
+            <button class="text-error hover:underline">Delete</button>
           </form>
         </td>
       </tr>
       {% else %}
-      <tr><td colspan="6" class="px-4 py-8 text-center text-stone-400">No coupons yet.</td></tr>
+      <tr><td colspan="6" class="px-4 py-8 text-center text-on-surface-variant">No coupons yet.</td></tr>
       {% endfor %}
     </tbody>
   </table>

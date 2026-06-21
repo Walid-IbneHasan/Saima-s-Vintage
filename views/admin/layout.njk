@@ -7,26 +7,26 @@
     <title>{{ title }} · Admin · {{ appName }}</title>
     <link rel="stylesheet" href="{{ asset('src/client/styles.css') }}" />
   </head>
-  <body class="flex min-h-full bg-stone-100 text-stone-900">
-    <aside class="hidden w-56 shrink-0 bg-stone-900 p-4 text-stone-100 md:block">
-      <a href="/admin" class="font-serif text-lg">{{ appName }}</a>
+  <body class="flex min-h-full bg-surface text-on-surface">
+    <aside class="hidden w-56 shrink-0 border-r border-outline/10 bg-surface-container-lowest p-4 md:block">
+      <a href="/admin" class="font-display-lg text-headline-md text-primary">{{ appName }}</a>
       <nav class="mt-6 space-y-1 text-sm">
-        <a href="/admin" class="block rounded px-3 py-2 hover:bg-stone-800">Dashboard</a>
-        <a href="/admin/products" class="block rounded px-3 py-2 hover:bg-stone-800">Products</a>
-        <a href="/admin/orders" class="block rounded px-3 py-2 hover:bg-stone-800">Orders</a>
-        <a href="/admin/categories" class="block rounded px-3 py-2 hover:bg-stone-800">Categories</a>
-        <a href="/admin/coupons" class="block rounded px-3 py-2 hover:bg-stone-800">Coupons</a>
-        <a href="/admin/reviews" class="block rounded px-3 py-2 hover:bg-stone-800">Reviews</a>
-        <a href="/admin/analytics" class="block rounded px-3 py-2 hover:bg-stone-800">Analytics</a>
-        <a href="/" class="block rounded px-3 py-2 text-stone-400 hover:bg-stone-800">View store ↗</a>
+        <a href="/admin" class="block rounded px-3 py-2 text-on-surface-variant hover:bg-primary-container/40 hover:text-primary">Dashboard</a>
+        <a href="/admin/products" class="block rounded px-3 py-2 text-on-surface-variant hover:bg-primary-container/40 hover:text-primary">Products</a>
+        <a href="/admin/orders" class="block rounded px-3 py-2 text-on-surface-variant hover:bg-primary-container/40 hover:text-primary">Orders</a>
+        <a href="/admin/categories" class="block rounded px-3 py-2 text-on-surface-variant hover:bg-primary-container/40 hover:text-primary">Categories</a>
+        <a href="/admin/coupons" class="block rounded px-3 py-2 text-on-surface-variant hover:bg-primary-container/40 hover:text-primary">Coupons</a>
+        <a href="/admin/reviews" class="block rounded px-3 py-2 text-on-surface-variant hover:bg-primary-container/40 hover:text-primary">Reviews</a>
+        <a href="/admin/analytics" class="block rounded px-3 py-2 text-on-surface-variant hover:bg-primary-container/40 hover:text-primary">Analytics</a>
+        <a href="/" class="block rounded px-3 py-2 text-on-surface-variant hover:bg-primary-container/40 hover:text-primary">View store ↗</a>
       </nav>
     </aside>
     <div class="flex-1">
-      <header class="flex items-center justify-between border-b border-stone-200 bg-white px-6 py-3">
-        <h1 class="text-lg font-medium">{{ title }}</h1>
+      <header class="flex items-center justify-between border-b border-outline/10 bg-surface-container-lowest px-6 py-3">
+        <h1 class="font-display-lg text-headline-md text-on-surface">{{ title }}</h1>
         <form action="/admin/logout" method="post">
           <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-          <button class="text-sm text-stone-500 hover:text-stone-900">Log out</button>
+          <button class="text-sm text-on-surface-variant hover:text-primary">Log out</button>
         </form>
       </header>
       <main class="p-6">{% block content %}{% endblock %}</main>

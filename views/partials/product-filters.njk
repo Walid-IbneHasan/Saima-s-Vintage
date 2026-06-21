@@ -1,8 +1,8 @@
 <form method="get" action="{{ formAction }}"
-      class="mb-6 flex flex-wrap items-end gap-4 rounded-lg border border-stone-200 bg-white p-4 text-sm">
+      class="mb-6 flex flex-wrap items-end gap-5 rounded-lg border border-outline/10 bg-surface-container-lowest p-5 text-sm">
   <label class="block">
-    <span class="text-xs text-stone-500">Sort</span>
-    <select name="sort" class="mt-1 block rounded border-stone-300 text-sm">
+    <span class="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Sort</span>
+    <select name="sort" class="mt-1 block rounded border border-outline/30 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:ring-0">
       <option value="newest" {% if filters.sort == 'newest' %}selected{% endif %}>Newest</option>
       <option value="price_asc" {% if filters.sort == 'price_asc' %}selected{% endif %}>Price: low to high</option>
       <option value="price_desc" {% if filters.sort == 'price_desc' %}selected{% endif %}>Price: high to low</option>
@@ -25,16 +25,16 @@
          normalize() { if (this.from > this.to) { const t = this.from; this.from = this.to; this.to = t; } }
        }">
     <div class="flex items-center justify-between gap-6">
-      <span class="text-xs text-stone-500">Price</span>
-      <span class="price-slider text-xs font-medium text-stone-700" x-cloak>
+      <span class="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Price</span>
+      <span class="price-slider font-label-md text-label-md text-primary" x-cloak>
         ৳<span x-text="lo"></span> – ৳<span x-text="hi"></span>
       </span>
     </div>
 
     {# Slider (shown only when JS is present) #}
     <div class="price-slider relative mt-2 h-5 w-56" x-cloak>
-      <div class="absolute top-1/2 h-1 w-full -translate-y-1/2 rounded bg-stone-200"></div>
-      <div class="absolute top-1/2 h-1 -translate-y-1/2 rounded bg-amber-600"
+      <div class="absolute top-1/2 h-1 w-full -translate-y-1/2 rounded bg-outline-variant/50"></div>
+      <div class="absolute top-1/2 h-1 -translate-y-1/2 rounded bg-primary"
            :style="`left:${pctLo}%; right:${100 - pctHi}%`"></div>
       <input type="range" class="price-range" :min="floor" :max="ceil" step="1"
              x-model.number="from" @change="normalize()" aria-label="Minimum price" />
@@ -46,26 +46,26 @@
        drives the same values via x-model. Hidden (but still submitted) when JS. #}
     <div class="price-fallback mt-1 flex items-end gap-2">
       <label class="block">
-        <span class="text-xs text-stone-500">Min ৳</span>
+        <span class="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Min ৳</span>
         <input type="number" name="priceMin" min="0" step="1" x-model.number="from"
                value="{{ filters.priceMin | default('') }}" placeholder="{{ bounds.min | default(0) }}"
-               class="mt-1 block w-24 rounded border-stone-300 text-sm" />
+               class="mt-1 block w-24 rounded border border-outline/30 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:ring-0" />
       </label>
       <label class="block">
-        <span class="text-xs text-stone-500">Max ৳</span>
+        <span class="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Max ৳</span>
         <input type="number" name="priceMax" min="0" step="1" x-model.number="to"
                value="{{ filters.priceMax | default('') }}" placeholder="{{ bounds.max | default(0) }}"
-               class="mt-1 block w-24 rounded border-stone-300 text-sm" />
+               class="mt-1 block w-24 rounded border border-outline/30 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:ring-0" />
       </label>
     </div>
   </div>
 
-  <label class="flex items-center gap-1.5">
-    <input type="checkbox" name="inStock" value="1" {% if filters.inStock %}checked{% endif %} /> In stock
+  <label class="flex items-center gap-2 text-on-surface">
+    <input type="checkbox" name="inStock" value="1" {% if filters.inStock %}checked{% endif %} class="rounded border-outline/40 text-primary focus:ring-primary" /> In stock
   </label>
-  <label class="flex items-center gap-1.5">
-    <input type="checkbox" name="onSale" value="1" {% if filters.onSale %}checked{% endif %} /> On sale
+  <label class="flex items-center gap-2 text-on-surface">
+    <input type="checkbox" name="onSale" value="1" {% if filters.onSale %}checked{% endif %} class="rounded border-outline/40 text-primary focus:ring-primary" /> On sale
   </label>
-  <button type="submit" class="rounded bg-stone-900 px-4 py-2 text-white hover:bg-stone-700">Apply</button>
-  <a href="{{ formAction }}" class="px-2 py-2 text-stone-500 hover:text-amber-700">Clear</a>
+  <button type="submit" class="rounded bg-primary px-5 py-2 font-label-md text-label-md uppercase tracking-widest text-on-primary transition-colors hover:bg-on-primary-fixed-variant">Apply</button>
+  <a href="{{ formAction }}" class="px-2 py-2 font-label-md text-label-md uppercase tracking-widest text-on-surface-variant transition-colors hover:text-primary">Clear</a>
 </form>

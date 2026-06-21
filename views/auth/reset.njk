@@ -1,23 +1,28 @@
 {% extends "layouts/base.njk" %}
 
 {% block content %}
-<div class="mx-auto max-w-md px-4 py-16">
-  <h1 class="font-serif text-3xl">Reset password</h1>
-  {% if sent %}<p class="mt-4 rounded bg-amber-50 px-3 py-2 text-sm text-amber-800">If an account exists for <strong>{{ email }}</strong>, a reset code has been sent. Enter it below.</p>{% endif %}
-  {% if error %}<p class="mt-4 rounded bg-red-50 px-3 py-2 text-sm text-red-700">{{ error }}</p>{% endif %}
+<div class="mx-auto flex min-h-[70vh] max-w-md flex-col justify-center px-margin-mobile py-16">
+  <div class="rounded-lg border border-outline/10 bg-surface-container-lowest p-8 ambient-shadow">
+    <h1 class="font-display-lg text-headline-lg text-on-surface">Reset password</h1>
+    {% if sent %}<p class="mt-4 rounded bg-secondary-container/40 px-4 py-3 text-sm text-on-surface">If an account exists for <strong>{{ email }}</strong>, a reset code has been sent. Enter it below.</p>{% endif %}
+    {% if error %}<p class="mt-4 rounded bg-error-container px-4 py-3 text-sm text-on-error-container">{{ error }}</p>{% endif %}
 
-  <form action="/reset" method="post" class="mt-6 space-y-4">
-    <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-    <label class="block text-sm font-medium">Email
-      <input name="email" type="email" required value="{{ email }}" class="mt-1 w-full rounded border-stone-300" />
-    </label>
-    <label class="block text-sm font-medium">Reset code
-      <input name="code" inputmode="numeric" maxlength="6" required class="mt-1 w-full rounded border-stone-300 tracking-[0.4em]" />
-    </label>
-    <label class="block text-sm font-medium">New password
-      <input name="password" type="password" required minlength="8" class="mt-1 w-full rounded border-stone-300" />
-    </label>
-    <button class="w-full rounded-full bg-stone-900 px-6 py-3 text-white hover:bg-stone-700">Reset password</button>
-  </form>
+    <form action="/reset" method="post" class="mt-6 space-y-4">
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+      <label class="block">
+        <span class="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Email</span>
+        <input name="email" type="email" required value="{{ email }}" class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2.5 text-body-md text-on-surface placeholder:text-on-surface-variant/50 focus:border-primary focus:ring-0" />
+      </label>
+      <label class="block">
+        <span class="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Reset code</span>
+        <input name="code" inputmode="numeric" maxlength="6" required class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2.5 text-body-md tracking-[0.4em] text-on-surface placeholder:text-on-surface-variant/50 focus:border-primary focus:ring-0" />
+      </label>
+      <label class="block">
+        <span class="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">New password</span>
+        <input name="password" type="password" required minlength="8" class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2.5 text-body-md text-on-surface placeholder:text-on-surface-variant/50 focus:border-primary focus:ring-0" />
+      </label>
+      <button class="w-full rounded bg-primary px-6 py-3 font-label-md text-label-md uppercase tracking-widest text-on-primary transition-colors hover:bg-on-primary-fixed-variant">Reset password</button>
+    </form>
+  </div>
 </div>
 {% endblock %}

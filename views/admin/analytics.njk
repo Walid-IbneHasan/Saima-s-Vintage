@@ -2,35 +2,35 @@
 
 {% block content %}
 <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
-  <div class="rounded-lg bg-white p-5 shadow-sm">
-    <p class="text-sm text-stone-500">Revenue (paid)</p>
-    <p class="mt-1 text-2xl font-semibold">{{ stats.revenue | money }}</p>
+  <div class="rounded-lg border border-outline/10 bg-surface-container-lowest p-6">
+    <p class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Revenue (paid)</p>
+    <p class="mt-1 font-display-lg text-headline-lg text-on-surface">{{ stats.revenue | money }}</p>
   </div>
-  <div class="rounded-lg bg-white p-5 shadow-sm">
-    <p class="text-sm text-stone-500">Paid orders</p>
-    <p class="mt-1 text-2xl font-semibold">{{ stats.paidOrders }}</p>
+  <div class="rounded-lg border border-outline/10 bg-surface-container-lowest p-6">
+    <p class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Paid orders</p>
+    <p class="mt-1 font-display-lg text-headline-lg text-on-surface">{{ stats.paidOrders }}</p>
   </div>
-  <div class="rounded-lg bg-white p-5 shadow-sm">
-    <p class="text-sm text-stone-500">Awaiting payment</p>
-    <p class="mt-1 text-2xl font-semibold">{{ stats.awaitingPayment }}</p>
+  <div class="rounded-lg border border-outline/10 bg-surface-container-lowest p-6">
+    <p class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Awaiting payment</p>
+    <p class="mt-1 font-display-lg text-headline-lg text-on-surface">{{ stats.awaitingPayment }}</p>
   </div>
-  <div class="rounded-lg bg-white p-5 shadow-sm">
-    <p class="text-sm text-stone-500">Payment review</p>
-    <p class="mt-1 text-2xl font-semibold">{{ stats.pendingReview }}</p>
+  <div class="rounded-lg border border-outline/10 bg-surface-container-lowest p-6">
+    <p class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Payment review</p>
+    <p class="mt-1 font-display-lg text-headline-lg text-on-surface">{{ stats.pendingReview }}</p>
   </div>
 </div>
 
-<div class="mt-8 rounded-lg bg-white p-6 shadow-sm">
-  <h2 class="text-base font-medium">Top products</h2>
+<div class="mt-8 rounded-lg border border-outline/10 bg-surface-container-lowest p-6">
+  <h2 class="font-headline-md text-headline-md text-on-surface">Top products</h2>
   <table class="mt-3 w-full text-left text-sm">
-    <thead class="text-xs uppercase text-stone-500">
+    <thead class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">
       <tr><th class="py-2">Product</th><th>Qty sold</th><th>Revenue</th></tr>
     </thead>
     <tbody>
       {% for p in stats.topProducts %}
-        <tr class="border-t border-stone-100"><td class="py-2">{{ p.name }}</td><td>{{ p.quantity }}</td><td>{{ p.revenue | money }}</td></tr>
+        <tr class="border-b border-outline/10 text-on-surface hover:bg-surface-container-low"><td class="py-2">{{ p.name }}</td><td>{{ p.quantity }}</td><td>{{ p.revenue | money }}</td></tr>
       {% else %}
-        <tr><td colspan="3" class="py-6 text-center text-stone-400">No sales yet.</td></tr>
+        <tr><td colspan="3" class="py-6 text-center text-on-surface-variant">No sales yet.</td></tr>
       {% endfor %}
     </tbody>
   </table>

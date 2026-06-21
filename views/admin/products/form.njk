@@ -5,52 +5,52 @@
 <form action="{{ action }}" method="post" class="max-w-3xl space-y-5">
   <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
 
-  <div class="rounded-lg bg-white p-6 shadow-sm">
-    <label class="block text-sm font-medium">Name
-      <input name="name" required value="{{ product.name or '' }}" class="mt-1 w-full rounded border-stone-300" />
+  <div class="rounded-lg border border-outline/10 bg-surface-container-lowest p-6">
+    <label class="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Name
+      <input name="name" required value="{{ product.name or '' }}" class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:ring-0" />
     </label>
     <div class="mt-4 grid gap-4 md:grid-cols-2">
-      <label class="block text-sm font-medium">Slug (optional)
-        <input name="slug" value="{{ product.slug or '' }}" placeholder="auto from name" class="mt-1 w-full rounded border-stone-300" />
+      <label class="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Slug (optional)
+        <input name="slug" value="{{ product.slug or '' }}" placeholder="auto from name" class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:ring-0" />
       </label>
-      <label class="block text-sm font-medium">SKU
-        <input name="sku" value="{{ product.sku or '' }}" class="mt-1 w-full rounded border-stone-300" />
+      <label class="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">SKU
+        <input name="sku" value="{{ product.sku or '' }}" class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:ring-0" />
       </label>
     </div>
     <div class="mt-4 grid gap-4 md:grid-cols-3">
-      <label class="block text-sm font-medium">Base price (BDT)
+      <label class="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Base price (BDT)
         <input name="basePrice" type="number" step="0.01" min="0" required
-               value="{{ product.basePrice or '' }}" class="mt-1 w-full rounded border-stone-300" />
+               value="{{ product.basePrice or '' }}" class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:ring-0" />
       </label>
-      <label class="block text-sm font-medium">Discounted price
+      <label class="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Discounted price
         <input name="salePrice" type="number" step="0.01" min="0"
-               value="{{ product.salePrice or '' }}" class="mt-1 w-full rounded border-stone-300" />
+               value="{{ product.salePrice or '' }}" class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:ring-0" />
       </label>
-      <label class="block text-sm font-medium">Currency
-        <input name="currency" value="{{ product.currency or 'BDT' }}" class="mt-1 w-full rounded border-stone-300" />
+      <label class="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Currency
+        <input name="currency" value="{{ product.currency or 'BDT' }}" class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:ring-0" />
       </label>
     </div>
     <div class="mt-4 grid gap-4 md:grid-cols-2">
-      <label class="block text-sm font-medium">Brand
-        <input name="brand" value="{{ product.brand or '' }}" class="mt-1 w-full rounded border-stone-300" />
+      <label class="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Brand
+        <input name="brand" value="{{ product.brand or '' }}" class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:ring-0" />
       </label>
-      <label class="block text-sm font-medium">Condition
-        <input name="condition" value="{{ product.condition or '' }}" placeholder="e.g. Excellent" class="mt-1 w-full rounded border-stone-300" />
+      <label class="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Condition
+        <input name="condition" value="{{ product.condition or '' }}" placeholder="e.g. Excellent" class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:ring-0" />
       </label>
     </div>
-    <label class="mt-4 block text-sm font-medium">Short description
-      <textarea name="shortDescription" rows="2" class="mt-1 w-full rounded border-stone-300">{{ product.shortDescription or '' }}</textarea>
+    <label class="mt-4 block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Short description
+      <textarea name="shortDescription" rows="2" class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:ring-0">{{ product.shortDescription or '' }}</textarea>
     </label>
-    <label class="mt-4 block text-sm font-medium">Description (HTML allowed; sanitized on save)
-      <textarea name="description" rows="6" class="mt-1 w-full rounded border-stone-300 font-mono text-xs">{{ product.description | safe if product else '' }}</textarea>
+    <label class="mt-4 block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Description (HTML allowed; sanitized on save)
+      <textarea name="description" rows="6" class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2 font-mono text-xs text-on-surface focus:border-primary focus:ring-0">{{ product.description | safe if product else '' }}</textarea>
     </label>
   </div>
 
-  <div class="rounded-lg bg-white p-6 shadow-sm">
-    <p class="mb-2 text-sm font-medium">Categories</p>
+  <div class="rounded-lg border border-outline/10 bg-surface-container-lowest p-6">
+    <p class="mb-2 font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Categories</p>
     <div class="grid grid-cols-2 gap-2 md:grid-cols-3">
       {% for c in categories %}
-        <label class="flex items-center gap-2 text-sm">
+        <label class="flex items-center gap-2 text-sm text-on-surface">
           <input type="checkbox" name="categoryIds" value="{{ c.id }}"
                  {% if c.id in selectedCategoryIds %}checked{% endif %} />
           {{ c.name }}
@@ -59,87 +59,87 @@
     </div>
   </div>
 
-  <div class="rounded-lg bg-white p-6 shadow-sm">
+  <div class="rounded-lg border border-outline/10 bg-surface-container-lowest p-6">
     <div class="flex flex-wrap gap-6">
-      <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="isActive" {% if product.isActive %}checked{% endif %} /> Active (visible)</label>
-      <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="isFeatured" {% if product.isFeatured %}checked{% endif %} /> Featured</label>
-      <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="allowBackorder" {% if product.allowBackorder %}checked{% endif %} /> Allow backorder</label>
+      <label class="flex items-center gap-2 text-sm text-on-surface"><input type="checkbox" name="isActive" {% if product.isActive %}checked{% endif %} /> Active (visible)</label>
+      <label class="flex items-center gap-2 text-sm text-on-surface"><input type="checkbox" name="isFeatured" {% if product.isFeatured %}checked{% endif %} /> Featured</label>
+      <label class="flex items-center gap-2 text-sm text-on-surface"><input type="checkbox" name="allowBackorder" {% if product.allowBackorder %}checked{% endif %} /> Allow backorder</label>
     </div>
     <div class="mt-4 grid gap-4 md:grid-cols-3">
-      <label class="block text-sm font-medium">Featured order
-        <input name="featuredOrder" type="number" value="{{ product.featuredOrder or 0 }}" class="mt-1 w-full rounded border-stone-300" />
+      <label class="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Featured order
+        <input name="featuredOrder" type="number" value="{{ product.featuredOrder or 0 }}" class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:ring-0" />
       </label>
-      <label class="block text-sm font-medium">Min per order
-        <input name="minPerOrder" type="number" min="1" value="{{ product.minPerOrder or 1 }}" class="mt-1 w-full rounded border-stone-300" />
+      <label class="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Min per order
+        <input name="minPerOrder" type="number" min="1" value="{{ product.minPerOrder or 1 }}" class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:ring-0" />
       </label>
-      <label class="block text-sm font-medium">Max per order (blank = unlimited)
-        <input name="maxPerOrder" type="number" min="1" value="{{ product.maxPerOrder or '' }}" class="mt-1 w-full rounded border-stone-300" />
+      <label class="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Max per order (blank = unlimited)
+        <input name="maxPerOrder" type="number" min="1" value="{{ product.maxPerOrder or '' }}" class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:ring-0" />
       </label>
     </div>
   </div>
 
   <div class="flex gap-3">
-    <button type="submit" class="rounded bg-stone-900 px-5 py-2.5 text-sm text-white hover:bg-stone-700">
+    <button type="submit" class="rounded bg-primary px-4 py-2 font-label-md text-label-md uppercase tracking-widest text-on-primary hover:bg-on-primary-fixed-variant">
       {{ 'Save changes' if product else 'Create product' }}
     </button>
-    <a href="/admin/products" class="rounded border border-stone-300 px-5 py-2.5 text-sm">Cancel</a>
+    <a href="/admin/products" class="rounded border border-outline px-4 py-2 font-label-md text-label-md uppercase tracking-widest text-on-surface hover:border-primary hover:text-primary">Cancel</a>
   </div>
 </form>
 
 {% if product %}
   {# ---- Variants ---- #}
-  <div class="mt-8 max-w-3xl rounded-lg bg-white p-6 shadow-sm">
-    <h2 class="text-base font-medium">Variants</h2>
+  <div class="mt-8 max-w-3xl rounded-lg border border-outline/10 bg-surface-container-lowest p-6">
+    <h2 class="font-headline-md text-headline-md text-on-surface">Variants</h2>
     <div class="mt-3 space-y-2">
       {% for v in product.variants %}
-      <div class="flex flex-wrap items-end gap-2 border-t border-stone-100 pt-2">
+      <div class="flex flex-wrap items-end gap-2 border-t border-outline/10 pt-2">
         <form action="/admin/products/{{ product.id }}/variants/{{ v.id }}" method="post" class="flex flex-wrap items-end gap-2">
           <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-          <label class="text-xs">SKU<input name="sku" value="{{ v.sku }}" class="mt-1 block w-32 rounded border-stone-300 text-xs" /></label>
-          <label class="text-xs">Name<input name="name" value="{{ v.name }}" class="mt-1 block w-32 rounded border-stone-300 text-xs" /></label>
-          <label class="text-xs">Price<input name="price" type="number" step="0.01" value="{{ v.price or '' }}" placeholder="base" class="mt-1 block w-24 rounded border-stone-300 text-xs" /></label>
-          <label class="text-xs">Sale<input name="salePrice" type="number" step="0.01" value="{{ v.salePrice or '' }}" placeholder="sale" class="mt-1 block w-24 rounded border-stone-300 text-xs" /></label>
-          <label class="text-xs">Stock<input name="stock" type="number" value="{{ v.stock }}" class="mt-1 block w-20 rounded border-stone-300 text-xs" /></label>
-          <button class="rounded bg-stone-200 px-3 py-2 text-xs hover:bg-stone-300">Save</button>
+          <label class="text-xs text-on-surface-variant">SKU<input name="sku" value="{{ v.sku }}" class="mt-1 block w-32 rounded border border-outline/30 bg-surface px-2 py-1 text-xs text-on-surface focus:border-primary focus:ring-0" /></label>
+          <label class="text-xs text-on-surface-variant">Name<input name="name" value="{{ v.name }}" class="mt-1 block w-32 rounded border border-outline/30 bg-surface px-2 py-1 text-xs text-on-surface focus:border-primary focus:ring-0" /></label>
+          <label class="text-xs text-on-surface-variant">Price<input name="price" type="number" step="0.01" value="{{ v.price or '' }}" placeholder="base" class="mt-1 block w-24 rounded border border-outline/30 bg-surface px-2 py-1 text-xs text-on-surface focus:border-primary focus:ring-0" /></label>
+          <label class="text-xs text-on-surface-variant">Sale<input name="salePrice" type="number" step="0.01" value="{{ v.salePrice or '' }}" placeholder="sale" class="mt-1 block w-24 rounded border border-outline/30 bg-surface px-2 py-1 text-xs text-on-surface focus:border-primary focus:ring-0" /></label>
+          <label class="text-xs text-on-surface-variant">Stock<input name="stock" type="number" value="{{ v.stock }}" class="mt-1 block w-20 rounded border border-outline/30 bg-surface px-2 py-1 text-xs text-on-surface focus:border-primary focus:ring-0" /></label>
+          <button class="rounded border border-outline px-3 py-2 font-label-md text-label-md uppercase tracking-widest text-on-surface hover:border-primary hover:text-primary">Save</button>
         </form>
         <form action="/admin/products/{{ product.id }}/variants/{{ v.id }}/delete" method="post" onsubmit="return confirm('Delete variant?')">
           <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-          <button class="rounded px-2 py-2 text-xs text-red-600 hover:underline">Delete</button>
+          <button class="rounded px-2 py-2 text-xs text-error hover:underline">Delete</button>
         </form>
       </div>
       {% endfor %}
-      {% if not product.variants.length %}<p class="text-sm text-stone-400">No variants yet — add one below.</p>{% endif %}
+      {% if not product.variants.length %}<p class="text-sm text-on-surface-variant">No variants yet — add one below.</p>{% endif %}
     </div>
 
-    <form action="/admin/products/{{ product.id }}/variants" method="post" class="mt-4 flex flex-wrap items-end gap-2 border-t border-stone-200 pt-4">
+    <form action="/admin/products/{{ product.id }}/variants" method="post" class="mt-4 flex flex-wrap items-end gap-2 border-t border-outline/20 pt-4">
       <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-      <label class="text-xs">SKU<input name="sku" required class="mt-1 block w-32 rounded border-stone-300 text-xs" /></label>
-      <label class="text-xs">Name<input name="name" required value="Default" class="mt-1 block w-32 rounded border-stone-300 text-xs" /></label>
-      <label class="text-xs">Price<input name="price" type="number" step="0.01" placeholder="base" class="mt-1 block w-24 rounded border-stone-300 text-xs" /></label>
-      <label class="text-xs">Sale<input name="salePrice" type="number" step="0.01" placeholder="sale" class="mt-1 block w-24 rounded border-stone-300 text-xs" /></label>
-      <label class="text-xs">Stock<input name="stock" type="number" value="0" class="mt-1 block w-20 rounded border-stone-300 text-xs" /></label>
-      <button class="rounded bg-stone-900 px-3 py-2 text-xs text-white">Add variant</button>
+      <label class="text-xs text-on-surface-variant">SKU<input name="sku" required class="mt-1 block w-32 rounded border border-outline/30 bg-surface px-2 py-1 text-xs text-on-surface focus:border-primary focus:ring-0" /></label>
+      <label class="text-xs text-on-surface-variant">Name<input name="name" required value="Default" class="mt-1 block w-32 rounded border border-outline/30 bg-surface px-2 py-1 text-xs text-on-surface focus:border-primary focus:ring-0" /></label>
+      <label class="text-xs text-on-surface-variant">Price<input name="price" type="number" step="0.01" placeholder="base" class="mt-1 block w-24 rounded border border-outline/30 bg-surface px-2 py-1 text-xs text-on-surface focus:border-primary focus:ring-0" /></label>
+      <label class="text-xs text-on-surface-variant">Sale<input name="salePrice" type="number" step="0.01" placeholder="sale" class="mt-1 block w-24 rounded border border-outline/30 bg-surface px-2 py-1 text-xs text-on-surface focus:border-primary focus:ring-0" /></label>
+      <label class="text-xs text-on-surface-variant">Stock<input name="stock" type="number" value="0" class="mt-1 block w-20 rounded border border-outline/30 bg-surface px-2 py-1 text-xs text-on-surface focus:border-primary focus:ring-0" /></label>
+      <button class="rounded bg-primary px-3 py-2 font-label-md text-label-md uppercase tracking-widest text-on-primary hover:bg-on-primary-fixed-variant">Add variant</button>
     </form>
   </div>
 
   {# ---- Images ---- #}
-  <div class="mt-8 max-w-3xl rounded-lg bg-white p-6 shadow-sm">
-    <h2 class="text-base font-medium">Images</h2>
+  <div class="mt-8 max-w-3xl rounded-lg border border-outline/10 bg-surface-container-lowest p-6">
+    <h2 class="font-headline-md text-headline-md text-on-surface">Images</h2>
     <div class="mt-3 grid grid-cols-3 gap-3 md:grid-cols-5">
       {% for img in product.images %}
         <div class="relative">
           <img src="{{ img.url }}" alt="" class="aspect-square w-full rounded object-cover" />
           <form action="/admin/products/{{ product.id }}/images/{{ img.id }}/delete" method="post" class="absolute right-1 top-1">
             <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-            <button class="rounded bg-white/90 px-1.5 text-xs text-red-600">✕</button>
+            <button class="rounded bg-surface-container-lowest/90 px-1.5 text-xs text-error">✕</button>
           </form>
         </div>
       {% endfor %}
     </div>
-    <form action="/admin/products/{{ product.id }}/images?_csrf={{ csrfToken }}" method="post" enctype="multipart/form-data" class="mt-4 flex items-center gap-3 border-t border-stone-200 pt-4">
-      <input type="file" name="image" accept="image/jpeg,image/png,image/webp,image/avif" required class="text-sm" />
-      <button class="rounded bg-stone-900 px-3 py-2 text-xs text-white">Upload</button>
-      <span class="text-xs text-stone-400">JPEG/PNG/WebP/AVIF, max 5 MB</span>
+    <form action="/admin/products/{{ product.id }}/images?_csrf={{ csrfToken }}" method="post" enctype="multipart/form-data" class="mt-4 flex items-center gap-3 border-t border-outline/20 pt-4">
+      <input type="file" name="image" accept="image/jpeg,image/png,image/webp,image/avif" required class="text-sm text-on-surface" />
+      <button class="rounded bg-primary px-3 py-2 font-label-md text-label-md uppercase tracking-widest text-on-primary hover:bg-on-primary-fixed-variant">Upload</button>
+      <span class="text-xs text-on-surface-variant">JPEG/PNG/WebP/AVIF, max 5 MB</span>
     </form>
   </div>
 {% endif %}
