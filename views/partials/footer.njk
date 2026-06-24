@@ -61,7 +61,7 @@
         <h3 class="mb-5 font-label-sm text-label-sm uppercase tracking-[0.24em] text-on-tertiary">Shop</h3>
         <ul class="space-y-3.5 text-body-md">
           <li><a href="/products" class="link-underline text-on-tertiary-container transition-colors hover:text-accent-bright">All pieces</a></li>
-          <li><a href="/products?onSale=1" class="link-underline text-on-tertiary-container transition-colors hover:text-accent-bright">Sale</a></li>
+          <li><a href="/products?onSale=1" class="link-underline text-on-tertiary-container transition-colors hover:text-accent-bright">Flash Deals</a></li>
           {% for cat in navCategories() %}{% if loop.index0 < 3 %}
             <li><a href="/c/{{ cat.slug }}" class="link-underline text-on-tertiary-container transition-colors hover:text-accent-bright">{{ cat.name }}</a></li>
           {% endif %}{% endfor %}
