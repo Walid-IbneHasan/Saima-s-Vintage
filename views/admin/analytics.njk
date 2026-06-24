@@ -1,38 +1,280 @@
 {% extends "admin/layout.njk" %}
 
-{% block content %}
-<div class="grid grid-cols-2 gap-4 md:grid-cols-4">
-  <div class="rounded-lg border border-outline/10 bg-surface-container-lowest p-6">
-    <p class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Revenue (paid)</p>
-    <p class="mt-1 font-display-lg text-headline-lg text-on-surface">{{ stats.revenue | money }}</p>
-  </div>
-  <div class="rounded-lg border border-outline/10 bg-surface-container-lowest p-6">
-    <p class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Paid orders</p>
-    <p class="mt-1 font-display-lg text-headline-lg text-on-surface">{{ stats.paidOrders }}</p>
-  </div>
-  <div class="rounded-lg border border-outline/10 bg-surface-container-lowest p-6">
-    <p class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Awaiting payment</p>
-    <p class="mt-1 font-display-lg text-headline-lg text-on-surface">{{ stats.awaitingPayment }}</p>
-  </div>
-  <div class="rounded-lg border border-outline/10 bg-surface-container-lowest p-6">
-    <p class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Payment review</p>
-    <p class="mt-1 font-display-lg text-headline-lg text-on-surface">{{ stats.pendingReview }}</p>
-  </div>
-</div>
+{# ── Delta chip (period-over-period) ───────────────────────────────────── #}
+{% macro delta(kpi) %}
+  {% if kpi.deltaPct == null %}
+    <span class="text-xs text-on-surface-variant/70">No prior data</span>
+  {% else %}
+    {% set up = kpi.deltaPct >= 0 %}
+    <span class="inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-xs font-semibold {{ 'bg-[#3f7d4f1f] text-[#356b43]' if up else 'bg-error/10 text-error' }}">
+      <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+        {% if up %}<path d="M5 15l7-7 7 7" stroke-linecap="round" stroke-linejoin="round"/>{% else %}<path d="M5 9l7 7 7-7" stroke-linecap="round" stroke-linejoin="round"/>{% endif %}
+      </svg>
+      {{ kpi.deltaPct | abs | round(1) }}%
+    </span>
+    <span class="text-xs text-on-surface-variant/70">vs prev</span>
+  {% endif %}
+{% endmacro %}
 
-<div class="mt-8 rounded-lg border border-outline/10 bg-surface-container-lowest p-6">
-  <h2 class="font-headline-md text-headline-md text-on-surface">Top products</h2>
-  <table class="mt-3 w-full text-left text-sm">
-    <thead class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">
-      <tr><th class="py-2">Product</th><th>Qty sold</th><th>Revenue</th></tr>
-    </thead>
-    <tbody>
-      {% for p in stats.topProducts %}
-        <tr class="border-b border-outline/10 text-on-surface hover:bg-surface-container-low"><td class="py-2">{{ p.name }}</td><td>{{ p.quantity }}</td><td>{{ p.revenue | money }}</td></tr>
-      {% else %}
-        <tr><td colspan="3" class="py-6 text-center text-on-surface-variant">No sales yet.</td></tr>
+{# ── Vertical bar chart macro (peak hour / weekday) ─────────────────────── #}
+{% macro barSvg(chart, label) %}
+<svg viewBox="0 0 {{ chart.w }} {{ chart.h }}" class="mt-4 w-full" role="img" aria-label="{{ label }}">
+  <line x1="0" y1="{{ chart.baseline }}" x2="{{ chart.w }}" y2="{{ chart.baseline }}" class="stroke-outline" stroke-opacity="0.5"/>
+  {% for b in chart.bars %}
+    <rect x="{{ b.x }}" y="{{ b.y }}" width="{{ b.w }}" height="{{ b.h }}" rx="2"
+          class="{{ 'fill-accent' if b.peak else 'fill-primary' }}" fill-opacity="{{ '1' if b.peak else '0.32' }}">
+      <title>{{ b.label }}: {{ b.value }} order{{ 's' if b.value != 1 }}</title>
+    </rect>
+  {% endfor %}
+  {% for x in chart.xLabels %}
+    <text x="{{ x.x }}" y="{{ chart.h - 8 }}" text-anchor="middle" class="fill-on-surface-variant" font-size="10">{{ x.label }}</text>
+  {% endfor %}
+</svg>
+{% endmacro %}
+
+{% block content %}
+<div class="space-y-6">
+
+  {# ── Header + range selector ─────────────────────────────────────────── #}
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h2 class="font-display-lg text-2xl text-on-surface">Analytics</h2>
+      <p class="mt-1 text-sm text-on-surface-variant">{{ dash.range.label }} · updated {{ dash.generatedAt | date }}</p>
+    </div>
+    <div class="inline-flex rounded-full border border-outline/40 bg-surface-container-lowest p-1" role="group" aria-label="Date range">
+      {% for r in dash.ranges %}
+        <a href="/admin/analytics?range={{ r.key }}"
+           class="rounded-full px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.08em] transition-colors {{ 'bg-primary text-on-primary shadow-sm' if r.key == dash.range.key else 'text-on-surface-variant hover:text-accent-deep' }}"
+           {% if r.key == dash.range.key %}aria-current="true"{% endif %}>{{ r.label | replace('Last ', '') }}</a>
       {% endfor %}
-    </tbody>
-  </table>
+    </div>
+  </div>
+
+  {# ── KPI cards ───────────────────────────────────────────────────────── #}
+  <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
+    {% set kpiCards = [
+      { label: 'Revenue', value: dash.kpis.revenue.value | money, kpi: dash.kpis.revenue, sub: 'realised sales' },
+      { label: 'Orders', value: dash.kpis.orders.value, kpi: dash.kpis.orders, sub: 'paid orders' },
+      { label: 'Avg order value', value: dash.kpis.aov.value | money, kpi: dash.kpis.aov, sub: 'per order' },
+      { label: 'New customers', value: dash.kpis.customers.value, kpi: dash.kpis.customers, sub: 'sign-ups' }
+    ] %}
+    {% for c in kpiCards %}
+      <div class="rounded-2xl border border-outline/30 bg-surface-container-lowest p-5 shadow-luxe">
+        <p class="font-label-sm text-label-sm uppercase tracking-[0.12em] text-on-surface-variant">{{ c.label }}</p>
+        <p class="mt-2 font-display-lg text-2xl text-on-surface md:text-3xl">{{ c.value }}</p>
+        <div class="mt-2 flex flex-wrap items-center gap-1.5">{{ delta(c.kpi) }}</div>
+      </div>
+    {% endfor %}
+  </div>
+
+  {# ── Revenue & orders trend ──────────────────────────────────────────── #}
+  <section class="rounded-2xl border border-outline/30 bg-surface-container-lowest p-5 shadow-luxe md:p-6">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+      <div>
+        <h3 class="font-headline-md text-lg text-on-surface">Revenue &amp; orders</h3>
+        <p class="mt-0.5 text-sm text-on-surface-variant">{{ dash.range.label }}, by {{ dash.range.bucket }}</p>
+      </div>
+      <div class="flex items-center gap-4 text-xs text-on-surface-variant">
+        <span class="inline-flex items-center gap-1.5"><span class="h-2.5 w-4 rounded-full bg-accent"></span>Revenue</span>
+        <span class="inline-flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-sm bg-accent/30"></span>Orders</span>
+        <span class="hidden sm:inline">Paid rate <strong class="text-on-surface">{{ dash.paidRate | round }}%</strong></span>
+      </div>
+    </div>
+
+    {% if dash.kpis.orders.value or dash.kpis.revenue.value %}
+      <svg viewBox="0 0 {{ trendChart.w }} {{ trendChart.h }}" class="mt-4 w-full" role="img"
+           aria-label="Revenue and orders for {{ dash.range.label }}. Total revenue {{ dash.kpis.revenue.value | money }} across {{ dash.kpis.orders.value }} orders.">
+        <defs>
+          <linearGradient id="revGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#a87c32" stop-opacity="0.22"/>
+            <stop offset="100%" stop-color="#a87c32" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        {# gridlines + y-axis (৳) #}
+        {% for t in trendYTicks %}
+          <line x1="{{ trendChart.padL }}" y1="{{ t.y }}" x2="{{ trendChart.w - trendChart.padR }}" y2="{{ t.y }}" class="stroke-outline" stroke-opacity="0.45" stroke-width="1"/>
+          <text x="{{ trendChart.padL - 8 }}" y="{{ t.y + 3.5 }}" text-anchor="end" class="fill-on-surface-variant" font-size="10">{{ t.label }}</text>
+        {% endfor %}
+        {# order bars #}
+        {% for b in trendChart.bars %}
+          <rect x="{{ b.x }}" y="{{ b.y }}" width="{{ b.w }}" height="{{ b.h }}" rx="1.5" class="fill-accent" fill-opacity="0.28"/>
+        {% endfor %}
+        {# revenue area + line #}
+        <path d="{{ trendChart.areaPath }}" fill="url(#revGrad)"/>
+        <polyline points="{{ trendChart.linePoints }}" fill="none" class="stroke-accent" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+        {# dots w/ native tooltips #}
+        {% for d in trendChart.dots %}
+          <circle cx="{{ d.x }}" cy="{{ d.y }}" r="3.5" class="fill-primary stroke-accent" stroke-width="1.5">
+            <title>{{ d.label }} — {{ d.revenue | money }} · {{ d.orders }} order{{ 's' if d.orders != 1 }}</title>
+          </circle>
+        {% endfor %}
+        {# x-axis labels #}
+        {% for x in trendChart.xLabels %}
+          <text x="{{ x.x }}" y="{{ trendChart.h - 9 }}" text-anchor="middle" class="fill-on-surface-variant" font-size="10">{{ x.label }}</text>
+        {% endfor %}
+      </svg>
+    {% else %}
+      {% include "admin/_chart-empty.njk" %}
+    {% endif %}
+  </section>
+
+  {# ── Peak time: hour of day + weekday ────────────────────────────────── #}
+  <div class="grid gap-6 lg:grid-cols-2">
+    <section class="rounded-2xl border border-outline/30 bg-surface-container-lowest p-5 shadow-luxe md:p-6">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <h3 class="font-headline-md text-lg text-on-surface">Peak hours</h3>
+          <p class="mt-0.5 text-sm text-on-surface-variant">Orders by time of day · last 90 days</p>
+        </div>
+        {% if peakHourLabel %}<span class="rounded-full bg-accent/10 px-3 py-1 text-xs font-semibold text-accent-deep">Busiest {{ peakHourLabel }}</span>{% endif %}
+      </div>
+      {% if dash.peakHour %}
+        {{ barSvg(hourChart, 'Orders by hour of day') }}
+      {% else %}{% include "admin/_chart-empty.njk" %}{% endif %}
+    </section>
+
+    <section class="rounded-2xl border border-outline/30 bg-surface-container-lowest p-5 shadow-luxe md:p-6">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <h3 class="font-headline-md text-lg text-on-surface">Peak days</h3>
+          <p class="mt-0.5 text-sm text-on-surface-variant">Orders by weekday · last 90 days</p>
+        </div>
+        {% if dash.peakDay %}<span class="rounded-full bg-accent/10 px-3 py-1 text-xs font-semibold text-accent-deep">Busiest {{ dash.peakDay.label }}</span>{% endif %}
+      </div>
+      {% if dash.peakDay %}
+        {{ barSvg(weekdayChart, 'Orders by weekday') }}
+      {% else %}{% include "admin/_chart-empty.njk" %}{% endif %}
+    </section>
+  </div>
+
+  {# ── Status donut + top products ─────────────────────────────────────── #}
+  <div class="grid gap-6 lg:grid-cols-2">
+    <section class="rounded-2xl border border-outline/30 bg-surface-container-lowest p-5 shadow-luxe md:p-6">
+      <h3 class="font-headline-md text-lg text-on-surface">Order status</h3>
+      <p class="mt-0.5 text-sm text-on-surface-variant">{{ dash.range.label }} · {{ statusDonut.total }} orders placed</p>
+      {% if statusDonut.total %}
+        <div class="mt-4 flex flex-col items-center gap-6 sm:flex-row sm:items-center">
+          <svg viewBox="0 0 {{ statusDonut.size }} {{ statusDonut.size }}" class="h-44 w-44 shrink-0" role="img" aria-label="Order status breakdown">
+            {% for a in statusDonut.arcs %}
+              <path d="{{ a.d }}" fill="{{ a.color }}"><title>{{ a.label }}: {{ a.value }} ({{ a.pct }}%)</title></path>
+            {% endfor %}
+            <text x="{{ statusDonut.cx }}" y="{{ statusDonut.cy - 2 }}" text-anchor="middle" class="fill-on-surface" font-size="26" font-weight="700">{{ statusDonut.total }}</text>
+            <text x="{{ statusDonut.cx }}" y="{{ statusDonut.cy + 14 }}" text-anchor="middle" class="fill-on-surface-variant" font-size="10" letter-spacing="1">ORDERS</text>
+          </svg>
+          <ul class="w-full space-y-2">
+            {% for s in legend %}
+              <li class="flex items-center gap-2.5 text-sm">
+                <span class="h-2.5 w-2.5 shrink-0 rounded-full" style="background-color: {{ s.color }}"></span>
+                <span class="min-w-0 flex-1 truncate text-on-surface">{{ s.label }}</span>
+                <span class="font-medium text-on-surface">{{ s.count }}</span>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% else %}{% include "admin/_chart-empty.njk" %}{% endif %}
+    </section>
+
+    <section class="rounded-2xl border border-outline/30 bg-surface-container-lowest p-5 shadow-luxe md:p-6">
+      <h3 class="font-headline-md text-lg text-on-surface">Top products</h3>
+      <p class="mt-0.5 text-sm text-on-surface-variant">By revenue · {{ dash.range.label }}</p>
+      {% if dash.topProducts.length %}
+        <div class="mt-4 space-y-3.5">
+          {% for p in dash.topProducts %}
+            <div>
+              <div class="flex items-baseline justify-between gap-3 text-sm">
+                <span class="min-w-0 truncate text-on-surface">{{ p.name }}</span>
+                <span class="shrink-0 font-medium text-on-surface">{{ p.revenue | money }}</span>
+              </div>
+              <div class="mt-1.5 flex items-center gap-2">
+                <div class="h-2 flex-1 overflow-hidden rounded-full bg-surface-container-high">
+                  <div class="h-full rounded-full bg-accent" style="width: {{ (p.revenue / maxProductRevenue * 100) | round }}%"></div>
+                </div>
+                <span class="shrink-0 text-xs text-on-surface-variant">{{ p.quantity }} sold</span>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}<p class="mt-6 text-center text-sm text-on-surface-variant">No sales in this period yet.</p>{% endif %}
+    </section>
+  </div>
+
+  {# ── Top categories + operational ────────────────────────────────────── #}
+  <div class="grid gap-6 lg:grid-cols-2">
+    <section class="rounded-2xl border border-outline/30 bg-surface-container-lowest p-5 shadow-luxe md:p-6">
+      <h3 class="font-headline-md text-lg text-on-surface">Top categories</h3>
+      <p class="mt-0.5 text-sm text-on-surface-variant">By revenue · {{ dash.range.label }}</p>
+      {% if dash.topCategories.length %}
+        <div class="mt-4 space-y-3.5">
+          {% for c in dash.topCategories %}
+            <div>
+              <div class="flex items-baseline justify-between gap-3 text-sm">
+                <span class="min-w-0 truncate text-on-surface">{{ c.name }}</span>
+                <span class="shrink-0 font-medium text-on-surface">{{ c.revenue | money }}</span>
+              </div>
+              <div class="mt-1.5 h-2 overflow-hidden rounded-full bg-surface-container-high">
+                <div class="h-full rounded-full bg-[#4a7d8c]" style="width: {{ (c.revenue / maxCategoryRevenue * 100) | round }}%"></div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}<p class="mt-6 text-center text-sm text-on-surface-variant">No category sales yet.</p>{% endif %}
+    </section>
+
+    <section class="rounded-2xl border border-outline/30 bg-surface-container-lowest p-5 shadow-luxe md:p-6">
+      <h3 class="font-headline-md text-lg text-on-surface">Needs attention</h3>
+      <p class="mt-0.5 text-sm text-on-surface-variant">Current open work across the store</p>
+      <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+        {% set tiles = [
+          { label: 'Awaiting payment', value: dash.ops.awaitingPayment, href: '/admin/orders', tone: 'amber' },
+          { label: 'Payment review', value: dash.ops.paymentReview, href: '/admin/orders', tone: 'violet' },
+          { label: 'To process', value: dash.ops.processing, href: '/admin/orders', tone: 'gold' },
+          { label: 'Shipped', value: dash.ops.shipped, href: '/admin/orders', tone: 'teal' },
+          { label: 'Low stock', value: dash.ops.lowStock, href: '/admin/products', tone: 'red' }
+        ] %}
+        {% for t in tiles %}
+          <a href="{{ t.href }}" class="group rounded-xl border border-outline/30 bg-surface-container-low/40 p-3.5 transition-colors hover:border-accent/50">
+            <p class="font-display-lg text-2xl text-on-surface">{{ t.value }}</p>
+            <p class="mt-0.5 text-xs text-on-surface-variant group-hover:text-accent-deep">{{ t.label }}</p>
+          </a>
+        {% endfor %}
+      </div>
+    </section>
+  </div>
+
+  {# ── Recent orders ───────────────────────────────────────────────────── #}
+  <section class="rounded-2xl border border-outline/30 bg-surface-container-lowest p-5 shadow-luxe md:p-6">
+    <div class="flex items-center justify-between">
+      <h3 class="font-headline-md text-lg text-on-surface">Recent orders</h3>
+      <a href="/admin/orders" class="text-sm text-accent-deep underline-offset-4 hover:underline">View all →</a>
+    </div>
+    <div class="mt-3 overflow-x-auto">
+      <table class="w-full min-w-[34rem] text-left text-sm">
+        <thead class="font-label-sm text-label-sm uppercase tracking-[0.1em] text-on-surface-variant">
+          <tr class="border-b border-outline/30">
+            <th class="py-2 pr-3">Order</th><th class="pr-3">When</th><th class="pr-3">Customer</th>
+            <th class="pr-3 text-right">Total</th><th class="text-right">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for o in dash.recentOrders %}
+            <tr class="border-b border-outline/15 text-on-surface">
+              <td class="py-2.5 pr-3 font-medium">{{ o.orderNumber }}</td>
+              <td class="pr-3 text-on-surface-variant">{{ o.placedAt | date }}</td>
+              <td class="max-w-[12rem] truncate pr-3 text-on-surface-variant">{{ o.email }}</td>
+              <td class="pr-3 text-right font-medium">{{ o.grandTotal | money(o.currency) }}</td>
+              <td class="text-right">
+                {% set sc = statusColors[o.status] or '#8a7d6c' %}
+                <span class="inline-block rounded-full px-2.5 py-0.5 text-xs font-medium"
+                      style="background-color: {{ sc }}1f; color: {{ sc }}">{{ o.status | replace('_', ' ') | title }}</span>
+              </td>
+            </tr>
+          {% else %}
+            <tr><td colspan="5" class="py-8 text-center text-on-surface-variant">No orders yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
 </div>
 {% endblock %}
