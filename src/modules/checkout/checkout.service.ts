@@ -9,7 +9,7 @@ import {
 } from '@prisma/client';
 import { randomBytes } from 'crypto';
 import { PrismaService } from '../../prisma/prisma.service';
-import { variantCurrent } from '../../common/pricing';
+import { resolveProductPricing, variantCurrent } from '../../common/pricing';
 import { CouponsService } from '../coupons/coupons.service';
 import { InventoryService } from '../inventory/inventory.service';
 import { CheckoutDto } from './dto';
@@ -52,7 +52,14 @@ export class CheckoutService {
             price: true,
             salePrice: true,
             product: {
-              select: { name: true, basePrice: true, salePrice: true },
+              select: {
+                name: true,
+                basePrice: true,
+                salePrice: true,
+                flashPrice: true,
+                flashStartAt: true,
+                flashEndAt: true,
+              },
             },
           },
         },
@@ -62,10 +69,15 @@ export class CheckoutService {
       throw new BadRequestException('Your cart is empty');
     }
 
-    // Recompute every price from the DB (incl. active discounts) — never trust
-    // the cart snapshot or the client.
+    // Recompute every price from the DB (incl. active discounts and any live
+    // flash deal at this moment) — never trust the cart snapshot or the client.
+    // A flash deal that has expired by checkout time no longer applies.
+    const now = new Date();
     const orderItemsData = cartItems.map((ci) => {
-      const unitPrice = variantCurrent(ci.variant, ci.variant.product);
+      const unitPrice = variantCurrent(
+        ci.variant,
+        resolveProductPricing(ci.variant.product, now),
+      );
       return {
         variantId: ci.variantId,
         productName: ci.variant.product.name,

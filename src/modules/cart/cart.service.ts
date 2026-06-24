@@ -3,7 +3,7 @@ import { Cart, CartStatus, Prisma } from '@prisma/client';
 import { randomUUID } from 'crypto';
 import { Request, Response } from 'express';
 import { PrismaService } from '../../prisma/prisma.service';
-import { variantCurrent, variantRegular } from '../../common/pricing';
+import { resolveProductPricing, variantCurrent } from '../../common/pricing';
 
 const COOKIE = 'sv_cart';
 const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
@@ -74,6 +74,9 @@ export class CartService {
             isActive: true,
             basePrice: true,
             salePrice: true,
+            flashPrice: true,
+            flashStartAt: true,
+            flashEndAt: true,
             allowBackorder: true,
             maxPerOrder: true,
           },
@@ -92,8 +95,12 @@ export class CartService {
 
     this.assertWithinLimits(newQty, variant.stock, variant.product);
 
-    // Charge the discounted price when on sale (variant- or product-level).
-    const unitPrice = variantCurrent(variant, variant.product);
+    // Charge the discounted price when on sale (variant- or product-level), or
+    // the flash-deal price while a flash is live. Snapshotted at add time.
+    const unitPrice = variantCurrent(
+      variant,
+      resolveProductPricing(variant.product, new Date()),
+    );
     await this.prisma.cartItem.upsert({
       where: { cartId_variantId: { cartId: cart.id, variantId } },
       update: { quantity: newQty, unitPriceSnapshot: unitPrice },

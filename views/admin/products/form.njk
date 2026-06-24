@@ -46,6 +46,30 @@
     </label>
   </div>
 
+  {# ---- Flash deal (time-bound discount) ---- #}
+  <div class="rounded-lg border border-outline/10 bg-surface-container-lowest p-6">
+    <div class="flex flex-wrap items-center justify-between gap-2">
+      <h2 class="font-headline-md text-headline-md text-on-surface">Flash deal</h2>
+      <span class="rounded-full bg-primary-container px-3 py-1 font-label-sm text-label-sm uppercase tracking-wider text-on-primary-container">Time-limited</span>
+    </div>
+    <p class="mt-1 text-sm text-on-surface-variant">Set a discounted price and an end time. The deal goes live within the window and automatically disappears once it ends — no further action needed.</p>
+    <div class="mt-4 grid gap-4 md:grid-cols-3">
+      <label class="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Flash price (BDT)
+        <input name="flashPrice" type="number" step="0.01" min="0" value="{{ product.flashPrice or '' }}" placeholder="blank = off"
+               class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:ring-0" />
+      </label>
+      <label class="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Starts at (optional)
+        <input name="flashStartAt" type="datetime-local" value="{{ product.flashStartAt | dtLocal }}"
+               class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:ring-0" />
+      </label>
+      <label class="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Ends at
+        <input name="flashEndAt" type="datetime-local" value="{{ product.flashEndAt | dtLocal }}"
+               class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:ring-0" />
+      </label>
+    </div>
+    <p class="mt-2 text-xs text-on-surface-variant">Leave the flash price blank to disable. Blank start = live immediately. The flash price must be lower than the base price to show as a deal. Times use the server's timezone.</p>
+  </div>
+
   <div class="rounded-lg border border-outline/10 bg-surface-container-lowest p-6">
     <p class="mb-2 font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Categories</p>
     <div class="grid grid-cols-2 gap-2 md:grid-cols-3">

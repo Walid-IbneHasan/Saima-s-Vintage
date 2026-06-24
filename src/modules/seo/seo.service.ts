@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { resolveProductPricing } from '../../common/pricing';
 
 interface ProductForLd {
   name: string;
@@ -9,6 +10,9 @@ interface ProductForLd {
   brand: string | null;
   basePrice: Prisma.Decimal;
   salePrice: Prisma.Decimal | null;
+  flashPrice?: Prisma.Decimal | null;
+  flashStartAt?: Date | null;
+  flashEndAt?: Date | null;
   currency: string;
   images: { url: string }[];
 }
@@ -35,11 +39,13 @@ export class SeoService {
   }
 
   productJsonLd(p: ProductForLd, inStock: boolean): string {
-    // Advertise the price actually charged (discounted when on sale).
+    // Advertise the price actually charged (discounted when on sale or during a
+    // live flash deal).
+    const resolved = resolveProductPricing(p, new Date());
     const current =
-      p.salePrice && p.salePrice.lessThan(p.basePrice)
-        ? p.salePrice
-        : p.basePrice;
+      resolved.salePrice && resolved.salePrice.lessThan(resolved.basePrice)
+        ? resolved.salePrice
+        : resolved.basePrice;
     const obj = {
       '@context': 'https://schema.org',
       '@type': 'Product',

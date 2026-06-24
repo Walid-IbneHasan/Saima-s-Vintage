@@ -48,6 +48,17 @@ export class ProductDto {
   @IsOptional() @ToNumber() @IsNumber() @Min(0)
   salePrice?: number;
 
+  // Flash deal: a time-bound discounted price. flashEndAt is required when
+  // flashPrice is set (enforced in the service).
+  @IsOptional() @ToNumber() @IsNumber() @Min(0)
+  flashPrice?: number;
+
+  @IsOptional() @ToTrimmed() @IsString()
+  flashStartAt?: string;
+
+  @IsOptional() @ToTrimmed() @IsString()
+  flashEndAt?: string;
+
   @IsOptional() @ToTrimmed() @IsString() @MaxLength(8)
   currency?: string;
 

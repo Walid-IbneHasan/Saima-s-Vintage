@@ -171,7 +171,27 @@ export class AdminProductsService {
 
   // --- Helpers ------------------------------------------------------------
 
+  /** Parse an optional datetime-local string to a Date, or null. */
+  private parseDate(value: string | undefined, label: string): Date | null {
+    if (!value) return null;
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) {
+      throw new BadRequestException(`Invalid ${label}`);
+    }
+    return d;
+  }
+
   private scalarData(dto: ProductDto, slug: string): Prisma.ProductCreateInput {
+    const flashPrice = dto.flashPrice ?? null;
+    const flashStartAt = this.parseDate(dto.flashStartAt, 'flash deal start time');
+    const flashEndAt = this.parseDate(dto.flashEndAt, 'flash deal end time');
+    if (flashPrice != null && flashEndAt == null) {
+      throw new BadRequestException('A flash deal needs an end time.');
+    }
+    if (flashStartAt && flashEndAt && flashStartAt >= flashEndAt) {
+      throw new BadRequestException('Flash deal end time must be after the start time.');
+    }
+
     return {
       name: dto.name,
       slug,
@@ -182,6 +202,9 @@ export class AdminProductsService {
       condition: dto.condition ?? null,
       basePrice: dto.basePrice,
       salePrice: dto.salePrice ?? null,
+      flashPrice,
+      flashStartAt,
+      flashEndAt,
       currency: dto.currency || 'BDT',
       isActive: dto.isActive,
       isFeatured: dto.isFeatured,

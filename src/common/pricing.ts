@@ -11,6 +11,65 @@ interface ProductPricing {
   salePrice: D | null;
 }
 
+/** Time-bound flash-deal fields on a product. */
+export interface FlashFields {
+  flashPrice: D | null;
+  flashStartAt: Date | null;
+  flashEndAt: Date | null;
+}
+
+/**
+ * Whether a product's flash deal is live at `now`: a flash price is set, the end
+ * time is in the future, and the start time (if any) has passed. This is the
+ * single source of truth that makes deals appear and disappear with no cron.
+ */
+export function isFlashActive(p: Partial<FlashFields>, now: Date): boolean {
+  return !!(
+    p.flashPrice != null &&
+    p.flashEndAt != null &&
+    now < p.flashEndAt &&
+    (p.flashStartAt == null || now >= p.flashStartAt)
+  );
+}
+
+/**
+ * Resolve the *effective* product pricing for `now`: while a flash deal is live
+ * (and actually lower than base), the flash price becomes the salePrice fed to
+ * the rest of the pricing pipeline. If a standing salePrice is even cheaper, the
+ * customer keeps the cheaper one. Once the window closes, pricing reverts to the
+ * standing salePrice (or full price).
+ */
+export function resolveProductPricing(
+  p: ProductPricing & Partial<FlashFields>,
+  now: Date,
+): ProductPricing {
+  if (isFlashActive(p, now) && p.flashPrice!.lessThan(p.basePrice)) {
+    const standing = p.salePrice;
+    const eff =
+      standing != null && standing.lessThan(p.flashPrice!) ? standing : p.flashPrice!;
+    return { basePrice: p.basePrice, salePrice: eff };
+  }
+  return { basePrice: p.basePrice, salePrice: p.salePrice ?? null };
+}
+
+/**
+ * Prisma filter for "on sale right now" — a standing salePrice OR a live flash
+ * deal. Expired flash deals are excluded automatically because `flashEndAt` must
+ * be in the future. Used by the storefront Flash Deals / on-sale filter.
+ */
+export function onSaleWhere(now: Date): Prisma.ProductWhereInput {
+  return {
+    OR: [
+      { salePrice: { not: null } },
+      {
+        flashPrice: { not: null },
+        flashEndAt: { gt: now },
+        OR: [{ flashStartAt: null }, { flashStartAt: { lte: now } }],
+      },
+    ],
+  };
+}
+
 /** The regular (pre-discount) price for a variant — variant override or product base. */
 export function variantRegular(v: VariantPricing, p: ProductPricing): D {
   return v.price ?? p.basePrice;

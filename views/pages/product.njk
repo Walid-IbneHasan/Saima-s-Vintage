@@ -81,6 +81,32 @@
         {% endif %}
       </div>
 
+      {% if flashEndsAtMs %}
+        {# Flash-deal countdown — progressive enhancement (JS only). The discount
+           is server-evaluated, so once it expires a refresh drops the deal. #}
+        <div x-data="{
+               end: {{ flashEndsAtMs }},
+               now: Date.now(),
+               get left() { return Math.max(0, this.end - this.now); },
+               get d() { return Math.floor(this.left / 86400000); },
+               get h() { return Math.floor(this.left % 86400000 / 3600000); },
+               get m() { return Math.floor(this.left % 3600000 / 60000); },
+               get s() { return Math.floor(this.left % 60000 / 1000); },
+               pad(n) { return String(n).padStart(2, '0'); }
+             }"
+             x-init="setInterval(() => now = Date.now(), 1000)"
+             x-show="left > 0" x-cloak
+             class="mt-5 inline-flex flex-wrap items-center gap-x-3 gap-y-1 rounded-full border border-accent/40 bg-accent/10 px-4 py-2">
+          <span class="inline-flex items-center gap-1.5 font-label-sm text-label-sm uppercase tracking-[0.12em] text-accent-deep">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13 2L4.5 13.5H11l-1 8.5 8.5-11.5H12l1-8.5z"/></svg>
+            Flash deal ends in
+          </span>
+          <span class="text-sm font-semibold tabular-nums text-on-surface">
+            <template x-if="d > 0"><span><span x-text="d"></span>d </span></template><span x-text="pad(h)"></span>:<span x-text="pad(m)"></span>:<span x-text="pad(s)"></span>
+          </span>
+        </div>
+      {% endif %}
+
       {# Provenance trust chip. #}
       <p class="mt-5 inline-flex w-fit items-center gap-2 rounded-full border border-accent/30 bg-accent/5 px-4 py-1.5 font-label-sm text-label-sm uppercase tracking-[0.12em] text-accent-deep">
         <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 7l8-4 8 4v6c0 5-3.5 7.5-8 9-4.5-1.5-8-4-8-9V7z" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>

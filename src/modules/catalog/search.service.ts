@@ -51,6 +51,9 @@ export class SearchService {
           slug: true,
           basePrice: true,
           salePrice: true,
+          flashPrice: true,
+          flashStartAt: true,
+          flashEndAt: true,
           currency: true,
           images: {
             take: 1,
@@ -71,7 +74,8 @@ export class SearchService {
     const orderIndex = new Map(ids.map((id, i) => [id, i]));
     rows.sort((a, b) => orderIndex.get(a.id)! - orderIndex.get(b.id)!);
 
-    const items: ProductCard[] = rows.map(toCard);
+    const now = new Date();
+    const items: ProductCard[] = rows.map((r) => toCard(r, now));
 
     return { items, total: Number(countRows[0]?.c ?? 0), query: rawQuery };
   }

@@ -241,6 +241,13 @@ model Product {
   condition        String?  @db.VarChar(64) // vintage condition: e.g. Excellent / Good / Fair
   basePrice        Decimal  @db.Decimal(12, 2) // regular price
   salePrice        Decimal? @db.Decimal(12, 2) // optional discounted price (when set & lower, this is charged)
+  // Time-bound "Flash Deal": while now is within [flashStartAt, flashEndAt] and
+  // flashPrice is set & lower than basePrice, flashPrice is charged and the item
+  // shows under Flash Deals. After flashEndAt it automatically reverts (evaluated
+  // at read/charge time — no background job required).
+  flashPrice       Decimal?  @db.Decimal(12, 2)
+  flashStartAt     DateTime? // null = active immediately once flashPrice is set
+  flashEndAt       DateTime? // required for a flash deal; deal disappears after this
   currency         String   @default("BDT") @db.VarChar(8)
   isActive         Boolean  @default(true)
   isFeatured       Boolean  @default(false)
@@ -266,6 +273,7 @@ model Product {
   @@index([basePrice])
   @@index([createdAt])
   @@index([publishedAt])
+  @@index([flashEndAt])
   @@fulltext([name, shortDescription])
 }
 

@@ -8,7 +8,11 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import { buildPageMeta, parsePage } from '../../common/pagination';
-import { productPriceView } from '../../common/pricing';
+import {
+  isFlashActive,
+  productPriceView,
+  resolveProductPricing,
+} from '../../common/pricing';
 import {
   filterQueryString,
   parseProductFilters,
@@ -140,16 +144,18 @@ export class CatalogController {
       { name: product.name, path: `/p/${product.slug}` },
     ];
 
+    const now = new Date();
+    const flashLive = isFlashActive(product, now);
+
     res.render('pages/product', {
       title: product.seoTitle || product.name,
       metaDescription: product.seoDescription || product.shortDescription,
       canonical: this.seo.abs(`/p/${product.slug}`),
       ogImage: product.images[0] ? this.seo.abs(product.images[0].url) : undefined,
       product,
-      pricing: productPriceView({
-        basePrice: product.basePrice,
-        salePrice: product.salePrice,
-      }),
+      pricing: productPriceView(resolveProductPricing(product, now)),
+      flashEndsAt: flashLive ? product.flashEndAt : null,
+      flashEndsAtMs: flashLive && product.flashEndAt ? product.flashEndAt.getTime() : null,
       reviewStats,
       canReview,
       hasReviewed,

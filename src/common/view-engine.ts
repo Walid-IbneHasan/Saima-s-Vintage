@@ -89,4 +89,14 @@ function registerGlobals(env: nunjucks.Environment, isProd: boolean): void {
     if (Number.isNaN(d.getTime())) return String(value);
     return d.toISOString().slice(0, 16).replace('T', ' ');
   });
+
+  // Value for an <input type="datetime-local"> — server-local wall-clock
+  // (YYYY-MM-DDTHH:mm), so it round-trips with `new Date(value)` on submit.
+  env.addFilter('dtLocal', (value: unknown) => {
+    if (!value) return '';
+    const d = new Date(value as string);
+    if (Number.isNaN(d.getTime())) return '';
+    const p = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+  });
 }
