@@ -49,12 +49,12 @@ if (!prefersReducedMotion && 'IntersectionObserver' in window) {
     { rootMargin: '0px 0px -10% 0px' },
   );
   document
-    .querySelectorAll('[data-reveal]')
+    .querySelectorAll('[data-reveal], [data-reveal-stagger]')
     .forEach((el) => observer.observe(el));
 } else {
   // Reduced motion (or no IO support): reveal everything immediately.
   document
-    .querySelectorAll('[data-reveal]')
+    .querySelectorAll('[data-reveal], [data-reveal-stagger]')
     .forEach((el) => el.classList.add('is-visible'));
 }
 

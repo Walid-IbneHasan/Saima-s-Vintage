@@ -1,40 +1,47 @@
 {% extends "layouts/base.njk" %}
 
 {% block content %}
-<div class="mx-auto max-w-container-max px-margin-mobile py-12 md:px-margin-desktop md:py-16">
-  <nav class="mb-6 text-sm text-on-surface-variant">
-    <a href="/" class="hover:text-primary">Home</a>
-    {% for c in product.categories %}
-      / <a href="/c/{{ c.category.slug }}" class="hover:text-primary">{{ c.category.name }}</a>
-    {% endfor %}
+<div class="mx-auto max-w-container-max px-margin-mobile py-10 md:px-margin-desktop md:py-14">
+  <nav aria-label="Breadcrumb" class="mb-8 text-sm text-on-surface-variant">
+    <ol class="flex flex-wrap items-center gap-1.5">
+      <li><a href="/" class="transition-colors hover:text-accent-deep">Home</a></li>
+      {% for c in product.categories %}
+        <li aria-hidden="true" class="text-on-surface-variant/50">/</li>
+        <li><a href="/c/{{ c.category.slug }}" class="transition-colors hover:text-accent-deep">{{ c.category.name }}</a></li>
+      {% endfor %}
+      <li aria-hidden="true" class="text-on-surface-variant/50">/</li>
+      <li><span class="text-on-surface" aria-current="page">{{ product.name }}</span></li>
+    </ol>
   </nav>
 
-  <div class="grid gap-10 md:grid-cols-2 lg:gap-16">
-    {# Gallery: click a thumbnail to swap the main image (Alpine); the main image
-       links to the full-size file. No-JS: main shows the first image and each
+  <div class="grid gap-10 lg:grid-cols-2 lg:gap-16">
+    {# ── Gallery (sticky on desktop) ──────────────────────────────────────
+       Click a thumbnail to swap the main image (Alpine); the main image links
+       to the full-size file. No-JS: main shows the first image and each
        thumbnail is a real link that opens the full image in a new tab. #}
-    <div x-data="{ sel: '', pick(u) { this.sel = u; this.$refs.main.src = u; this.$refs.mainlink.href = u; } }"
+    <div class="lg:sticky lg:top-28 lg:self-start"
+         x-data="{ sel: '', pick(u) { this.sel = u; this.$refs.main.src = u; this.$refs.mainlink.href = u; } }"
          x-init="sel = $refs.main ? $refs.main.src : ''">
       <a x-ref="mainlink" href="{% if product.images.length %}{{ product.images[0].url }}{% else %}#{% endif %}"
          {% if product.images.length %}target="_blank" rel="noopener"{% endif %}
-         class="block aspect-[4/5] overflow-hidden rounded-lg bg-surface-container-low ambient-shadow">
+         class="group block aspect-[4/5] overflow-hidden rounded-2xl border border-outline/20 bg-surface-container-low shadow-luxe-lg">
         {% if product.images.length %}
           <img x-ref="main" src="{{ product.images[0].url }}" alt="{{ product.images[0].alt or product.name }}"
                {% if product.images[0].width %}width="{{ product.images[0].width }}" height="{{ product.images[0].height }}"{% endif %}
-               class="h-full w-full object-cover" />
+               class="h-full w-full object-cover transition-transform duration-[900ms] ease-lux group-hover:scale-[1.04]" />
         {% else %}
-          <div class="flex h-full w-full items-center justify-center">
-            <p class="font-label-md text-label-md uppercase tracking-widest text-on-surface-variant">No image available</p>
+          <div class="grid h-full w-full place-items-center">
+            <p class="font-label-md text-label-md uppercase tracking-[0.2em] text-on-surface-variant">No image available</p>
           </div>
         {% endif %}
       </a>
       {% if product.images.length > 1 %}
-        <div class="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <div class="mt-4 grid grid-cols-4 gap-3 sm:grid-cols-5">
           {% for img in product.images %}
             <a href="{{ img.url }}" target="_blank" rel="noopener"
                @click.prevent="pick($el.href)"
-               :class="sel === $el.href ? 'ring-2 ring-primary ring-offset-2 ring-offset-surface' : 'opacity-80 hover:opacity-100'"
-               class="block aspect-square overflow-hidden rounded bg-surface-container-low transition"
+               :class="sel === $el.href ? 'ring-2 ring-accent ring-offset-2 ring-offset-background' : 'opacity-75 hover:opacity-100'"
+               class="block aspect-square overflow-hidden rounded-lg border border-outline/20 bg-surface-container-low transition"
                aria-label="View image {{ loop.index }}">
               <img src="{{ img.url }}" alt="{{ img.alt or product.name }}" loading="lazy" class="h-full w-full object-cover" />
             </a>
@@ -43,47 +50,53 @@
       {% endif %}
     </div>
 
-    <div>
-      <h1 class="font-display-lg text-headline-lg leading-tight text-on-surface">{{ product.name }}</h1>
+    {# ── Buying panel ─────────────────────────────────────────────────────── #}
+    <div class="flex flex-col">
+      {% if product.categories.length %}
+        <p class="font-label-sm text-[11px] uppercase tracking-[0.22em] text-accent-deep">{{ product.categories[0].category.name }}</p>
+      {% endif %}
+      <h1 class="mt-2.5 font-display-lg text-[2.25rem] leading-[1.08] text-on-surface text-balance md:text-headline-lg">{{ product.name }}</h1>
+
       {% if reviewStats.count %}
         {% set filledStars = reviewStats.average | round | int %}
-        <a href="#reviews" class="mt-2 inline-flex items-center gap-2 text-sm text-on-surface-variant transition-colors hover:text-primary">
-          <span class="text-primary" aria-hidden="true">{% for i in range(0, filledStars) %}★{% endfor %}<span class="text-outline-variant">{% for i in range(filledStars, 5) %}★{% endfor %}</span></span>
+        <a href="#reviews" class="mt-3 inline-flex items-center gap-2 text-sm text-on-surface-variant transition-colors hover:text-accent-deep">
+          <span class="text-accent" aria-hidden="true">{% for i in range(0, filledStars) %}★{% endfor %}<span class="text-outline">{% for i in range(filledStars, 5) %}★{% endfor %}</span></span>
           <span>{{ reviewStats.average }} · {{ reviewStats.count }} review{% if reviewStats.count != 1 %}s{% endif %}</span>
         </a>
       {% endif %}
+
       {% if product.brand or product.condition %}
-        <p class="mt-2 font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">
+        <p class="mt-3 font-label-sm text-label-sm uppercase tracking-[0.12em] text-on-surface-variant">
           {% if product.brand %}{{ product.brand }}{% endif %}
           {% if product.brand and product.condition %} · {% endif %}
           {% if product.condition %}Condition: {{ product.condition }}{% endif %}
         </p>
       {% endif %}
 
-      <div class="mt-4 flex flex-wrap items-center gap-3">
-        <p class="font-headline-md text-headline-md text-primary">{{ pricing.current | money(product.currency) }}</p>
+      <div class="mt-5 flex flex-wrap items-center gap-3">
+        <p class="font-display-lg text-3xl text-primary">{{ pricing.current | money(product.currency) }}</p>
         {% if pricing.onSale %}
           <p class="text-lg text-on-surface-variant line-through">{{ pricing.regular | money(product.currency) }}</p>
-          <span class="rounded-full bg-primary-container px-3 py-1 font-label-md text-label-md uppercase tracking-wider text-on-primary-container">-{{ pricing.discountPercent }}% off</span>
+          <span class="rounded-full bg-primary-container px-3 py-1 font-label-sm text-label-sm uppercase tracking-[0.12em] text-on-primary-container">−{{ pricing.discountPercent }}% off</span>
         {% endif %}
       </div>
 
-      {# Provenance trust signal — subtle heritage-red chip. #}
-      <p class="mt-4 inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/5 px-3 py-1 font-label-sm text-label-sm uppercase tracking-wider text-primary">
-        <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Restored &amp; Authenticated
+      {# Provenance trust chip. #}
+      <p class="mt-5 inline-flex w-fit items-center gap-2 rounded-full border border-accent/30 bg-accent/5 px-4 py-1.5 font-label-sm text-label-sm uppercase tracking-[0.12em] text-accent-deep">
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 7l8-4 8 4v6c0 5-3.5 7.5-8 9-4.5-1.5-8-4-8-9V7z" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Restored &amp; authenticated
       </p>
 
       {% if product.shortDescription %}
-        <p class="mt-4 text-body-lg text-on-surface-variant">{{ product.shortDescription }}</p>
+        <p class="mt-6 max-w-prose text-body-lg text-on-surface-variant">{{ product.shortDescription }}</p>
       {% endif %}
 
-      <form action="/cart/items" method="post" class="mt-6 space-y-4">
+      <form action="/cart/items" method="post" class="mt-8 space-y-5">
         {% if csrfToken %}<input type="hidden" name="_csrf" value="{{ csrfToken }}" />{% endif %}
         {% if product.variants.length > 1 %}
           <div>
-            <label for="variantId" class="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Option</label>
-            <select id="variantId" name="variantId" class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2.5 text-body-md text-on-surface focus:border-primary focus:ring-0">
+            <label for="variantId" class="block font-label-sm text-label-sm uppercase tracking-[0.12em] text-on-surface-variant">Option</label>
+            <select id="variantId" name="variantId" class="mt-2 w-full rounded-lg border border-outline bg-surface-container-lowest px-4 py-3 text-body-md text-on-surface transition-colors focus:border-accent-deep focus:ring-0">
               {% for v in product.variants %}
                 <option value="{{ v.id }}" {% if v.stock <= 0 %}disabled{% endif %}>
                   {{ v.name }}{% if v.stock <= 0 %} — sold out{% endif %}
@@ -94,77 +107,142 @@
         {% elif product.variants.length == 1 %}
           <input type="hidden" name="variantId" value="{{ product.variants[0].id }}" />
         {% endif %}
-        <div>
-          <label for="quantity" class="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Quantity</label>
-          <input id="quantity" type="number" name="quantity" value="1" min="1"
-                 class="mt-1 w-24 rounded border border-outline/30 bg-surface px-3 py-2.5 text-body-md text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/30" />
+
+        <div class="flex flex-wrap items-end gap-5">
+          {# Quantity stepper (Alpine) with plain number-input fallback. #}
+          <div x-data="{ qty: 1 }">
+            <span class="block font-label-sm text-label-sm uppercase tracking-[0.12em] text-on-surface-variant">Quantity</span>
+            <div class="mt-2 inline-flex items-center rounded-full border border-outline bg-surface-container-lowest">
+              <button type="button" @click="qty = Math.max(1, qty - 1)" class="grid h-11 w-11 place-items-center rounded-full text-on-surface transition-colors hover:text-accent-deep" aria-label="Decrease quantity">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14" stroke-linecap="round"/></svg>
+              </button>
+              <input id="quantity" type="number" name="quantity" x-model.number="qty" value="1" min="1" inputmode="numeric"
+                     class="w-12 border-0 bg-transparent p-0 text-center text-body-md font-medium text-on-surface focus:ring-0 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none" />
+              <button type="button" @click="qty = qty + 1" class="grid h-11 w-11 place-items-center rounded-full text-on-surface transition-colors hover:text-accent-deep" aria-label="Increase quantity">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" {% if not inStock %}disabled{% endif %}
+                  class="group inline-flex min-h-[3.25rem] flex-1 items-center justify-center gap-2.5 rounded-full bg-primary px-8 py-4 font-label-md text-label-md uppercase tracking-[0.16em] text-on-primary shadow-luxe transition-colors duration-300 hover:bg-on-primary-fixed-variant disabled:cursor-not-allowed disabled:bg-surface-container-high disabled:text-on-surface-variant disabled:shadow-none">
+            {% if inStock %}
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 7h12l-1 13H7L6 7z" stroke-linejoin="round"/><path d="M9 7a3 3 0 016 0" stroke-linecap="round"/></svg>
+              Add to bag
+            {% else %}Sold out{% endif %}
+          </button>
         </div>
-        <button type="submit" {% if not inStock %}disabled{% endif %}
-                class="w-full rounded bg-primary px-6 py-3.5 font-label-md text-label-md uppercase tracking-widest text-on-primary transition-colors hover:bg-on-primary-fixed-variant disabled:cursor-not-allowed disabled:bg-surface-container-high disabled:text-on-surface-variant">
-          {% if inStock %}Add to cart{% else %}Sold out{% endif %}
-        </button>
       </form>
 
+      {# Trust bullets. #}
+      <ul class="mt-7 grid grid-cols-1 gap-3 border-t border-outline/30 pt-7 text-sm text-on-surface-variant sm:grid-cols-3">
+        <li class="flex items-center gap-2.5">
+          <svg class="h-5 w-5 shrink-0 text-accent-deep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 8h13v8H3zM16 11h3l2 2v3h-5z" stroke-linejoin="round"/><circle cx="7" cy="17" r="1.7"/><circle cx="18" cy="17" r="1.7"/></svg>
+          Nationwide delivery
+        </li>
+        <li class="flex items-center gap-2.5">
+          <svg class="h-5 w-5 shrink-0 text-accent-deep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 9h16v11H4zM4 9l2-5h12l2 5M12 4v5M9 13h6" stroke-linejoin="round"/></svg>
+          Gift wrapping
+        </li>
+        <li class="flex items-center gap-2.5">
+          <svg class="h-5 w-5 shrink-0 text-accent-deep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          One-of-a-kind
+        </li>
+      </ul>
+
       {% if product.description %}
-        {# Rich text is sanitized on admin write (Phase 1 admin), so `safe` is OK here. #}
-        <div class="prose mt-8 max-w-none text-on-surface-variant">{{ product.description | safe }}</div>
+        <details class="group mt-7 border-t border-outline/30 pt-2" open>
+          <summary class="flex cursor-pointer list-none items-center justify-between py-3 font-label-md text-label-md uppercase tracking-[0.14em] text-on-surface [&::-webkit-details-marker]:hidden">
+            Description
+            <svg class="h-4 w-4 text-on-surface-variant transition-transform duration-300 group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </summary>
+          {# Rich text is sanitized on admin write (Phase 1 admin), so `safe` is OK here. #}
+          <div class="prose prose-stone max-w-none pb-4 pt-1 text-on-surface-variant">{{ product.description | safe }}</div>
+        </details>
       {% endif %}
+
+      <details class="group border-t border-outline/30 pt-2">
+        <summary class="flex cursor-pointer list-none items-center justify-between py-3 font-label-md text-label-md uppercase tracking-[0.14em] text-on-surface [&::-webkit-details-marker]:hidden">
+          Shipping &amp; care
+          <svg class="h-4 w-4 text-on-surface-variant transition-transform duration-300 group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </summary>
+        <div class="pb-4 pt-1 text-sm leading-relaxed text-on-surface-variant">
+          Each piece is carefully packed and shipped across Bangladesh with complimentary gift wrapping. As vintage and handcrafted items, slight variations in patina and finish are part of their character. Dust gently with a soft, dry cloth.
+        </div>
+      </details>
     </div>
   </div>
 
-  <section id="reviews" class="mt-16 border-t border-outline/20 pt-10">
-    <h2 class="font-display-lg text-headline-md text-on-surface">Reviews</h2>
-
-    {% if reviewError %}<p class="mt-3 rounded bg-error-container px-4 py-3 text-sm text-on-error-container">{{ reviewError }}</p>{% endif %}
-
-    {% if canReview and not hasReviewed %}
-      <form action="/p/{{ product.slug }}/reviews" method="post" class="mt-4 max-w-lg space-y-3 rounded-lg border border-outline/10 bg-surface-container-low p-5">
-        <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-        <p class="font-label-md text-label-md uppercase tracking-widest text-on-surface">Write a review</p>
-        <label class="block text-sm text-on-surface-variant">Rating
-          <select name="rating" class="mt-1 block w-40 rounded border border-outline/30 bg-surface px-3 py-2 text-on-surface focus:border-primary focus:ring-0">
-            <option value="5">★★★★★ (5)</option>
-            <option value="4">★★★★ (4)</option>
-            <option value="3">★★★ (3)</option>
-            <option value="2">★★ (2)</option>
-            <option value="1">★ (1)</option>
-          </select>
-        </label>
-        <label class="block text-sm text-on-surface-variant">Title (optional)
-          <input name="title" class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2 text-on-surface focus:border-primary focus:ring-0" />
-        </label>
-        <label class="block text-sm text-on-surface-variant">Your review
-          <textarea name="body" rows="3" required class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2 text-on-surface focus:border-primary focus:ring-0"></textarea>
-        </label>
-        <button class="rounded bg-primary px-5 py-2.5 font-label-md text-label-md uppercase tracking-widest text-on-primary transition-colors hover:bg-on-primary-fixed-variant">Submit review</button>
-      </form>
-    {% elif currentCustomer and hasReviewed %}
-      <p class="mt-3 text-sm text-on-surface-variant">You've already reviewed this product. Thank you!</p>
-    {% elif currentCustomer and not canReview %}
-      <p class="mt-3 text-sm text-on-surface-variant">Only verified purchasers can review this product.</p>
-    {% elif not currentCustomer %}
-      <p class="mt-3 text-sm text-on-surface-variant"><a href="/login" class="text-primary hover:underline">Log in</a> to review products you've purchased.</p>
-    {% endif %}
-
-    {% if reviewStats.count %}
-      <p class="mt-4 text-sm text-on-surface-variant">
-        <span class="text-primary">★</span> {{ reviewStats.average }} · {{ reviewStats.count }} review{% if reviewStats.count != 1 %}s{% endif %}
-      </p>
-      <div class="mt-6 max-w-2xl space-y-5">
-        {% for r in product.reviews %}
-          <div class="border-b border-outline/10 pb-4">
-            <div class="flex items-center gap-2">
-              <span class="text-primary">{% for i in range(0, r.rating) %}★{% endfor %}<span class="text-outline-variant">{% for i in range(r.rating, 5) %}★{% endfor %}</span></span>
-              {% if r.title %}<span class="font-medium text-on-surface">{{ r.title }}</span>{% endif %}
+  {# ── Reviews ──────────────────────────────────────────────────────────── #}
+  <section id="reviews" class="mt-20 border-t border-outline/30 pt-14">
+    <div class="grid gap-10 lg:grid-cols-12 lg:gap-16">
+      <div class="lg:col-span-4">
+        <p class="eyebrow text-accent-deep">Reviews</p>
+        <h2 class="mt-3 font-display-lg text-headline-md text-on-surface">What collectors say</h2>
+        {% if reviewStats.count %}
+          <div class="mt-5 flex items-baseline gap-3">
+            <span class="font-display-lg text-5xl text-primary">{{ reviewStats.average }}</span>
+            <div>
+              <span class="text-accent" aria-hidden="true">★★★★★</span>
+              <p class="text-sm text-on-surface-variant">{{ reviewStats.count }} review{% if reviewStats.count != 1 %}s{% endif %}</p>
             </div>
-            <p class="mt-1 text-sm text-on-surface-variant">{{ r.body }}</p>
-            <p class="mt-1 text-xs text-on-surface-variant/70">— {{ r.authorName }}</p>
           </div>
-        {% endfor %}
+        {% endif %}
+
+        {% if reviewError %}<p class="mt-4 rounded-lg bg-error-container px-4 py-3 text-sm text-on-error-container">{{ reviewError }}</p>{% endif %}
+
+        {% if canReview and not hasReviewed %}
+          <form action="/p/{{ product.slug }}/reviews" method="post" class="mt-6 space-y-3 rounded-2xl border border-outline/30 bg-surface-container-lowest p-6 shadow-luxe">
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+            <p class="font-label-md text-label-md uppercase tracking-[0.14em] text-on-surface">Write a review</p>
+            <label class="block text-sm text-on-surface-variant">Rating
+              <select name="rating" class="mt-1.5 block w-44 rounded-lg border border-outline bg-surface-container-lowest px-3 py-2.5 text-on-surface focus:border-accent-deep focus:ring-0">
+                <option value="5">★★★★★ (5)</option>
+                <option value="4">★★★★ (4)</option>
+                <option value="3">★★★ (3)</option>
+                <option value="2">★★ (2)</option>
+                <option value="1">★ (1)</option>
+              </select>
+            </label>
+            <label class="block text-sm text-on-surface-variant">Title (optional)
+              <input name="title" class="mt-1.5 w-full rounded-lg border border-outline bg-surface-container-lowest px-3 py-2.5 text-on-surface focus:border-accent-deep focus:ring-0" />
+            </label>
+            <label class="block text-sm text-on-surface-variant">Your review
+              <textarea name="body" rows="3" required class="mt-1.5 w-full rounded-lg border border-outline bg-surface-container-lowest px-3 py-2.5 text-on-surface focus:border-accent-deep focus:ring-0"></textarea>
+            </label>
+            <button class="rounded-full bg-primary px-6 py-3 font-label-md text-label-md uppercase tracking-[0.14em] text-on-primary transition-colors hover:bg-on-primary-fixed-variant">Submit review</button>
+          </form>
+        {% elif currentCustomer and hasReviewed %}
+          <p class="mt-5 text-sm text-on-surface-variant">You've already reviewed this product. Thank you!</p>
+        {% elif currentCustomer and not canReview %}
+          <p class="mt-5 text-sm text-on-surface-variant">Only verified purchasers can review this product.</p>
+        {% elif not currentCustomer %}
+          <p class="mt-5 text-sm text-on-surface-variant"><a href="/login" class="text-accent-deep underline-offset-4 hover:underline">Log in</a> to review products you've purchased.</p>
+        {% endif %}
       </div>
-    {% else %}
-      <p class="mt-2 text-on-surface-variant">No reviews yet.</p>
-    {% endif %}
+
+      <div class="lg:col-span-8">
+        {% if reviewStats.count %}
+          <div class="space-y-6">
+            {% for r in product.reviews %}
+              <article class="rounded-2xl border border-outline/30 bg-surface-container-lowest p-6 shadow-luxe">
+                <div class="flex items-center gap-3">
+                  <span class="text-accent" aria-hidden="true">{% for i in range(0, r.rating) %}★{% endfor %}<span class="text-outline">{% for i in range(r.rating, 5) %}★{% endfor %}</span></span>
+                  {% if r.title %}<span class="font-headline-sm text-base text-on-surface">{{ r.title }}</span>{% endif %}
+                </div>
+                <p class="mt-2.5 text-body-md text-on-surface-variant">{{ r.body }}</p>
+                <p class="mt-3 font-label-sm text-label-sm uppercase tracking-[0.12em] text-on-surface-variant/70">— {{ r.authorName }}</p>
+              </article>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="grid place-items-center rounded-2xl border border-dashed border-outline/50 bg-surface-container-low/40 py-16 text-center">
+            <svg class="h-9 w-9 text-on-surface-variant/40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke-linejoin="round"/></svg>
+            <p class="mt-3 text-on-surface-variant">No reviews yet — be the first to share your impressions.</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
   </section>
 </div>
 {% endblock %}

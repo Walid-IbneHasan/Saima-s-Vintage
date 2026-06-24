@@ -1,48 +1,71 @@
 {% extends "layouts/base.njk" %}
 
 {% block content %}
-<div class="mx-auto max-w-2xl px-margin-mobile py-16 text-center md:px-margin-desktop md:py-20">
-  {% if order.status == 'PAID' or order.status == 'PROCESSING' %}
-    <p class="font-label-md text-label-md uppercase tracking-widest text-primary">Payment confirmed</p>
-    <h1 class="mt-3 font-display-lg text-headline-lg text-on-surface">Thank you — you're all set!</h1>
-    <p class="mt-4 text-on-surface-variant">Order <span class="text-on-surface">{{ order.orderNumber }}</span> is paid and being prepared.</p>
-  {% elif order.status == 'PAYMENT_REVIEW' %}
-    <p class="font-label-md text-label-md uppercase tracking-widest text-on-secondary-container">Under review</p>
-    <h1 class="mt-3 font-display-lg text-headline-lg text-on-surface">We're confirming your payment</h1>
-    <p class="mt-4 text-on-surface-variant">Order <span class="text-on-surface">{{ order.orderNumber }}</span> is being verified. We'll email you shortly.</p>
-  {% elif order.status == 'FAILED' %}
-    <p class="font-label-md text-label-md uppercase tracking-widest text-error">Payment failed</p>
-    <h1 class="mt-3 font-display-lg text-headline-lg text-on-surface">That payment didn't go through</h1>
-    <p class="mt-4 text-on-surface-variant">Order <span class="text-on-surface">{{ order.orderNumber }}</span> wasn't paid. Your items have been released.</p>
-  {% elif order.status == 'CANCELLED' %}
-    <p class="font-label-md text-label-md uppercase tracking-widest text-on-surface-variant">Cancelled</p>
-    <h1 class="mt-3 font-display-lg text-headline-lg text-on-surface">Payment cancelled</h1>
-    <p class="mt-4 text-on-surface-variant">Order <span class="text-on-surface">{{ order.orderNumber }}</span> was cancelled.</p>
-  {% else %}
-    <p class="font-label-md text-label-md uppercase tracking-widest text-on-secondary-container">Order placed</p>
-    <h1 class="mt-3 font-display-lg text-headline-lg text-on-surface">Thank you!</h1>
-    <p class="mt-4 text-on-surface-variant">Order <span class="text-on-surface">{{ order.orderNumber }}</span> is <span class="text-on-surface">awaiting payment</span>.</p>
-  {% endif %}
+<section class="relative overflow-hidden">
+  <div class="pointer-events-none absolute -right-24 -top-24 -z-10 h-80 w-80 rounded-full bg-accent/10 blur-3xl" aria-hidden="true"></div>
 
-  <div class="ambient-shadow mt-10 rounded-lg border border-outline/10 bg-surface-container-lowest p-8 text-left">
-    <h2 class="font-headline-md text-headline-md text-on-surface">Summary</h2>
-    <div class="mt-4 space-y-2 text-sm">
-      {% for item in order.items %}
-        <div class="flex justify-between">
-          <span class="text-on-surface-variant">{{ item.productName }} ({{ item.variantName }}) × {{ item.quantity }}</span>
-          <span class="text-on-surface">{{ item.lineTotal | money(order.currency) }}</span>
-        </div>
-      {% endfor %}
+  <div class="mx-auto max-w-2xl px-margin-mobile py-16 text-center md:px-margin-desktop md:py-24" data-reveal>
+    {% if order.status == 'PAID' or order.status == 'PROCESSING' %}
+      <div class="mx-auto grid h-20 w-20 place-items-center rounded-full border border-accent/30 bg-accent/5 text-accent-deep">
+        <svg class="h-9 w-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8.5 12l2.5 2.5 4.5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <p class="mt-7 eyebrow text-accent-deep">Payment confirmed</p>
+      <h1 class="mt-4 font-display-lg text-headline-lg text-on-surface text-balance">Thank you — you're all set!</h1>
+      <p class="mt-4 text-body-lg text-on-surface-variant">Order <span class="font-medium text-on-surface">{{ order.orderNumber }}</span> is paid and being prepared.</p>
+    {% elif order.status == 'PAYMENT_REVIEW' %}
+      <div class="mx-auto grid h-20 w-20 place-items-center rounded-full border border-accent/30 bg-accent/5 text-accent-deep">
+        <svg class="h-9 w-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <p class="mt-7 eyebrow text-accent-deep">Under review</p>
+      <h1 class="mt-4 font-display-lg text-headline-lg text-on-surface text-balance">We're confirming your payment</h1>
+      <p class="mt-4 text-body-lg text-on-surface-variant">Order <span class="font-medium text-on-surface">{{ order.orderNumber }}</span> is being verified. We'll email you shortly.</p>
+    {% elif order.status == 'FAILED' %}
+      <div class="mx-auto grid h-20 w-20 place-items-center rounded-full border border-error/20 bg-error-container text-error">
+        <svg class="h-9 w-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6" stroke-linecap="round"/></svg>
+      </div>
+      <p class="mt-7 eyebrow text-error">Payment failed</p>
+      <h1 class="mt-4 font-display-lg text-headline-lg text-on-surface text-balance">That payment didn't go through</h1>
+      <p class="mt-4 text-body-lg text-on-surface-variant">Order <span class="font-medium text-on-surface">{{ order.orderNumber }}</span> wasn't paid. Your items have been released.</p>
+    {% elif order.status == 'CANCELLED' %}
+      <div class="mx-auto grid h-20 w-20 place-items-center rounded-full border border-outline/40 bg-surface-container-low text-on-surface-variant">
+        <svg class="h-9 w-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6" stroke-linecap="round"/></svg>
+      </div>
+      <p class="mt-7 eyebrow text-on-surface-variant">Cancelled</p>
+      <h1 class="mt-4 font-display-lg text-headline-lg text-on-surface text-balance">Payment cancelled</h1>
+      <p class="mt-4 text-body-lg text-on-surface-variant">Order <span class="font-medium text-on-surface">{{ order.orderNumber }}</span> was cancelled.</p>
+    {% else %}
+      <div class="mx-auto grid h-20 w-20 place-items-center rounded-full border border-accent/30 bg-accent/5 text-accent-deep">
+        <svg class="h-9 w-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 7h12l-1 13H7L6 7z" stroke-linejoin="round"/><path d="M9 7a3 3 0 016 0" stroke-linecap="round"/></svg>
+      </div>
+      <p class="mt-7 eyebrow text-accent-deep">Order placed</p>
+      <h1 class="mt-4 font-display-lg text-headline-lg text-on-surface text-balance">Thank you!</h1>
+      <p class="mt-4 text-body-lg text-on-surface-variant">Order <span class="font-medium text-on-surface">{{ order.orderNumber }}</span> is <span class="font-medium text-on-surface">awaiting payment</span>.</p>
+    {% endif %}
+
+    <div class="mt-12 rounded-2xl border border-outline/30 bg-surface-container-lowest p-8 text-left shadow-luxe">
+      <h2 class="font-headline-sm text-lg uppercase tracking-[0.06em] text-on-surface">Summary</h2>
+      <hr class="hairline-gold my-5" />
+      <div class="space-y-3 text-sm">
+        {% for item in order.items %}
+          <div class="flex justify-between gap-4">
+            <span class="text-on-surface-variant">{{ item.productName }} ({{ item.variantName }}) × {{ item.quantity }}</span>
+            <span class="shrink-0 text-on-surface">{{ item.lineTotal | money(order.currency) }}</span>
+          </div>
+        {% endfor %}
+      </div>
+      <div class="mt-6 flex justify-between border-t border-outline/30 pt-6 font-display-lg text-xl text-on-surface">
+        <span>Total</span><span>{{ order.grandTotal | money(order.currency) }}</span>
+      </div>
     </div>
-    <div class="mt-5 flex justify-between border-t border-outline/10 pt-5 text-lg text-on-surface">
-      <span>Total</span><span>{{ order.grandTotal | money(order.currency) }}</span>
-    </div>
+
+    {% if order.status == 'AWAITING_PAYMENT' %}
+      <a href="/checkout" class="mt-10 inline-flex items-center justify-center gap-2.5 rounded-full bg-primary px-9 py-3.5 font-label-md text-label-md uppercase tracking-[0.16em] text-on-primary shadow-luxe transition-colors duration-300 hover:bg-on-primary-fixed-variant">
+        Complete payment
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    {% else %}
+      <a href="/" class="mt-10 inline-flex items-center justify-center gap-2 rounded-full border border-outline px-8 py-3.5 font-label-md text-label-md uppercase tracking-[0.16em] text-on-surface transition-colors duration-300 hover:border-accent hover:text-accent-deep">Back to home</a>
+    {% endif %}
   </div>
-
-  {% if order.status == 'AWAITING_PAYMENT' %}
-    <a href="/checkout" class="mt-8 inline-flex items-center justify-center rounded bg-primary px-8 py-3 font-label-md text-label-md uppercase tracking-widest text-on-primary transition-colors hover:bg-on-primary-fixed-variant">Complete payment</a>
-  {% else %}
-    <a href="/" class="mt-8 inline-block rounded border border-outline px-6 py-3 font-label-md text-label-md uppercase tracking-widest text-on-surface transition-colors hover:border-primary hover:text-primary">Back to home</a>
-  {% endif %}
-</div>
+</section>
 {% endblock %}

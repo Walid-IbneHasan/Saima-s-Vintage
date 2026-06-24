@@ -2,25 +2,50 @@
 {% from "partials/breadcrumbs.njk" import breadcrumbs %}
 
 {% block content %}
-<div class="mx-auto max-w-container-max px-margin-mobile py-16 md:px-margin-desktop md:py-20">
+<div class="mx-auto max-w-container-max px-margin-mobile py-16 md:px-margin-desktop md:py-24">
   {{ breadcrumbs([{ name: 'Home', path: '/' }, { name: 'Search' }]) }}
-  <form action="/search" method="get" class="mb-8 flex flex-col gap-3 sm:flex-row">
-    <input type="search" name="q" value="{{ query }}" placeholder="Search vintage…"
-           class="w-full rounded-full border border-outline/30 bg-surface px-5 py-3 text-body-md text-on-surface placeholder:text-on-surface-variant/50 focus:border-primary focus:ring-0" />
-    <button type="submit" class="inline-flex items-center justify-center rounded bg-primary px-8 py-3 font-label-md text-label-md uppercase tracking-widest text-on-primary transition-colors hover:bg-on-primary-fixed-variant">Search</button>
-  </form>
+
+  <div class="mt-8 max-w-2xl">
+    <p class="eyebrow text-accent-deep">Find your piece</p>
+    <h1 class="mt-4 font-display-lg text-headline-lg text-on-surface">Search the collection</h1>
+
+    <form action="/search" method="get" class="mt-7">
+      <div class="group flex items-center gap-3 rounded-full border border-outline bg-surface-container-lowest px-6 py-2 shadow-luxe transition-colors focus-within:border-accent-deep">
+        <svg class="h-5 w-5 shrink-0 text-on-surface-variant transition-colors group-focus-within:text-accent-deep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3" stroke-linecap="round"/></svg>
+        <input type="search" name="q" value="{{ query }}" placeholder="Search Lippan, Jharoka, vintage…"
+               class="w-full border-none bg-transparent py-2.5 text-body-md text-on-surface placeholder:text-on-surface-variant/50 focus:ring-0" />
+        <button type="submit" class="shrink-0 rounded-full bg-primary px-7 py-3 font-label-md text-label-md uppercase tracking-[0.16em] text-on-primary transition-colors duration-300 hover:bg-on-primary-fixed-variant">Search</button>
+      </div>
+    </form>
+  </div>
 
   {% if query %}
-    <p class="text-sm text-on-surface-variant">{{ meta.total }} result(s) for &ldquo;{{ query }}&rdquo;</p>
+    <p class="mt-8 font-label-sm text-label-sm uppercase tracking-[0.12em] text-on-surface-variant">
+      {{ meta.total }} result{% if meta.total != 1 %}s{% endif %} for <span class="text-on-surface">&ldquo;{{ query }}&rdquo;</span>
+    </p>
   {% endif %}
 
   {% if products.length %}
-    <div class="mt-8 grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4">
+    <div class="mt-10 grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4" data-reveal-stagger>
       {% for p in products %}{% include "partials/product-card.njk" %}{% endfor %}
     </div>
     {% include "partials/pagination.njk" %}
   {% elif query %}
-    <p class="mt-10 text-on-surface-variant">No matches. Try a different term.</p>
+    <div class="mt-14 grid place-items-center rounded-2xl border border-dashed border-outline/50 bg-surface-container-low/40 px-6 py-20 text-center">
+      <svg class="h-10 w-10 text-on-surface-variant/40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3" stroke-linecap="round"/></svg>
+      <h2 class="mt-5 font-headline-sm text-xl text-on-surface">No matches found</h2>
+      <p class="mt-2 max-w-sm text-body-md text-on-surface-variant">We couldn't find anything for that term. Try a different keyword, or browse the full collection.</p>
+      <a href="/products" class="mt-7 inline-flex items-center justify-center gap-2 rounded-full border border-outline px-6 py-3 font-label-md text-label-md uppercase tracking-[0.16em] text-on-surface transition-colors duration-300 hover:border-accent hover:text-accent-deep">
+        Browse all pieces
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+  {% else %}
+    <div class="mt-14 grid place-items-center rounded-2xl border border-dashed border-outline/50 bg-surface-container-low/40 px-6 py-20 text-center">
+      <svg class="h-10 w-10 text-accent-deep/60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3" stroke-linecap="round"/></svg>
+      <h2 class="mt-5 font-headline-sm text-xl text-on-surface">What are you looking for?</h2>
+      <p class="mt-2 max-w-sm text-body-md text-on-surface-variant">Search by name, craft or style to discover one-of-a-kind heritage pieces.</p>
+    </div>
   {% endif %}
 </div>
 {% endblock %}

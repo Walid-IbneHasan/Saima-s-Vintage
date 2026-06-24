@@ -1,11 +1,17 @@
 {% if meta.totalPages > 1 %}
-<nav class="mt-12 flex items-center justify-center gap-4 text-sm" aria-label="Pagination">
+<nav class="mt-16 flex items-center justify-center gap-3 text-sm" aria-label="Pagination">
   {% if meta.hasPrev %}
-    <a class="rounded border border-outline px-4 py-2 font-label-md text-label-md uppercase tracking-widest text-on-surface transition-colors hover:border-primary hover:text-primary" href="{{ basePath }}page={{ meta.page - 1 }}">Previous</a>
+    <a class="group inline-flex items-center gap-2 rounded-full border border-outline px-5 py-2.5 font-label-md text-label-md uppercase tracking-[0.14em] text-on-surface transition-colors hover:border-accent hover:text-accent-deep" href="{{ basePath }}page={{ meta.page - 1 }}">
+      <svg class="h-4 w-4 transition-transform duration-300 ease-lux group-hover:-translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Prev
+    </a>
   {% endif %}
-  <span class="font-label-md text-label-md uppercase tracking-widest text-on-surface-variant">Page {{ meta.page }} of {{ meta.totalPages }}</span>
+  <span class="px-2 font-label-md text-label-md uppercase tracking-[0.14em] text-on-surface-variant">Page {{ meta.page }} <span class="text-on-surface-variant/50">/</span> {{ meta.totalPages }}</span>
   {% if meta.hasNext %}
-    <a class="rounded border border-outline px-4 py-2 font-label-md text-label-md uppercase tracking-widest text-on-surface transition-colors hover:border-primary hover:text-primary" href="{{ basePath }}page={{ meta.page + 1 }}">Next</a>
+    <a class="group inline-flex items-center gap-2 rounded-full border border-outline px-5 py-2.5 font-label-md text-label-md uppercase tracking-[0.14em] text-on-surface transition-colors hover:border-accent hover:text-accent-deep" href="{{ basePath }}page={{ meta.page + 1 }}">
+      Next
+      <svg class="h-4 w-4 transition-transform duration-300 ease-lux group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
   {% endif %}
 </nav>
 {% endif %}

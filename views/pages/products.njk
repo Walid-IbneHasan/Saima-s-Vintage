@@ -2,31 +2,46 @@
 {% from "partials/breadcrumbs.njk" import breadcrumbs %}
 
 {% block content %}
-<div class="mx-auto max-w-container-max px-margin-mobile py-12 md:px-margin-desktop md:py-16">
-  {{ breadcrumbs([{ name: 'Home', path: '/' }, { name: 'Shop all' }]) }}
+{# ── Collection masthead ──────────────────────────────────────────────── #}
+<section class="relative overflow-hidden border-b border-outline/30 bg-surface-container-low/50">
+  <div class="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-accent/[0.08] blur-3xl"></div>
+  <div class="relative mx-auto max-w-container-max px-margin-mobile py-12 md:px-margin-desktop md:py-16">
+    {{ breadcrumbs([{ name: 'Home', path: '/' }, { name: 'Shop all' }]) }}
+    <div class="mt-6 max-w-2xl">
+      <p class="eyebrow text-accent-deep">The Collection</p>
+      <h1 class="mt-4 font-display-lg text-[2.5rem] leading-[1.04] text-on-surface md:text-display-lg">Curated heritage pieces</h1>
+      <p class="mt-4 text-body-lg text-on-surface-variant">
+        {{ meta.total }} one-of-a-kind piece{% if meta.total != 1 %}s{% endif %} — handcrafted Lippan &amp; Jharoka art and restored vintage treasures, chosen to live beautifully in modern spaces.
+      </p>
+    </div>
+  </div>
+</section>
 
-  <div class="mt-6 flex flex-col gap-gutter md:flex-row">
+<div class="mx-auto max-w-container-max px-margin-mobile py-12 md:px-margin-desktop md:py-16">
+  <div class="flex flex-col gap-10 lg:flex-row lg:gap-12">
     {# Sidebar filters #}
-    <aside class="w-full shrink-0 md:w-72">
-      <div class="md:sticky md:top-28">{% include "partials/product-filters.njk" %}</div>
+    <aside class="w-full shrink-0 lg:w-72">
+      <div class="lg:sticky lg:top-28">{% include "partials/product-filters.njk" %}</div>
     </aside>
 
     {# Product canvas #}
     <section class="min-w-0 flex-grow">
-      <div class="mb-10 border-b border-outline-variant/40 pb-6">
-        <h1 class="font-display-lg-mobile text-display-lg-mobile text-primary">The Collection</h1>
-        <p class="mt-2 max-w-lg text-body-md text-on-surface-variant">
-          {{ meta.total }} curated piece{% if meta.total != 1 %}s{% endif %} blending traditional craftsmanship with modern minimalist spaces.
-        </p>
-      </div>
-
       {% if products.length %}
-        <div class="grid grid-cols-1 gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="mb-8 flex items-center justify-between border-b border-outline/30 pb-4">
+          <p class="font-label-sm text-label-sm uppercase tracking-[0.14em] text-on-surface-variant">
+            Showing {{ products.length }} of {{ meta.total }}
+          </p>
+        </div>
+        <div class="grid grid-cols-1 gap-x-7 gap-y-12 sm:grid-cols-2 lg:grid-cols-3" data-reveal-stagger>
           {% for p in products %}{% include "partials/product-card.njk" %}{% endfor %}
         </div>
         {% include "partials/pagination.njk" %}
       {% else %}
-        <p class="text-on-surface-variant">No products match your filters. <a href="/products" class="text-primary hover:underline">Clear filters</a>.</p>
+        <div class="grid place-items-center rounded-2xl border border-dashed border-outline/50 bg-surface-container-low/40 py-24 text-center">
+          <svg class="h-10 w-10 text-on-surface-variant/40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3" stroke-linecap="round"/></svg>
+          <p class="mt-4 text-body-md text-on-surface-variant">No pieces match your filters.</p>
+          <a href="/products" class="mt-5 inline-flex items-center justify-center rounded-full border border-outline px-6 py-3 font-label-md text-label-md uppercase tracking-[0.16em] text-on-surface transition-colors hover:border-accent hover:text-accent-deep">Clear filters</a>
+        </div>
       {% endif %}
     </section>
   </div>

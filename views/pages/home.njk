@@ -2,90 +2,153 @@
 
 {% block content %}
 {# ─── Hero ─────────────────────────────────────────────────────────────── #}
-<section class="relative flex min-h-[86vh] items-center overflow-hidden">
-  {# Soft tonal wash behind the animated Lippan/Jharoka motifs. #}
-  <div class="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-surface via-surface-container-low to-surface-container"></div>
+<section class="relative flex min-h-[90vh] items-center overflow-hidden">
+  <div class="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-surface via-surface-container-low/60 to-background"></div>
+  <div class="pointer-events-none absolute -left-40 top-1/3 -z-10 h-[34rem] w-[34rem] rounded-full bg-accent/[0.07] blur-3xl"></div>
   {% include "partials/hero-decor.njk" %}
 
-  <div class="mx-auto grid w-full max-w-container-max grid-cols-1 items-center gap-12 px-margin-mobile py-20 md:px-margin-desktop lg:grid-cols-2">
-    <div class="flex max-w-2xl flex-col items-start gap-6 rounded border border-outline/10 bg-surface/40 p-8 shadow-[0_20px_40px_-15px_rgba(139,0,0,0.05)] backdrop-blur-sm hero-fade">
-      <span class="inline-block rounded-full bg-primary-container px-4 py-1.5 font-label-sm text-label-sm uppercase tracking-widest text-on-primary-container">New Collection</span>
-      <h1 class="font-display-lg text-[2.75rem] leading-[1.05] tracking-tight text-on-surface md:text-display-lg lg:text-[5rem]">
-        Handcrafted <br /><span class="font-light italic text-primary">Heritage</span>
+  <div class="mx-auto grid w-full max-w-container-max grid-cols-1 items-center gap-14 px-margin-mobile py-24 md:px-margin-desktop lg:grid-cols-12 lg:gap-10">
+    <div class="flex flex-col items-start lg:col-span-6">
+      <span class="hero-fade inline-flex items-center gap-2.5 rounded-full border border-accent/30 bg-surface-container-lowest/60 px-4 py-1.5 backdrop-blur-sm">
+        <span class="h-1.5 w-1.5 rounded-full bg-accent"></span>
+        <span class="font-label-sm text-[11px] uppercase tracking-[0.24em] text-accent-deep">New Collection — Lippan &amp; Jharoka</span>
+      </span>
+      <h1 class="hero-fade hero-fade-delay-1 mt-7 font-display-lg text-[2.85rem] leading-[1.02] tracking-tight text-on-surface text-balance md:text-display-lg lg:text-[5.25rem]">
+        Handcrafted <span class="font-normal italic text-accent">heritage</span> for the modern home.
       </h1>
-      <p class="max-w-lg text-body-lg text-on-surface-variant">
-        Curated vintage treasures — timeless, one-of-a-kind pieces that bring character and history into modern spaces.
+      <p class="hero-fade hero-fade-delay-1 mt-7 max-w-md text-body-lg text-on-surface-variant">
+        One-of-a-kind Lippan mirror art and Mughal Jharoka decor — sought out, lovingly restored, and brought home to be admired again.
       </p>
-      <a href="/products" class="inline-flex h-12 items-center justify-center rounded bg-primary px-8 font-label-md text-label-md uppercase text-on-primary shadow-md transition-colors hover:bg-on-primary-fixed-variant">
-        Shop Collection
-      </a>
+      <div class="hero-fade hero-fade-delay-2 mt-9 flex flex-wrap items-center gap-4">
+        <a href="/products" class="group inline-flex h-14 items-center justify-center gap-2.5 rounded-full bg-primary px-9 font-label-md text-label-md uppercase tracking-[0.16em] text-on-primary shadow-luxe transition-colors duration-300 hover:bg-on-primary-fixed-variant">
+          Shop the collection
+          <svg class="h-4 w-4 transition-transform duration-300 ease-lux group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a href="/pages/about" class="link-underline inline-flex h-14 items-center font-label-md text-label-md uppercase tracking-[0.16em] text-on-surface transition-colors hover:text-accent-deep">
+          Our story
+        </a>
+      </div>
+      <div class="hero-fade hero-fade-delay-3 mt-10 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-on-surface-variant">
+        <span class="inline-flex items-center gap-2">
+          <span class="text-accent" aria-hidden="true">★★★★★</span>
+          <span>Loved by collectors</span>
+        </span>
+        <span class="hidden h-4 w-px bg-outline sm:block"></span>
+        <span class="inline-flex items-center gap-2">
+          <svg class="h-4 w-4 text-accent-deep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 7l8-4 8 4v6c0 5-3.5 7.5-8 9-4.5-1.5-8-4-8-9V7z" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Restored &amp; authenticated
+        </span>
+      </div>
     </div>
 
     {% set hero = featured[0] %}
-    <a href="{% if hero %}/p/{{ hero.slug }}{% else %}/products{% endif %}"
-       class="tilt-3d group relative block h-[440px] w-full overflow-hidden rounded-xl border border-outline/10 shadow-[0_40px_80px_-20px_rgba(139,0,0,0.1)] md:h-[600px]">
-      {% if hero and hero.image %}
-        <img src="{{ hero.image.url }}" alt="{{ hero.image.alt or hero.name }}"
-             class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
-      {% else %}
-        <img src="/images/products/lippan-mandala-marigold.avif" alt="Featured handcrafted Lippan piece"
-             class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
-      {% endif %}
-      {% if hero %}
-        <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-surface/90 via-surface/40 to-transparent p-6">
-          <div class="flex items-end justify-between gap-4">
-            <div>
-              <p class="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant">Featured piece</p>
-              <h3 class="mt-1 font-headline-md text-headline-md text-on-surface">{{ hero.name }}</h3>
+    <div class="hero-fade hero-fade-delay-2 relative lg:col-span-6 lg:col-start-7">
+      <a href="{% if hero %}/p/{{ hero.slug }}{% else %}/products{% endif %}"
+         class="tilt-3d group relative block aspect-[4/5] w-full overflow-hidden rounded-2xl border border-accent/20 shadow-luxe-xl">
+        {% if hero and hero.image %}
+          <img src="{{ hero.image.url }}" alt="{{ hero.image.alt or hero.name }}"
+               class="h-full w-full object-cover transition-transform duration-[1100ms] ease-lux group-hover:scale-105" />
+        {% else %}
+          <img src="/images/products/lippan-mandala-marigold.avif" alt="Featured handcrafted Lippan mirror piece"
+               class="h-full w-full object-cover transition-transform duration-[1100ms] ease-lux group-hover:scale-105" />
+        {% endif %}
+        {% if hero %}
+          <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-primary/85 via-primary/25 to-transparent p-7">
+            <div class="flex items-end justify-between gap-4">
+              <div>
+                <p class="font-label-sm text-[11px] uppercase tracking-[0.22em] text-on-primary/75">Featured piece</p>
+                <h3 class="mt-1.5 font-headline-md text-2xl text-on-primary">{{ hero.name }}</h3>
+              </div>
+              <span class="shrink-0 rounded-full bg-surface-container-lowest/95 px-4 py-1.5 font-label-md text-label-md text-primary">{{ hero.pricing.current | money(hero.currency) }}</span>
             </div>
-            <span class="shrink-0 font-label-md text-label-md text-primary">{{ hero.pricing.current | money(hero.currency) }}</span>
           </div>
+        {% endif %}
+      </a>
+
+      {# Rotating gold authenticity seal. #}
+      <div class="pointer-events-none absolute -left-6 -top-6 hidden h-28 w-28 place-items-center rounded-full border border-accent/30 bg-surface-container-lowest shadow-luxe sm:grid">
+        <svg class="hero-spin h-24 w-24 text-accent-deep" style="--spin: 26s" viewBox="0 0 100 100" aria-hidden="true">
+          <defs><path id="sealpath" d="M50,50 m-37,0 a37,37 0 1,1 74,0 a37,37 0 1,1 -74,0"/></defs>
+          <text font-size="8.4" letter-spacing="2.4" fill="currentColor"><textPath href="#sealpath" startOffset="0">· RESTORED · AUTHENTICATED · HANDCRAFTED </textPath></text>
+        </svg>
+        <svg class="absolute h-7 w-7 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8.5 12l2.5 2.5 4.5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <a href="#collection" class="absolute bottom-7 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 text-on-surface-variant transition-colors hover:text-accent-deep md:flex" aria-label="Scroll to collection">
+    <span class="font-label-sm text-[10px] uppercase tracking-[0.3em]">Discover</span>
+    <svg class="h-5 w-5 animate-bounce" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </a>
+</section>
+
+{# ─── Trust feature row ────────────────────────────────────────────────── #}
+<section class="border-y border-outline/30 bg-surface-container-low/50">
+  <div class="mx-auto grid max-w-container-max grid-cols-2 gap-px overflow-hidden px-margin-mobile py-3 md:grid-cols-4 md:px-margin-desktop" data-reveal-stagger>
+    {% set feats = [
+      { t: 'Handcrafted', d: 'Traditional Kutch artistry', icon: 'spark' },
+      { t: 'Restored & authenticated', d: 'Verified, cared-for pieces', icon: 'shield' },
+      { t: 'Nationwide delivery', d: 'Shipped with care', icon: 'truck' },
+      { t: 'Gift wrapping', d: 'Complimentary on every order', icon: 'gift' }
+    ] %}
+    {% for f in feats %}
+      <div class="flex items-center gap-4 px-2 py-6 md:px-6">
+        <span class="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-accent/30 text-accent-deep">
+          {% if f.icon == 'spark' %}<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 3l2 6 6 2-6 2-2 6-2-6-6-2 6-2z" stroke-linejoin="round"/></svg>
+          {% elif f.icon == 'shield' %}<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 7l8-4 8 4v6c0 5-3.5 7.5-8 9-4.5-1.5-8-4-8-9V7z" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          {% elif f.icon == 'truck' %}<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 8h13v8H3zM16 11h3l2 2v3h-5z" stroke-linejoin="round"/><circle cx="7" cy="17" r="1.7"/><circle cx="18" cy="17" r="1.7"/></svg>
+          {% else %}<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 9h16v11H4zM4 9l2-5h12l2 5M12 4v5M9 13h6" stroke-linejoin="round"/></svg>{% endif %}
+        </span>
+        <div class="min-w-0">
+          <p class="font-label-md text-[13px] uppercase tracking-[0.12em] text-on-surface">{{ f.t }}</p>
+          <p class="mt-0.5 text-sm text-on-surface-variant">{{ f.d }}</p>
         </div>
-      {% endif %}
-    </a>
+      </div>
+    {% endfor %}
   </div>
 </section>
 
 {# ─── Featured (bento grid) ────────────────────────────────────────────── #}
-<section class="mx-auto max-w-container-max px-margin-mobile py-24 md:px-margin-desktop md:py-32">
-  <div class="mb-12 flex flex-col items-start justify-between gap-6 md:mb-16 md:flex-row md:items-end">
+<section id="collection" class="mx-auto max-w-container-max px-margin-mobile py-24 md:px-margin-desktop md:py-32">
+  <div class="mb-12 flex flex-col items-start justify-between gap-6 md:mb-16 md:flex-row md:items-end" data-reveal>
     <div>
-      <h2 class="font-display-lg text-headline-lg text-on-surface">Curated Collection</h2>
-      <p class="mt-2 text-body-md text-on-surface-variant">A rotating selection of our latest finds, lovingly restored.</p>
+      <p class="eyebrow text-accent-deep">Curated this season</p>
+      <h2 class="mt-4 font-display-lg text-headline-lg text-on-surface">The Collection</h2>
+      <p class="mt-3 max-w-md text-body-md text-on-surface-variant">A rotating selection of our latest finds, each one lovingly restored and ready for a new home.</p>
     </div>
-    <a href="/products" class="inline-flex items-center gap-2 border-b border-primary/30 pb-1 font-label-md text-label-md uppercase text-primary transition-opacity hover:opacity-70">
+    <a href="/products" class="link-underline inline-flex items-center gap-2 font-label-md text-label-md uppercase tracking-[0.18em] text-primary transition-colors hover:text-accent-deep">
       View all
       <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </a>
   </div>
 
   {% if featured.length %}
-    <div class="grid grid-cols-1 gap-gutter md:grid-cols-12" data-reveal>
+    <div class="grid grid-cols-1 gap-gutter md:grid-cols-12" data-reveal-stagger>
       {# Large feature tile #}
       {% set p = featured[0] %}
-      <a href="/p/{{ p.slug }}" class="group relative col-span-1 h-[400px] overflow-hidden rounded border border-outline/10 bg-surface-container-low ambient-shadow md:col-span-8 md:row-span-2 md:h-[600px]">
-        {% if p.image %}<img src="{{ p.image.url }}" alt="{{ p.image.alt or p.name }}" class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />{% endif %}
-        <div class="absolute left-6 top-6"><span class="rounded-full bg-surface/90 px-3 py-1 font-label-sm text-label-sm text-on-surface shadow-sm backdrop-blur-sm">Featured</span></div>
-        <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-surface/90 via-surface/40 to-transparent p-8">
+      <a href="/p/{{ p.slug }}" class="hover-lift group relative col-span-1 h-[400px] overflow-hidden rounded-2xl border border-outline/20 bg-surface-container-low shadow-luxe md:col-span-8 md:row-span-2 md:h-[600px]">
+        {% if p.image %}<img src="{{ p.image.url }}" alt="{{ p.image.alt or p.name }}" class="absolute inset-0 h-full w-full object-cover transition-transform duration-[1100ms] ease-lux group-hover:scale-105" />{% endif %}
+        <div class="absolute left-6 top-6"><span class="rounded-full bg-surface-container-lowest/90 px-3.5 py-1.5 font-label-sm text-[11px] uppercase tracking-[0.18em] text-primary shadow-sm backdrop-blur-sm">Featured</span></div>
+        <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-primary/85 via-primary/20 to-transparent p-8">
           <div class="flex items-end justify-between gap-4">
             <div>
-              <h3 class="font-headline-md text-headline-md text-on-surface group-hover:text-primary">{{ p.name }}</h3>
-              {% if not p.inStock %}<p class="mt-1 font-label-sm text-label-sm uppercase text-error">Sold out</p>{% endif %}
+              <h3 class="font-headline-md text-headline-md text-on-primary">{{ p.name }}</h3>
+              {% if not p.inStock %}<p class="mt-1.5 font-label-sm text-label-sm uppercase tracking-[0.12em] text-accent-bright">Sold out</p>{% endif %}
             </div>
-            <span class="shrink-0 font-label-md text-label-md text-primary">{{ p.pricing.current | money(p.currency) }}</span>
+            <span class="shrink-0 rounded-full bg-surface-container-lowest/95 px-4 py-1.5 font-label-md text-label-md text-primary">{{ p.pricing.current | money(p.currency) }}</span>
           </div>
         </div>
       </a>
 
       {# Tall tile #}
       {% if featured[1] %}{% set p = featured[1] %}
-      <a href="/p/{{ p.slug }}" class="group relative col-span-1 h-[300px] overflow-hidden rounded border border-outline/10 bg-surface-container-low ambient-shadow md:col-span-4 md:h-[288px]">
-        {% if p.image %}<img src="{{ p.image.url }}" alt="{{ p.image.alt or p.name }}" class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />{% endif %}
-        <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-surface/90 via-surface/50 to-transparent p-4">
-          <h3 class="font-headline-md text-body-lg font-medium text-on-surface">{{ p.name }}</h3>
+      <a href="/p/{{ p.slug }}" class="hover-lift group relative col-span-1 h-[300px] overflow-hidden rounded-2xl border border-outline/20 bg-surface-container-low shadow-luxe md:col-span-4 md:h-[288px]">
+        {% if p.image %}<img src="{{ p.image.url }}" alt="{{ p.image.alt or p.name }}" class="absolute inset-0 h-full w-full object-cover transition-transform duration-[1100ms] ease-lux group-hover:scale-105" />{% endif %}
+        <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-primary/80 via-primary/15 to-transparent p-5">
+          <h3 class="font-headline-sm text-lg text-on-primary">{{ p.name }}</h3>
           <div class="mt-1 flex items-center justify-between">
-            <p class="font-label-sm text-label-sm text-on-surface-variant">Hand-picked</p>
-            <span class="font-label-md text-label-md text-primary">{{ p.pricing.current | money(p.currency) }}</span>
+            <p class="font-label-sm text-[11px] uppercase tracking-[0.18em] text-on-primary/70">Hand-picked</p>
+            <span class="font-label-md text-label-md text-on-primary">{{ p.pricing.current | money(p.currency) }}</span>
           </div>
         </div>
       </a>
@@ -93,11 +156,11 @@
 
       {# Two small tiles #}
       {% for i in [2, 3] %}{% if featured[i] %}{% set p = featured[i] %}
-      <a href="/p/{{ p.slug }}" class="group relative col-span-1 h-[260px] overflow-hidden rounded border border-outline/10 bg-surface-container-low ambient-shadow md:col-span-2 md:h-[288px]">
-        {% if p.image %}<img src="{{ p.image.url }}" alt="{{ p.image.alt or p.name }}" class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />{% endif %}
-        <div class="absolute inset-0 flex flex-col items-center justify-center bg-surface/0 p-4 text-center opacity-0 transition-all duration-300 group-hover:bg-surface/70 group-hover:opacity-100">
-          <h3 class="font-headline-md text-body-lg font-medium text-on-surface">{{ p.name }}</h3>
-          <span class="mt-1 font-label-md text-label-md text-primary">{{ p.pricing.current | money(p.currency) }}</span>
+      <a href="/p/{{ p.slug }}" class="hover-lift group relative col-span-1 h-[260px] overflow-hidden rounded-2xl border border-outline/20 bg-surface-container-low shadow-luxe md:col-span-2 md:h-[288px]">
+        {% if p.image %}<img src="{{ p.image.url }}" alt="{{ p.image.alt or p.name }}" class="absolute inset-0 h-full w-full object-cover transition-transform duration-[1100ms] ease-lux group-hover:scale-105" />{% endif %}
+        <div class="absolute inset-0 flex flex-col items-center justify-center bg-primary/0 p-4 text-center opacity-0 transition-all duration-500 group-hover:bg-primary/65 group-hover:opacity-100">
+          <h3 class="font-headline-sm text-lg text-on-primary">{{ p.name }}</h3>
+          <span class="mt-1.5 font-label-md text-label-md text-accent-bright">{{ p.pricing.current | money(p.currency) }}</span>
         </div>
       </a>
       {% endif %}{% endfor %}
@@ -107,37 +170,57 @@
   {% endif %}
 </section>
 
+{# ─── Editorial manifesto band ─────────────────────────────────────────── #}
+<section class="relative overflow-hidden bg-tertiary py-24 text-on-tertiary md:py-32">
+  <svg class="pointer-events-none absolute left-1/2 top-1/2 h-[42rem] w-[42rem] -translate-x-1/2 -translate-y-1/2 text-on-tertiary-container/[0.05]" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="0.5" aria-hidden="true">
+    <circle cx="50" cy="50" r="48" stroke-dasharray="1 4"/><circle cx="50" cy="50" r="38"/><circle cx="50" cy="50" r="28" stroke-dasharray="2 5"/><circle cx="50" cy="50" r="16"/>
+  </svg>
+  <div class="relative mx-auto max-w-3xl px-margin-mobile text-center md:px-margin-desktop" data-reveal>
+    <span class="font-display-lg text-6xl leading-none text-accent-bright" aria-hidden="true">&ldquo;</span>
+    <blockquote class="mt-2 font-display-lg text-[1.85rem] italic leading-[1.35] text-on-tertiary text-balance md:text-[2.5rem]">
+      Every piece is a fragment of history — sought out, restored with a reverent hand, and made to be lived with for generations to come.
+    </blockquote>
+    <p class="mt-8 font-label-sm text-label-sm uppercase tracking-[0.3em] text-on-tertiary-container">Saima — Founder &amp; Curator</p>
+  </div>
+</section>
+
 {# ─── Our story ────────────────────────────────────────────────────────── #}
-<section class="relative overflow-hidden bg-surface-container-low py-24 md:py-32">
-  <div class="pointer-events-none absolute right-0 top-0 h-[50rem] w-[40rem] -translate-y-1/4 translate-x-1/3 rounded-lg border border-outline/10"></div>
-  <div class="relative z-10 mx-auto grid max-w-container-max grid-cols-1 items-center gap-16 px-margin-mobile md:px-margin-desktop lg:grid-cols-12">
-    <div class="relative lg:col-span-5">
-      <div class="relative z-10 aspect-[3/4] overflow-hidden rounded-lg border border-outline/10 shadow-[0_40px_80px_-20px_rgba(139,0,0,0.08)]">
+<section class="relative overflow-hidden py-24 md:py-32">
+  <div class="relative z-10 mx-auto grid max-w-container-max grid-cols-1 items-center gap-14 px-margin-mobile md:px-margin-desktop lg:grid-cols-12 lg:gap-16">
+    <div class="relative lg:col-span-5" data-reveal>
+      <div class="relative z-10 aspect-[3/4] overflow-hidden rounded-2xl border border-accent/20 shadow-luxe-xl">
         {% set sp = featured[4] or featured[1] or featured[0] %}
         {% if sp and sp.image %}
-          <img src="{{ sp.image.url }}" alt="{{ sp.image.alt or sp.name }}" class="h-full w-full object-cover" />
+          <img src="{{ sp.image.url }}" alt="{{ sp.image.alt or sp.name }}" loading="lazy" class="h-full w-full object-cover" />
         {% else %}
-          <div class="h-full w-full bg-tertiary-fixed"></div>
+          <img src="/images/products/jharoka-mud-art-window.webp" alt="Handcrafted Jharoka mud-art window" loading="lazy" class="h-full w-full object-cover" />
         {% endif %}
       </div>
-      <div class="absolute -bottom-10 -right-10 -z-10 h-full w-full rounded-lg bg-tertiary-fixed opacity-50"></div>
+      <div class="absolute -bottom-8 -right-6 z-20 hidden rounded-2xl border border-outline/30 bg-surface-container-lowest px-7 py-6 shadow-luxe-lg sm:block">
+        <p class="font-display-lg text-4xl text-primary">100+</p>
+        <p class="mt-1 font-label-sm text-[11px] uppercase tracking-[0.2em] text-on-surface-variant">Pieces restored</p>
+      </div>
+      <div class="absolute -left-8 -top-8 -z-10 h-44 w-44 rounded-2xl border border-accent/30"></div>
     </div>
-    <div class="flex flex-col items-start justify-center lg:col-span-6 lg:col-start-7">
-      <h2 class="mb-8 font-display-lg text-headline-lg leading-tight text-on-surface">
-        Preserving the <br /><span class="font-light italic text-primary">Poetry</span> of the Past.
+
+    <div class="flex flex-col items-start lg:col-span-6 lg:col-start-7" data-reveal>
+      <p class="eyebrow text-accent-deep">The atelier</p>
+      <h2 class="mt-4 font-display-lg text-headline-lg leading-tight text-on-surface text-balance">
+        Preserving the <span class="font-normal italic text-accent">poetry</span> of the past.
       </h2>
-      <div class="max-w-xl space-y-6 text-body-lg text-on-surface-variant">
+      <div class="mt-7 max-w-xl space-y-5 text-body-lg text-on-surface-variant">
         <p>
           Every piece in Saima's Vintage is more than a decorative object; it is a fragment of history. We seek out
-          authentic vintage treasures and bring them home to be admired again.
+          authentic vintage treasures and handcrafted heritage art, and bring them home to be admired again.
         </p>
         <p>
           Each find is cleaned, restored and cared for with a reverent hand — preserving its original, soulful patina so
           it can endure for generations to come.
         </p>
       </div>
-      <a href="/pages/about" class="mt-10 inline-flex h-12 items-center justify-center rounded border border-outline px-8 font-label-md text-label-md uppercase text-on-surface transition-all duration-300 hover:border-primary hover:text-primary">
-        Our Story
+      <a href="/pages/about" class="group mt-9 inline-flex items-center gap-2.5 rounded-full border border-outline px-8 py-4 font-label-md text-label-md uppercase tracking-[0.16em] text-on-surface transition-all duration-300 hover:border-accent hover:text-accent-deep">
+        Read our story
+        <svg class="h-4 w-4 transition-transform duration-300 ease-lux group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>
     </div>
   </div>
@@ -146,21 +229,24 @@
 {# ─── Shop by category ─────────────────────────────────────────────────── #}
 {% if categories.length %}
 <section class="mx-auto max-w-container-max px-margin-mobile py-24 md:px-margin-desktop md:py-32">
-  <h2 class="mb-16 text-center font-display-lg text-headline-lg text-on-surface">Shop by Category</h2>
+  <div class="mb-16 text-center" data-reveal>
+    <p class="eyebrow text-accent-deep">Explore by craft</p>
+    <h2 class="mt-4 font-display-lg text-headline-lg text-on-surface">Shop by Category</h2>
+  </div>
   <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:gap-16">
     {% for category in categories %}{% if loop.index0 < 4 %}
       <a href="/c/{{ category.slug }}"
-         class="group relative block h-[420px] overflow-hidden rounded-xl border border-outline/10 ambient-shadow lg:h-[560px] {% if loop.index0 % 2 == 1 %}md:translate-y-16{% endif %}">
+         class="hover-lift group relative block h-[420px] overflow-hidden rounded-2xl border border-outline/20 shadow-luxe lg:h-[560px] {% if loop.index0 % 2 == 1 %}md:translate-y-16{% endif %}">
         {% if category.imageUrl %}
           <img src="{{ category.imageUrl }}" alt="{{ category.name }}" loading="lazy"
-               class="absolute inset-0 h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105" />
+               class="absolute inset-0 h-full w-full object-cover transition-transform duration-[1200ms] ease-lux group-hover:scale-105" />
         {% else %}
-          <div class="absolute inset-0 bg-tertiary-fixed"></div>
+          <div class="absolute inset-0 bg-surface-container-high"></div>
         {% endif %}
-        <div class="absolute inset-0 bg-surface/10 transition-colors duration-500 group-hover:bg-surface/0"></div>
-        <div class="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-t from-surface/80 via-transparent to-transparent p-8 text-center">
-          <h3 class="mb-4 font-display-lg text-[2.5rem] leading-tight text-on-surface drop-shadow-sm">{{ category.name }}</h3>
-          <span class="inline-flex items-center gap-2 border-b border-primary pb-1 font-label-md text-label-md uppercase text-primary">
+        <div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/10 to-transparent transition-opacity duration-500"></div>
+        <div class="absolute inset-x-0 bottom-0 flex flex-col items-center p-10 text-center">
+          <h3 class="font-display-lg text-[2.5rem] leading-tight text-on-primary drop-shadow-sm">{{ category.name }}</h3>
+          <span class="link-underline mt-4 inline-flex items-center gap-2 font-label-md text-label-md uppercase tracking-[0.18em] text-accent-bright">
             Explore
             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </span>
@@ -170,4 +256,24 @@
   </div>
 </section>
 {% endif %}
+
+{# ─── Closing CTA band ─────────────────────────────────────────────────── #}
+<section class="relative overflow-hidden">
+  <div class="mx-auto max-w-container-max px-margin-mobile pb-24 md:px-margin-desktop md:pb-32">
+    <div class="relative overflow-hidden rounded-3xl border border-accent/20 bg-tertiary px-8 py-16 text-center shadow-luxe-xl md:px-16 md:py-24" data-reveal>
+      <div class="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-accent/15 blur-3xl"></div>
+      <div class="pointer-events-none absolute -bottom-24 -left-16 h-72 w-72 rounded-full bg-accent/10 blur-3xl"></div>
+      <div class="relative">
+        <p class="eyebrow text-accent-bright">Bring heritage home</p>
+        <h2 class="mx-auto mt-5 max-w-2xl font-display-lg text-[2rem] leading-tight text-on-tertiary text-balance md:text-[2.75rem]">
+          A piece of history, waiting for its next chapter.
+        </h2>
+        <a href="/products" class="group mt-9 inline-flex h-14 items-center justify-center gap-2.5 rounded-full bg-accent px-10 font-label-md text-label-md uppercase tracking-[0.16em] text-primary transition-colors duration-300 hover:bg-accent-bright">
+          Explore the collection
+          <svg class="h-4 w-4 transition-transform duration-300 ease-lux group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
 {% endblock %}
