@@ -46,7 +46,7 @@
       </label>
     </div>
     <label class="mt-4 block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Short description
-      <textarea name="shortDescription" rows="2" class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:ring-0">{{ product.shortDescription or '' }}</textarea>
+      <textarea name="shortDescription" rows="2" maxlength="500" class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:ring-0">{{ product.shortDescription or '' }}</textarea>
     </label>
     <label class="mt-4 block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Description (HTML allowed; sanitized on save)
       <textarea name="description" rows="6" class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2 font-mono text-xs text-on-surface focus:border-primary focus:ring-0">{{ product.description | safe if product else '' }}</textarea>

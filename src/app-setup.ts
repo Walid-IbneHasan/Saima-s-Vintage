@@ -83,7 +83,12 @@ export function setupApp(app: NestExpressApplication): void {
     new ValidationPipe({
       whitelist: true,
       transform: true,
-      transformOptions: { enableImplicitConversion: true },
+      // NOTE: implicit conversion is intentionally OFF. With it on, empty form
+      // fields (e.g. an untouched maxPerOrder/flashPrice) get coerced to 0,
+      // overriding the explicit @ToNumber transforms (which map '' → undefined)
+      // and breaking @Min validation. Every DTO already declares explicit
+      // @ToNumber/@ToBool/@ToArray transforms, so implicit conversion is both
+      // redundant and harmful here.
     }),
   );
   app.useGlobalFilters(new AllExceptionsFilter(isProd));
