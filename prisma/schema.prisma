@@ -164,6 +164,7 @@ model Customer {
 enum VerificationType {
   EMAIL_VERIFY
   PASSWORD_RESET
+  PASSWORD_CHANGE
 }
 
 // One-time codes for email verification and password reset (code is hashed).

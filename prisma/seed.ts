@@ -9,9 +9,8 @@ import * as bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
-// Remote placeholder imagery (CSP allows https: images). Deterministic per seed.
-const img = (seed: string, w = 800, h = 1000) =>
-  `https://picsum.photos/seed/sv-${seed}/${w}/${h}`;
+// Local Lippan/Jharoka product imagery, served from /public (CSP allows 'self').
+const P = (file: string): string => `/images/products/${file}`;
 
 const rnd = (n: number) => Math.floor(Math.random() * n);
 
@@ -29,73 +28,52 @@ const DEMO_TABLES = [
 
 const CATEGORY_TREE = [
   {
-    slug: 'dresses', name: 'Vintage Dresses', desc: 'One-of-a-kind dresses from every era.',
+    slug: 'lippan-art', name: 'Lippan Art',
+    desc: 'Mirror-inlay clay mandalas, plates and flowers — traditional Kutchi Lippan craft.',
+    image: P('lippan-mandala-marigold.avif'),
     subs: [
-      { slug: 'tea-dresses', name: 'Tea Dresses' },
-      { slug: 'maxi-dresses', name: 'Maxi Dresses' },
-      { slug: 'evening-gowns', name: 'Evening Gowns' },
+      { slug: 'mandalas', name: 'Mandalas' },
+      { slug: 'mirror-plates', name: 'Mirror Plates' },
     ],
   },
   {
-    slug: 'outerwear', name: 'Outerwear & Coats', desc: 'Coats, jackets and blazers with history.',
+    slug: 'jharokas', name: 'Jharokas',
+    desc: 'Hand-painted and carved arched Jharoka window panels and frames.',
+    image: P('jharoka-floral-plaque.jpg'),
     subs: [
-      { slug: 'coats', name: 'Coats' },
-      { slug: 'jackets', name: 'Jackets' },
-      { slug: 'blazers', name: 'Blazers' },
+      { slug: 'arch-panels', name: 'Arch Panels' },
+      { slug: 'window-frames', name: 'Window Frames' },
     ],
   },
   {
-    slug: 'accessories', name: 'Accessories', desc: 'Scarves, belts, hats and more.',
+    slug: 'wall-decor', name: 'Wall Decor',
+    desc: 'Heritage wall hangings and mirror sets for modern, minimalist spaces.',
+    image: P('jharoka-mirror-triptych.webp'),
     subs: [
-      { slug: 'scarves', name: 'Scarves' },
-      { slug: 'hats', name: 'Hats' },
-      { slug: 'belts', name: 'Belts' },
+      { slug: 'wall-hangings', name: 'Wall Hangings' },
+      { slug: 'mirror-sets', name: 'Mirror Sets' },
     ],
   },
   {
-    slug: 'bags', name: 'Bags & Purses', desc: 'Handpicked vintage bags.',
-    subs: [
-      { slug: 'handbags', name: 'Handbags' },
-      { slug: 'clutches', name: 'Clutches' },
-    ],
-  },
-  {
-    slug: 'footwear', name: 'Footwear', desc: 'Boots, loafers and heels.',
-    subs: [
-      { slug: 'boots', name: 'Boots' },
-      { slug: 'loafers', name: 'Loafers' },
-    ],
-  },
-  {
-    slug: 'jewelry', name: 'Jewelry', desc: 'Brooches, earrings and statement pieces.',
-    subs: [
-      { slug: 'earrings', name: 'Earrings' },
-      { slug: 'necklaces', name: 'Necklaces' },
-      { slug: 'rings', name: 'Rings' },
-    ],
+    slug: 'custom-orders', name: 'Custom Orders',
+    desc: 'Bespoke, made-to-order Lippan and Jharoka commissions, personalised for you.',
+    image: P('lippan-flower-lavender.jpg'),
+    subs: [],
   },
 ];
 
 // Product slug → sub-category slug (products without an entry sit in the parent only).
 const SUBCAT: Record<string, string> = {
-  'silk-tea-dress-1960s': 'tea-dresses',
-  'floral-maxi-dress-1970s': 'maxi-dresses',
-  'velvet-evening-gown': 'evening-gowns',
-  'power-shoulder-dress-1980s': 'evening-gowns',
-  'wool-herringbone-coat': 'coats',
-  'leather-bomber-jacket': 'jackets',
-  'tweed-blazer': 'blazers',
-  'silk-patterned-scarf': 'scarves',
-  'tan-leather-belt': 'belts',
-  'felt-fedora-hat': 'hats',
-  'structured-top-handle-bag': 'handbags',
-  'beaded-evening-clutch': 'clutches',
-  'canvas-weekender-bag': 'handbags',
-  'leather-ankle-boots': 'boots',
-  'suede-loafers': 'loafers',
-  'pearl-drop-earrings': 'earrings',
-  'gold-chain-necklace': 'necklaces',
-  'cocktail-statement-ring': 'rings',
+  'marigold-mirror-lippan-plate': 'mirror-plates',
+  'amethyst-lippan-mandala': 'mandalas',
+  'festival-lippan-mandala': 'mandalas',
+  'lavender-petal-lippan-flower': 'mandalas',
+  'floral-jharoka-wall-plaque': 'arch-panels',
+  'jharoka-mud-art-window': 'window-frames',
+  'spring-birds-jharoka-hanging': 'arch-panels',
+  'carved-jharokha-mirror-triptych': 'mirror-sets',
+  'heritage-jharoka-niche-frame': 'wall-hangings',
+  'rangoli-lippan-wall-mandala': 'wall-hangings',
 };
 
 interface Spec {
@@ -107,54 +85,42 @@ interface Spec {
   base: string;
   sale?: string;
   feat?: number;
-  imgs: number;
+  img: string;
   stock?: number;
-  sizes?: { size: string; stock: number }[];
 }
 
 const PRODUCTS: Spec[] = [
-  { name: '1960s Silk Tea Dress', slug: 'silk-tea-dress-1960s', cat: 'dresses', brand: 'Unbranded', condition: 'Excellent', base: '4500.00', sale: '3800.00', feat: 0, imgs: 3, sizes: [{ size: 'S', stock: 1 }, { size: 'M', stock: 2 }, { size: 'L', stock: 0 }] },
-  { name: '1970s Floral Maxi Dress', slug: 'floral-maxi-dress-1970s', cat: 'dresses', brand: 'Boho House', condition: 'Very Good', base: '5200.00', sale: '4400.00', feat: 1, imgs: 2, stock: 1 },
-  { name: 'Velvet Evening Gown', slug: 'velvet-evening-gown', cat: 'dresses', brand: 'Maison Noir', condition: 'Excellent', base: '8900.00', imgs: 2, stock: 2 },
-  { name: '1980s Power-Shoulder Dress', slug: 'power-shoulder-dress-1980s', cat: 'dresses', brand: 'Retro Co', condition: 'Good', base: '3900.00', sale: '2900.00', imgs: 2, stock: 0 },
-  { name: 'Wool Herringbone Coat', slug: 'wool-herringbone-coat', cat: 'outerwear', brand: 'Highland Mills', condition: 'Excellent', base: '7600.00', feat: 2, imgs: 3, sizes: [{ size: 'S', stock: 1 }, { size: 'M', stock: 1 }, { size: 'L', stock: 2 }] },
-  { name: 'Leather Bomber Jacket', slug: 'leather-bomber-jacket', cat: 'outerwear', brand: 'Aviator', condition: 'Very Good', base: '6800.00', sale: '5900.00', imgs: 2, stock: 3 },
-  { name: 'Tweed Blazer', slug: 'tweed-blazer', cat: 'outerwear', brand: 'Country Club', condition: 'Good', base: '4200.00', imgs: 2, stock: 4 },
-  { name: 'Silk Patterned Scarf', slug: 'silk-patterned-scarf', cat: 'accessories', brand: 'Soie', condition: 'Excellent', base: '2200.00', sale: '1800.00', feat: 3, imgs: 2, stock: 6 },
-  { name: 'Tan Leather Belt', slug: 'tan-leather-belt', cat: 'accessories', brand: 'Saddler', condition: 'Very Good', base: '1500.00', imgs: 1, stock: 10 },
-  { name: 'Cat-Eye Sunglasses', slug: 'cat-eye-sunglasses', cat: 'accessories', brand: 'Riviera', condition: 'Good', base: '1900.00', imgs: 2, stock: 5 },
-  { name: 'Felt Fedora Hat', slug: 'felt-fedora-hat', cat: 'accessories', brand: 'Hatter & Co', condition: 'Very Good', base: '2400.00', sale: '1900.00', imgs: 2, stock: 2 },
-  { name: 'Structured Top-Handle Bag', slug: 'structured-top-handle-bag', cat: 'bags', brand: 'Maroquinerie', condition: 'Excellent', base: '6900.00', feat: 4, imgs: 3, stock: 1 },
-  { name: 'Beaded Evening Clutch', slug: 'beaded-evening-clutch', cat: 'bags', brand: 'Soirée', condition: 'Very Good', base: '3100.00', sale: '2600.00', imgs: 2, stock: 4 },
-  { name: 'Canvas Weekender Bag', slug: 'canvas-weekender-bag', cat: 'bags', brand: 'Voyage', condition: 'Good', base: '4500.00', imgs: 2, stock: 3 },
-  { name: 'Leather Ankle Boots', slug: 'leather-ankle-boots', cat: 'footwear', brand: 'Cobbler', condition: 'Very Good', base: '5800.00', feat: 5, imgs: 2, stock: 2 },
-  { name: 'Suede Loafers', slug: 'suede-loafers', cat: 'footwear', brand: 'Mocassino', condition: 'Good', base: '4100.00', sale: '3300.00', imgs: 2, stock: 0 },
-  { name: 'Art Deco Brooch', slug: 'art-deco-brooch', cat: 'jewelry', brand: 'Atelier', condition: 'Excellent', base: '2800.00', imgs: 1, stock: 3 },
-  { name: 'Pearl Drop Earrings', slug: 'pearl-drop-earrings', cat: 'jewelry', brand: 'Lustre', condition: 'Excellent', base: '3400.00', sale: '2700.00', imgs: 2, stock: 5 },
-  { name: 'Gold Chain Necklace', slug: 'gold-chain-necklace', cat: 'jewelry', brand: 'Orfèvre', condition: 'Very Good', base: '5200.00', imgs: 2, stock: 2 },
-  { name: 'Cocktail Statement Ring', slug: 'cocktail-statement-ring', cat: 'jewelry', brand: 'Atelier', condition: 'Good', base: '2100.00', imgs: 1, stock: 4 },
+  { name: 'Marigold Mirror Lippan Plate', slug: 'marigold-mirror-lippan-plate', cat: 'lippan-art', brand: "Saima's Atelier", condition: 'Handcrafted', base: '3800.00', sale: '3200.00', feat: 0, img: P('lippan-mandala-marigold.avif'), stock: 3 },
+  { name: 'Amethyst Lippan Mirror Mandala', slug: 'amethyst-lippan-mandala', cat: 'lippan-art', brand: "Saima's Atelier", condition: 'Handcrafted', base: '4200.00', feat: 1, img: P('lippan-mandala-amethyst.jpg'), stock: 2 },
+  { name: 'Festival Lippan Mandala Plate', slug: 'festival-lippan-mandala', cat: 'lippan-art', brand: "Saima's Atelier", condition: 'Handcrafted', base: '4600.00', sale: '3900.00', img: P('lippan-mandala-festival.jpg'), stock: 4 },
+  { name: 'Lavender Petal Lippan Flower', slug: 'lavender-petal-lippan-flower', cat: 'lippan-art', brand: "Saima's Atelier", condition: 'Handcrafted', base: '2900.00', feat: 3, img: P('lippan-flower-lavender.jpg'), stock: 5 },
+  { name: 'Floral Jharoka Wall Plaque', slug: 'floral-jharoka-wall-plaque', cat: 'jharokas', brand: "Saima's Atelier", condition: 'Hand-painted', base: '5400.00', sale: '4700.00', feat: 2, img: P('jharoka-floral-plaque.jpg'), stock: 2 },
+  { name: 'Jharoka Mud-Art Window Panel', slug: 'jharoka-mud-art-window', cat: 'jharokas', brand: "Saima's Atelier", condition: 'Handcrafted', base: '6200.00', feat: 4, img: P('jharoka-mud-art-window.webp'), stock: 1 },
+  { name: 'Spring Birds Jharoka Hanging', slug: 'spring-birds-jharoka-hanging', cat: 'jharokas', brand: "Saima's Atelier", condition: 'Handcrafted', base: '4800.00', sale: '4100.00', img: P('jharoka-spring-birds.webp'), stock: 3 },
+  { name: 'Carved Jharokha Mirror Triptych', slug: 'carved-jharokha-mirror-triptych', cat: 'wall-decor', brand: "Saima's Atelier", condition: 'Handcrafted', base: '7800.00', feat: 5, img: P('jharoka-mirror-triptych.webp'), stock: 2 },
+  { name: 'Heritage Jharoka Niche Frame', slug: 'heritage-jharoka-niche-frame', cat: 'wall-decor', brand: "Saima's Atelier", condition: 'Hand-painted', base: '5200.00', img: P('jharoka-mud-art-window.webp'), stock: 2 },
+  { name: 'Rangoli Lippan Wall Mandala', slug: 'rangoli-lippan-wall-mandala', cat: 'wall-decor', brand: "Saima's Atelier", condition: 'Handcrafted', base: '4400.00', sale: '3700.00', img: P('lippan-mandala-festival.jpg'), stock: 4 },
+  { name: 'Custom Lippan Name Mandala', slug: 'custom-lippan-name-mandala', cat: 'custom-orders', brand: "Saima's Atelier", condition: 'Made to order', base: '5000.00', img: P('lippan-mandala-marigold.avif'), stock: 10 },
+  { name: 'Bespoke Jharoka Portrait Frame', slug: 'bespoke-jharoka-portrait-frame', cat: 'custom-orders', brand: "Saima's Atelier", condition: 'Made to order', base: '6800.00', img: P('jharoka-floral-plaque.jpg'), stock: 8 },
 ];
 
 const REVIEWS: Record<string, { author: string; rating: number; title: string; body: string }[]> = {
-  'silk-tea-dress-1960s': [
-    { author: 'Naila R.', rating: 5, title: 'Absolutely stunning', body: 'The silk is in beautiful condition and the fit is perfect. Shipped quickly!' },
-    { author: 'Tasnim A.', rating: 4, title: 'Lovely piece', body: 'Gorgeous dress, slightly smaller than expected but still wonderful.' },
+  'marigold-mirror-lippan-plate': [
+    { author: 'Naila R.', rating: 5, title: 'Stunning mirror work', body: 'The little mirrors catch the light beautifully — even prettier in person. Shipped quickly!' },
+    { author: 'Tasnim A.', rating: 4, title: 'Lovely piece', body: 'Gorgeous colours and very well packed. A real statement on our wall.' },
   ],
-  'wool-herringbone-coat': [
-    { author: 'Imran H.', rating: 5, title: 'Timeless', body: 'Heavy, warm and beautifully made. Looks even better in person.' },
+  'floral-jharoka-wall-plaque': [
+    { author: 'Imran H.', rating: 5, title: 'Heirloom quality', body: 'The hand-painting is so detailed. It has become the centrepiece of our hallway.' },
   ],
-  'leather-bomber-jacket': [
-    { author: 'Sadia K.', rating: 5, title: 'Buttery leather', body: 'Such a great find — the leather has aged perfectly.' },
-    { author: 'Rezaul M.', rating: 4, title: 'Great jacket', body: 'Fits true to size. Minor wear adds character.' },
+  'carved-jharokha-mirror-triptych': [
+    { author: 'Sadia K.', rating: 5, title: 'Transformed our wall', body: 'The three panels look incredible together. Solid and beautifully made.' },
+    { author: 'Rezaul M.', rating: 4, title: 'Beautiful craft', body: 'Lovely fretwork and mirrors. Slight handmade variation only adds character.' },
   ],
-  'structured-top-handle-bag': [
-    { author: 'Farah N.', rating: 5, title: 'My new favourite', body: 'Structured, elegant, and the hardware is pristine.' },
+  'amethyst-lippan-mandala': [
+    { author: 'Farah N.', rating: 5, title: 'My new favourite', body: 'The amethyst tones are rich and the mirrors sparkle. Worth every taka.' },
   ],
-  'pearl-drop-earrings': [
-    { author: 'Mehjabin S.', rating: 5, title: 'Elegant', body: 'Delicate and classy. Wore them to a wedding and got compliments.' },
-  ],
-  'leather-ankle-boots': [
-    { author: 'Arif J.', rating: 4, title: 'Solid boots', body: 'Comfortable after a short break-in. Quality leather.' },
+  'spring-birds-jharoka-hanging': [
+    { author: 'Mehjabin S.', rating: 5, title: 'So charming', body: 'The little birds and tassels are adorable. Brightened our reading nook instantly.' },
   ],
 };
 
@@ -163,9 +129,9 @@ function baseSku(slug: string): string {
 }
 
 function description(name: string, brand: string, condition: string): string {
-  return `<p>A carefully selected <strong>${name.toLowerCase()}</strong>${brand && brand !== 'Unbranded' ? ` by ${brand}` : ''}. Condition: ${condition}.</p>
-  <ul><li>One-of-a-kind vintage piece</li><li>Inspected and gently cleaned</li><li>Ships within 2 business days across Bangladesh</li></ul>
-  <p>As with all vintage, expect minor signs of age that add to its character.</p>`;
+  return `<p>A handcrafted <strong>${name.toLowerCase()}</strong> from ${brand}. ${condition}.</p>
+  <ul><li>Traditional Kutchi Lippan mirror &amp; clay relief / Jharoka heritage art</li><li>Sealed, finished and ready to hang</li><li>Ships within 3–5 business days across Bangladesh</li></ul>
+  <p>As every piece is made by hand, expect small, beautiful variations unique to yours.</p>`;
 }
 
 async function clearDemo(): Promise<void> {
@@ -203,7 +169,7 @@ async function main(): Promise<void> {
         name: c.name,
         slug: c.slug,
         description: c.desc,
-        imageUrl: img(`cat-${c.slug}`, 1200, 600),
+        imageUrl: c.image,
         isActive: true,
         sortOrder: sort++,
         seoTitle: `${c.name} — Saima's Vintage`,
@@ -218,7 +184,7 @@ async function main(): Promise<void> {
         data: {
           name: s.name,
           slug: s.slug,
-          description: `${s.name} — curated vintage ${c.name.toLowerCase()}.`,
+          description: `${s.name} — handcrafted ${c.name.toLowerCase()}.`,
           parentId: parent.id,
           isActive: true,
           sortOrder: subSort++,
@@ -229,7 +195,7 @@ async function main(): Promise<void> {
     }
   }
 
-  // --- Size attribute ----------------------------------------------------
+  // --- Size attribute (kept for schema parity; pieces are one-of-a-kind) --
   const sizeAttr = await prisma.productAttribute.create({
     data: { name: 'Size', slug: 'size' },
   });
@@ -240,40 +206,30 @@ async function main(): Promise<void> {
     });
     sizeIds[value] = v.id;
   }
+  void sizeIds;
 
   // --- Products ----------------------------------------------------------
   for (const spec of PRODUCTS) {
     const sku = baseSku(spec.slug);
-    const images = Array.from({ length: spec.imgs }, (_, i) => ({
-      url: img(`${spec.slug}-${i}`),
-      alt: spec.name,
-      position: i,
-      isPrimary: i === 0,
-    }));
+    const images = [
+      { url: spec.img, alt: spec.name, position: 0, isPrimary: true },
+    ];
 
-    const variants = spec.sizes
-      ? spec.sizes.map((s) => ({
-          sku: `${sku}-${s.size}`,
-          name: `Size ${s.size}`,
-          stock: s.stock,
-          position: 0,
-          attributeValues: { create: [{ attributeValueId: sizeIds[s.size] }] },
-        }))
-      : [
-          {
-            sku: `${sku}-OS`,
-            name: 'One size',
-            stock: spec.stock ?? 1,
-            position: 0,
-          },
-        ];
+    const variants = [
+      {
+        sku: `${sku}-OS`,
+        name: 'One piece',
+        stock: spec.stock ?? 1,
+        position: 0,
+      },
+    ];
 
     await prisma.product.create({
       data: {
         name: spec.name,
         slug: spec.slug,
         sku,
-        shortDescription: `${spec.condition} condition · ${spec.brand}`,
+        shortDescription: `${spec.condition} · ${spec.brand}`,
         description: description(spec.name, spec.brand, spec.condition),
         brand: spec.brand,
         condition: spec.condition,
@@ -454,28 +410,28 @@ async function main(): Promise<void> {
         type: 'page',
         title: 'About Saima\'s Vintage',
         slug: 'about',
-        excerpt: 'Curated vintage, one piece at a time.',
-        body: '<p>Saima\'s Vintage is a small, lovingly run shop dedicated to one-of-a-kind vintage finds. Every piece is hand-selected, inspected, and gently cleaned before it reaches you.</p><p>We ship across Bangladesh and stand behind every item we sell.</p>',
+        excerpt: 'Handcrafted heritage, one piece at a time.',
+        body: '<p>Saima\'s Vintage is a small, lovingly run studio dedicated to handcrafted Lippan mirror art and Jharoka heritage pieces. Every piece is made and finished by hand before it reaches you.</p><p>We ship across Bangladesh and stand behind every item we make.</p>',
         status: ContentStatus.PUBLISHED,
         publishedAt: new Date(),
         seoTitle: 'About — Saima\'s Vintage',
-        seoDescription: 'The story behind Saima\'s Vintage.',
+        seoDescription: 'The story behind Saima\'s Vintage handcrafted Lippan & Jharoka art.',
       },
       {
         type: 'page',
         title: 'Shipping & Returns',
         slug: 'shipping-returns',
         excerpt: 'How delivery and returns work.',
-        body: '<p>Orders ship within 2 business days. Because each item is unique, returns are accepted within 7 days for store credit.</p>',
+        body: '<p>Orders ship within 3–5 business days. Because each piece is handmade and unique, returns are accepted within 7 days for store credit.</p>',
         status: ContentStatus.PUBLISHED,
         publishedAt: new Date(),
       },
       {
         type: 'blog',
-        title: 'How to Care for Vintage Silk',
-        slug: 'care-for-vintage-silk',
-        excerpt: 'Keep your silk pieces beautiful for decades.',
-        body: '<p>Vintage silk deserves gentle care. Hand wash cold, never wring, and dry flat away from direct sun.</p>',
+        title: 'Caring for Lippan Mirror Art',
+        slug: 'caring-for-lippan-art',
+        excerpt: 'Keep your mirror work sparkling for years.',
+        body: '<p>Lippan art loves a gentle touch. Dust lightly with a soft, dry brush, keep it away from damp walls, and avoid harsh cleaners so the mirrors keep their shine.</p>',
         status: ContentStatus.PUBLISHED,
         publishedAt: new Date(),
       },

@@ -2,20 +2,33 @@
 {% from "partials/breadcrumbs.njk" import breadcrumbs %}
 
 {% block content %}
-<div class="mx-auto max-w-container-max px-margin-mobile py-16 md:px-margin-desktop md:py-20">
+<div class="mx-auto max-w-container-max px-margin-mobile py-12 md:px-margin-desktop md:py-16">
   {{ breadcrumbs([{ name: 'Home', path: '/' }, { name: 'Shop all' }]) }}
-  <h1 class="font-display-lg text-headline-lg text-on-surface">Shop all</h1>
-  <p class="mt-2 text-on-surface-variant">{{ meta.total }} product{% if meta.total != 1 %}s{% endif %}</p>
 
-  <div class="mt-8">{% include "partials/product-filters.njk" %}</div>
+  <div class="mt-6 flex flex-col gap-gutter md:flex-row">
+    {# Sidebar filters #}
+    <aside class="w-full shrink-0 md:w-72">
+      <div class="md:sticky md:top-28">{% include "partials/product-filters.njk" %}</div>
+    </aside>
 
-  {% if products.length %}
-    <div class="mt-10 grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4">
-      {% for p in products %}{% include "partials/product-card.njk" %}{% endfor %}
-    </div>
-    {% include "partials/pagination.njk" %}
-  {% else %}
-    <p class="mt-10 text-on-surface-variant">No products match your filters. <a href="/products" class="text-primary hover:underline">Clear filters</a>.</p>
-  {% endif %}
+    {# Product canvas #}
+    <section class="min-w-0 flex-grow">
+      <div class="mb-10 border-b border-outline-variant/40 pb-6">
+        <h1 class="font-display-lg-mobile text-display-lg-mobile text-primary">The Collection</h1>
+        <p class="mt-2 max-w-lg text-body-md text-on-surface-variant">
+          {{ meta.total }} curated piece{% if meta.total != 1 %}s{% endif %} blending traditional craftsmanship with modern minimalist spaces.
+        </p>
+      </div>
+
+      {% if products.length %}
+        <div class="grid grid-cols-1 gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+          {% for p in products %}{% include "partials/product-card.njk" %}{% endfor %}
+        </div>
+        {% include "partials/pagination.njk" %}
+      {% else %}
+        <p class="text-on-surface-variant">No products match your filters. <a href="/products" class="text-primary hover:underline">Clear filters</a>.</p>
+      {% endif %}
+    </section>
+  </div>
 </div>
 {% endblock %}

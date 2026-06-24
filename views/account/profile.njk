@@ -54,23 +54,39 @@
       <button class="rounded bg-primary px-6 py-3 font-label-md text-label-md uppercase tracking-widest text-on-primary transition-colors hover:bg-on-primary-fixed-variant">Save changes</button>
     </form>
 
-    {# Security #}
-    <form action="/account/password" method="post" class="space-y-4 rounded-lg border border-outline/10 bg-surface-container-lowest p-6">
+    {# Security — password change is a two-step, email-OTP-verified flow. #}
+    <form action="{% if pwOtpStage == 'confirm' %}/account/password{% else %}/account/password/request{% endif %}" method="post" class="space-y-4 rounded-lg border border-outline/10 bg-surface-container-lowest p-6">
       <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
       <h2 class="font-headline-md text-headline-md text-on-surface">{% if hasPassword %}Change password{% else %}Set a password{% endif %}</h2>
       {% if pwError %}<p class="rounded bg-error-container px-4 py-3 text-sm text-on-error-container">{{ pwError }}</p>{% endif %}
       {% if not hasPassword %}<p class="text-xs text-on-surface-variant">Your account uses Google sign-in. Set a password to also log in with email.</p>{% endif %}
+      {% if pwOtpStage == 'confirm' and pwSent %}
+        <p class="rounded bg-secondary-container/40 px-4 py-3 text-sm text-on-surface">We sent a 6-digit code to <strong>{{ customer.email }}</strong>. Enter it below to confirm — it expires in 10 minutes.</p>
+      {% endif %}
+
       {% if hasPassword %}
         <label class="block">
           <span class="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Current password</span>
-          <input name="currentPassword" type="password" required class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2.5 text-body-md text-on-surface placeholder:text-on-surface-variant/50 focus:border-primary focus:ring-0" />
+          <input name="currentPassword" type="password" required autocomplete="current-password" class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2.5 text-body-md text-on-surface placeholder:text-on-surface-variant/50 focus:border-primary focus:ring-0" />
         </label>
       {% endif %}
-      <label class="block">
-        <span class="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">New password</span>
-        <input name="newPassword" type="password" required minlength="8" class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2.5 text-body-md text-on-surface placeholder:text-on-surface-variant/50 focus:border-primary focus:ring-0" />
-      </label>
-      <button class="rounded border border-outline/30 px-6 py-3 font-label-md text-label-md uppercase tracking-widest text-on-surface transition-colors hover:border-primary">Update password</button>
+
+      {% if pwOtpStage == 'confirm' %}
+        <label class="block">
+          <span class="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">New password</span>
+          <input name="newPassword" type="password" required minlength="8" autocomplete="new-password" class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2.5 text-body-md text-on-surface placeholder:text-on-surface-variant/50 focus:border-primary focus:ring-0" />
+        </label>
+        <label class="block">
+          <span class="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Verification code</span>
+          <input name="code" inputmode="numeric" maxlength="6" required autocomplete="one-time-code" class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2.5 text-body-md tracking-[0.4em] text-on-surface placeholder:text-on-surface-variant/50 focus:border-primary focus:ring-0" />
+        </label>
+        <div class="flex flex-wrap items-center gap-4">
+          <button class="rounded bg-primary px-6 py-3 font-label-md text-label-md uppercase tracking-widest text-on-primary transition-colors hover:bg-on-primary-fixed-variant">Confirm change</button>
+          <button type="submit" formaction="/account/password/request" formnovalidate class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant transition-colors hover:text-primary">Resend code</button>
+        </div>
+      {% else %}
+        <button class="rounded border border-outline/30 px-6 py-3 font-label-md text-label-md uppercase tracking-widest text-on-surface transition-colors hover:border-primary">Send verification code</button>
+      {% endif %}
     </form>
   </div>
 </div>

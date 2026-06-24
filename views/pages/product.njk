@@ -67,6 +67,13 @@
           <span class="rounded-full bg-primary-container px-3 py-1 font-label-md text-label-md uppercase tracking-wider text-on-primary-container">-{{ pricing.discountPercent }}% off</span>
         {% endif %}
       </div>
+
+      {# Provenance trust signal — subtle heritage-red chip. #}
+      <p class="mt-4 inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/5 px-3 py-1 font-label-sm text-label-sm uppercase tracking-wider text-primary">
+        <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Restored &amp; Authenticated
+      </p>
+
       {% if product.shortDescription %}
         <p class="mt-4 text-body-lg text-on-surface-variant">{{ product.shortDescription }}</p>
       {% endif %}

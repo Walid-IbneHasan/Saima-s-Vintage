@@ -3,13 +3,12 @@
 {% block content %}
 {# ─── Hero ─────────────────────────────────────────────────────────────── #}
 <section class="relative flex min-h-[86vh] items-center overflow-hidden">
-  {# Base gradient is always painted; the WebGL shader (JS-only) layers over it. #}
-  <div class="absolute inset-0 -z-10 bg-gradient-to-br from-surface via-surface to-tertiary-fixed/50"></div>
-  <canvas id="hero-shader" class="hero-shader pointer-events-none absolute inset-0 -z-10 h-full w-full"></canvas>
+  {# Soft tonal wash behind the animated Lippan/Jharoka motifs. #}
+  <div class="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-surface via-surface-container-low to-surface-container"></div>
   {% include "partials/hero-decor.njk" %}
 
   <div class="mx-auto grid w-full max-w-container-max grid-cols-1 items-center gap-12 px-margin-mobile py-20 md:px-margin-desktop lg:grid-cols-2">
-    <div class="flex max-w-2xl flex-col items-start gap-6 rounded border border-outline/10 bg-surface/40 p-8 shadow-[0_20px_40px_-15px_rgba(130,59,24,0.05)] backdrop-blur-sm hero-fade">
+    <div class="flex max-w-2xl flex-col items-start gap-6 rounded border border-outline/10 bg-surface/40 p-8 shadow-[0_20px_40px_-15px_rgba(139,0,0,0.05)] backdrop-blur-sm hero-fade">
       <span class="inline-block rounded-full bg-primary-container px-4 py-1.5 font-label-sm text-label-sm uppercase tracking-widest text-on-primary-container">New Collection</span>
       <h1 class="font-display-lg text-[2.75rem] leading-[1.05] tracking-tight text-on-surface md:text-display-lg lg:text-[5rem]">
         Handcrafted <br /><span class="font-light italic text-primary">Heritage</span>
@@ -24,12 +23,12 @@
 
     {% set hero = featured[0] %}
     <a href="{% if hero %}/p/{{ hero.slug }}{% else %}/products{% endif %}"
-       class="tilt-3d group relative block h-[440px] w-full overflow-hidden rounded-xl border border-outline/10 shadow-[0_40px_80px_-20px_rgba(130,59,24,0.1)] md:h-[600px]">
+       class="tilt-3d group relative block h-[440px] w-full overflow-hidden rounded-xl border border-outline/10 shadow-[0_40px_80px_-20px_rgba(139,0,0,0.1)] md:h-[600px]">
       {% if hero and hero.image %}
         <img src="{{ hero.image.url }}" alt="{{ hero.image.alt or hero.name }}"
              class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
       {% else %}
-        <img src="https://picsum.photos/seed/sv-hero/900/1100" alt="Featured vintage piece"
+        <img src="/images/products/lippan-mandala-marigold.avif" alt="Featured handcrafted Lippan piece"
              class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
       {% endif %}
       {% if hero %}
@@ -110,10 +109,10 @@
 
 {# ─── Our story ────────────────────────────────────────────────────────── #}
 <section class="relative overflow-hidden bg-surface-container-low py-24 md:py-32">
-  <div class="pointer-events-none absolute right-0 top-0 h-[50rem] w-[40rem] -translate-y-1/4 translate-x-1/3 rounded-t-[20rem] border border-outline/10"></div>
+  <div class="pointer-events-none absolute right-0 top-0 h-[50rem] w-[40rem] -translate-y-1/4 translate-x-1/3 rounded-lg border border-outline/10"></div>
   <div class="relative z-10 mx-auto grid max-w-container-max grid-cols-1 items-center gap-16 px-margin-mobile md:px-margin-desktop lg:grid-cols-12">
     <div class="relative lg:col-span-5">
-      <div class="relative z-10 aspect-[3/4] overflow-hidden rounded-[8rem] rounded-bl-none border border-outline/10 shadow-[0_40px_80px_-20px_rgba(130,59,24,0.08)]">
+      <div class="relative z-10 aspect-[3/4] overflow-hidden rounded-lg border border-outline/10 shadow-[0_40px_80px_-20px_rgba(139,0,0,0.08)]">
         {% set sp = featured[4] or featured[1] or featured[0] %}
         {% if sp and sp.image %}
           <img src="{{ sp.image.url }}" alt="{{ sp.image.alt or sp.name }}" class="h-full w-full object-cover" />
@@ -121,7 +120,7 @@
           <div class="h-full w-full bg-tertiary-fixed"></div>
         {% endif %}
       </div>
-      <div class="absolute -bottom-10 -right-10 -z-10 h-full w-full rounded-[8rem] rounded-bl-none bg-tertiary-fixed opacity-50"></div>
+      <div class="absolute -bottom-10 -right-10 -z-10 h-full w-full rounded-lg bg-tertiary-fixed opacity-50"></div>
     </div>
     <div class="flex flex-col items-start justify-center lg:col-span-6 lg:col-start-7">
       <h2 class="mb-8 font-display-lg text-headline-lg leading-tight text-on-surface">

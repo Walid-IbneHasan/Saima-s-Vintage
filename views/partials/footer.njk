@@ -1,41 +1,41 @@
-<footer class="w-full bg-tertiary-fixed">
+<footer class="w-full bg-tertiary text-on-tertiary-container">
   <div class="mx-auto grid max-w-container-max grid-cols-1 gap-gutter px-margin-mobile py-20 md:grid-cols-4 md:px-margin-desktop">
     <div class="flex flex-col justify-between md:col-span-2">
       <div>
-        <h2 class="font-headline-lg text-headline-lg text-on-tertiary-fixed-variant">{{ appName }}</h2>
-        <p class="mt-4 max-w-sm text-body-md text-on-tertiary-fixed-variant">
+        <h2 class="font-headline-lg text-headline-lg text-on-tertiary">{{ appName }}</h2>
+        <p class="mt-4 max-w-sm text-body-md text-on-tertiary-container">
           Curated vintage treasures and one-of-a-kind finds, hand-picked by Saima. Shipped across Bangladesh.
         </p>
         {# Newsletter — restyled; note: /newsletter has no backend yet (flagged). #}
         <form action="/newsletter" method="post" class="mt-6 flex max-w-sm gap-2">
           <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
           <input type="email" name="email" required placeholder="you@email.com"
-                 class="w-full rounded border border-outline/30 bg-surface px-3 py-2 text-body-md text-on-surface placeholder:text-on-surface-variant/50 focus:border-primary focus:ring-0" />
+                 class="w-full rounded border border-white/15 bg-white/5 px-3 py-2 text-body-md text-on-tertiary placeholder:text-on-tertiary-container/60 focus:border-inverse-primary focus:ring-0" />
           <button type="submit" class="shrink-0 rounded bg-primary px-4 py-2 font-label-md text-label-md uppercase tracking-widest text-on-primary transition-colors hover:bg-on-primary-fixed-variant">Join</button>
         </form>
       </div>
-      <p class="mt-8 text-body-md text-on-tertiary-fixed-variant">
-        &copy; {{ currentYear }} {{ appName }}. All rights reserved.
+      <p class="mt-8 text-body-md text-on-tertiary-container/80">
+        &copy; {{ currentYear }} {{ appName }}. Handcrafted Heritage.
       </p>
     </div>
 
     <div>
-      <h3 class="mb-6 font-label-md text-label-md uppercase tracking-widest text-on-tertiary-fixed-variant">Explore</h3>
+      <h3 class="mb-6 font-label-md text-label-md uppercase tracking-widest text-on-tertiary">Explore</h3>
       <ul class="space-y-4 text-body-md">
-        <li><a href="/products" class="text-on-tertiary-fixed-variant transition-colors hover:text-primary">Shop all</a></li>
-        <li><a href="/products?onSale=1" class="text-on-tertiary-fixed-variant transition-colors hover:text-primary">Sale</a></li>
+        <li><a href="/products" class="text-on-tertiary-container transition-colors hover:text-inverse-primary">Shop all</a></li>
+        <li><a href="/products?onSale=1" class="text-on-tertiary-container transition-colors hover:text-inverse-primary">Sale</a></li>
         {% for cat in navCategories() %}{% if loop.index0 < 3 %}
-          <li><a href="/c/{{ cat.slug }}" class="text-on-tertiary-fixed-variant transition-colors hover:text-primary">{{ cat.name }}</a></li>
+          <li><a href="/c/{{ cat.slug }}" class="text-on-tertiary-container transition-colors hover:text-inverse-primary">{{ cat.name }}</a></li>
         {% endif %}{% endfor %}
       </ul>
     </div>
 
     <div>
-      <h3 class="mb-6 font-label-md text-label-md uppercase tracking-widest text-on-tertiary-fixed-variant">Support</h3>
+      <h3 class="mb-6 font-label-md text-label-md uppercase tracking-widest text-on-tertiary">Support</h3>
       <ul class="space-y-4 text-body-md">
-        <li><a href="/pages/about" class="text-on-tertiary-fixed-variant transition-colors hover:text-primary">Our story</a></li>
-        <li><a href="/search" class="text-on-tertiary-fixed-variant transition-colors hover:text-primary">Search</a></li>
-        <li><a href="/cart" class="text-on-tertiary-fixed-variant transition-colors hover:text-primary">Cart</a></li>
+        <li><a href="/pages/about" class="text-on-tertiary-container transition-colors hover:text-inverse-primary">Our story</a></li>
+        <li><a href="/search" class="text-on-tertiary-container transition-colors hover:text-inverse-primary">Search</a></li>
+        <li><a href="/cart" class="text-on-tertiary-container transition-colors hover:text-inverse-primary">Cart</a></li>
       </ul>
     </div>
   </div>

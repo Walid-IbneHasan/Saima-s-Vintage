@@ -1,38 +1,98 @@
 {#
-  Background hero motifs — Lippan-art mandalas/mirror tiles + Jharoka arches,
-  spread across the hero (left/centre + far-right margin). Pure inline SVG + CSS
-  animation (no JS, CSP-safe); compositor-only transform/opacity, gated on
-  prefers-reduced-motion, so it stays smooth on low-end devices. This layer
-  sits behind the content (-z-10); motifs that fall over the product image are
-  added separately in hero-decor-image.njk. Decorative: aria-hidden, clipped.
+  Animated hero motifs — circular Lippan mandalas (mirror plates) + a Mughal
+  "Jharoka plaque": an ornate framed cusped-arch niche with a symmetric flowering
+  plant, modelled on Saima's wall-art reference. Pure inline SVG + CSS animation
+  (no JS, CSP-safe); compositor-only transform/opacity, gated on
+  prefers-reduced-motion. Sits behind hero content (-z-10). Decorative:
+  aria-hidden, clipped. Motion is brisk (short --dur / --spin). Round motifs spin;
+  the framed plaque only drifts (a spinning frame would read wrong).
 #}
+
+{# ── Reusable motif shapes ─────────────────────────────────────────────── #}
+{% macro mandala(cls, spin) %}
+<svg class="hero-spin {{ cls }}" style="--spin:{{ spin }}" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.2">
+  <circle cx="50" cy="50" r="47" stroke-dasharray="1.5 5" />
+  <circle cx="50" cy="50" r="40" />
+  <ellipse cx="50" cy="17" rx="3.6" ry="8" transform="rotate(0 50 50)" />
+  <ellipse cx="50" cy="17" rx="3.6" ry="8" transform="rotate(30 50 50)" />
+  <ellipse cx="50" cy="17" rx="3.6" ry="8" transform="rotate(60 50 50)" />
+  <ellipse cx="50" cy="17" rx="3.6" ry="8" transform="rotate(90 50 50)" />
+  <ellipse cx="50" cy="17" rx="3.6" ry="8" transform="rotate(120 50 50)" />
+  <ellipse cx="50" cy="17" rx="3.6" ry="8" transform="rotate(150 50 50)" />
+  <ellipse cx="50" cy="17" rx="3.6" ry="8" transform="rotate(180 50 50)" />
+  <ellipse cx="50" cy="17" rx="3.6" ry="8" transform="rotate(210 50 50)" />
+  <ellipse cx="50" cy="17" rx="3.6" ry="8" transform="rotate(240 50 50)" />
+  <ellipse cx="50" cy="17" rx="3.6" ry="8" transform="rotate(270 50 50)" />
+  <ellipse cx="50" cy="17" rx="3.6" ry="8" transform="rotate(300 50 50)" />
+  <ellipse cx="50" cy="17" rx="3.6" ry="8" transform="rotate(330 50 50)" />
+  <circle cx="50" cy="50" r="24" stroke-dasharray="2 5" />
+  <circle cx="50" cy="50" r="10" />
+  <circle cx="50" cy="50" r="3.5" fill="currentColor" stroke="none" />
+</svg>
+{% endmacro %}
+
+{% macro rings(cls, spin) %}
+<svg class="hero-spin {{ cls }}" style="--spin:{{ spin }}" viewBox="0 0 60 60" fill="none" stroke="currentColor" stroke-width="1.4">
+  <circle cx="30" cy="30" r="27" stroke-dasharray="2 6" />
+  <circle cx="30" cy="30" r="15" />
+  <circle cx="30" cy="30" r="4" fill="currentColor" stroke="none" />
+</svg>
+{% endmacro %}
+
+{# Mughal Jharoka plaque — ornate frame + cusped-arch niche + flowering plant. #}
+{% macro plaque(cls) %}
+<svg class="{{ cls }}" viewBox="0 0 80 112" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="3" y="3" width="74" height="106" rx="2" />
+  <rect x="9" y="9" width="62" height="94" rx="1" />
+  {# cusped (multi-lobed) arch niche #}
+  <path d="M22 96 V52 C22 46 28 48 30 42 C32 36 36 38 38 32 C39 29 40 27 40 24 C40 27 41 29 42 32 C44 38 48 36 50 42 C52 48 58 46 58 52 V96" />
+  {# symmetric flowering plant #}
+  <path d="M40 92 C40 74 40 58 40 42" />
+  <path d="M40 76 C33 74 29 68 27 62" />
+  <path d="M40 76 C47 74 51 68 53 62" />
+  <path d="M40 64 C34 63 30 58 29 53" />
+  <path d="M40 64 C46 63 50 58 51 53" />
+  <path d="M40 52 C35 51 32 47 31 43" />
+  <path d="M40 52 C45 51 48 47 49 43" />
+  <path d="M33 92 H47" />
+  <circle cx="40" cy="39" r="3.6" />
+  <circle cx="40" cy="39" r="1.2" fill="currentColor" stroke="none" />
+  <circle cx="27" cy="60" r="2.4" />
+  <circle cx="53" cy="60" r="2.4" />
+  <circle cx="29" cy="51" r="2" />
+  <circle cx="51" cy="51" r="2" />
+</svg>
+{% endmacro %}
+
+{# Square Jharokha lattice panel — geometric mirror fretwork (Image #5 ref). #}
+{% macro lattice(cls) %}
+<svg class="{{ cls }}" viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round">
+  <rect x="4" y="4" width="72" height="72" rx="1.5" />
+  <rect x="11" y="11" width="58" height="58" />
+  <path d="M40 11 L69 40 L40 69 L11 40 Z" />
+  <path d="M40 22 L58 40 L40 58 L22 40 Z" />
+  <rect x="33" y="33" width="14" height="14" />
+  <rect x="37.5" y="37.5" width="5" height="5" fill="currentColor" stroke="none" />
+  <rect x="14" y="14" width="7" height="7" />
+  <rect x="59" y="14" width="7" height="7" />
+  <rect x="14" y="59" width="7" height="7" />
+  <rect x="59" y="59" width="7" height="7" />
+</svg>
+{% endmacro %}
+
 <div class="pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden="true">
-  {# Lippan mirror mandala — top-left #}
-  <span class="hero-motif absolute left-[4%] top-[14%] text-primary opacity-20"
-        style="--dur:13s; --dx:16px; --dy:-22px; --delay:-3s">
-    <svg class="hero-spin h-24 w-24 md:h-32 md:w-32" style="--spin:42s" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.4">
-      <circle cx="50" cy="50" r="47" />
-      <circle cx="50" cy="50" r="34" stroke-dasharray="2 6" />
-      <circle cx="50" cy="50" r="20" />
-      <circle cx="50" cy="50" r="6" fill="currentColor" stroke="none" />
-    </svg>
-  </span>
+  {# Jharoka plaque — top-left (drifts) #}
+  <span class="hero-motif absolute left-[3%] top-[10%] text-primary opacity-20"
+        style="--dur:6.5s; --dx:26px; --dy:-22px; --delay:-2s">{{ plaque('h-28 w-20 md:h-40 md:w-28') }}</span>
 
-  {# Jharoka arched window — lower-left #}
-  <span class="hero-motif absolute bottom-[12%] left-[8%] hidden text-secondary opacity-25 sm:block"
-        style="--dur:15s; --dx:-14px; --dy:-18px; --delay:-5s">
-    <svg class="h-24 w-16 md:h-32 md:w-20" viewBox="0 0 60 92" fill="none" stroke="currentColor" stroke-width="1.6">
-      <path d="M6 90 V40 a24 24 0 0 1 48 0 V90" />
-      <path d="M30 18 V90" />
-      <path d="M6 58 H54" />
-      <circle cx="30" cy="40" r="5" />
-    </svg>
-  </span>
+  {# Concentric mandala — top-centre (spins) #}
+  <span class="hero-motif absolute left-[33%] top-[5%] text-outline opacity-25"
+        style="--dur:7s; --dx:-26px; --dy:24px; --delay:-5s">{{ mandala('h-24 w-24 md:h-32 md:w-32', '22s') }}</span>
 
-  {# Mirror-tile diamond cluster — top-center #}
-  <span class="hero-motif absolute left-[30%] top-[5%] text-primary opacity-20"
-        style="--dur:12s; --dx:-18px; --dy:20px; --delay:-6s">
-    <svg class="hero-spin h-20 w-20 md:h-28 md:w-28" style="--spin:54s" viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.5">
+  {# Mirror-tile diamond cluster — upper-right of copy (spins) #}
+  <span class="hero-motif absolute left-[60%] top-[8%] hidden text-outline opacity-20 sm:block"
+        style="--dur:5.5s; --dx:28px; --dy:18px; --delay:-3s">
+    <svg class="hero-spin h-20 w-20 md:h-28 md:w-28" style="--spin:16s" viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.5">
       <rect x="32" y="6" width="16" height="16" transform="rotate(45 40 14)" />
       <rect x="14" y="34" width="14" height="14" transform="rotate(45 21 41)" />
       <rect x="52" y="34" width="14" height="14" transform="rotate(45 59 41)" />
@@ -40,22 +100,36 @@
     </svg>
   </span>
 
-  {# Dotted sun ring — lower-centre (kept off the product image) #}
-  <span class="hero-motif absolute bottom-[10%] left-[34%] hidden text-secondary opacity-25 md:block"
-        style="--dur:10s; --dx:12px; --dy:-14px; --delay:-2s">
-    <svg class="hero-spin h-16 w-16" style="--spin:34s" viewBox="0 0 60 60" fill="none" stroke="currentColor" stroke-width="1.5">
+  {# Triple-ring mandala — mid-left edge (spins) #}
+  <span class="hero-motif absolute left-[2%] top-[54%] text-primary opacity-20"
+        style="--dur:7.5s; --dx:-18px; --dy:-20px; --delay:-9s">{{ rings('h-16 w-16 md:h-24 md:w-24', '20s') }}</span>
+
+  {# Jharoka plaque — mid-right, peeks past the product image (drifts) #}
+  <span class="hero-motif absolute right-[4%] top-[34%] hidden text-primary opacity-15 lg:block"
+        style="--dur:6s; --dx:22px; --dy:-18px; --delay:-6s">{{ plaque('h-28 w-20 md:h-36 md:w-24') }}</span>
+
+  {# Concentric mandala — top-right (spins) #}
+  <span class="hero-motif absolute right-[9%] top-[6%] hidden text-outline opacity-20 md:block"
+        style="--dur:6.5s; --dx:18px; --dy:22px; --delay:-7s">{{ mandala('h-20 w-20 md:h-28 md:w-28', '19s') }}</span>
+
+  {# Dotted sun ring — lower-centre (spins) #}
+  <span class="hero-motif absolute left-[40%] bottom-[8%] hidden text-outline opacity-25 md:block"
+        style="--dur:5s; --dx:16px; --dy:-18px; --delay:-2s">
+    <svg class="hero-spin h-16 w-16" style="--spin:14s" viewBox="0 0 60 60" fill="none" stroke="currentColor" stroke-width="1.5">
       <circle cx="30" cy="30" r="22" stroke-dasharray="1.5 5" />
       <circle cx="30" cy="30" r="11" />
     </svg>
   </span>
 
-  {# Small mandala — mid-left edge #}
-  <span class="hero-motif absolute left-[2%] top-[50%] text-primary opacity-20"
-        style="--dur:14s; --dx:-12px; --dy:-16px; --delay:-10s">
-    <svg class="hero-spin h-16 w-16 md:h-20 md:w-20" style="--spin:46s" viewBox="0 0 60 60" fill="none" stroke="currentColor" stroke-width="1.4">
-      <circle cx="30" cy="30" r="27" stroke-dasharray="2 6" />
-      <circle cx="30" cy="30" r="15" />
-      <circle cx="30" cy="30" r="4" fill="currentColor" stroke="none" />
-    </svg>
-  </span>
+  {# Triple-ring mandala — bottom-right (spins) #}
+  <span class="hero-motif absolute right-[22%] bottom-[13%] hidden text-primary opacity-15 lg:block"
+        style="--dur:6.5s; --dx:-22px; --dy:-16px; --delay:-8s">{{ rings('h-16 w-16 md:h-20 md:w-20', '21s') }}</span>
+
+  {# Square Jharokha lattice — lower-left (drifts) #}
+  <span class="hero-motif absolute left-[19%] bottom-[16%] hidden text-primary opacity-20 sm:block"
+        style="--dur:6.5s; --dx:20px; --dy:-22px; --delay:-4s">{{ lattice('h-20 w-20 md:h-28 md:w-28') }}</span>
+
+  {# Square Jharokha lattice — mid-right (drifts) #}
+  <span class="hero-motif absolute right-[14%] top-[46%] hidden text-outline opacity-20 lg:block"
+        style="--dur:7s; --dx:-18px; --dy:18px; --delay:-7s">{{ lattice('h-16 w-16 md:h-24 md:w-24') }}</span>
 </div>

@@ -3,65 +3,58 @@
 @tailwind utilities;
 
 /*
- * Self-hosted fonts (Heritage Minimalist design system). Served from /public so
- * they satisfy the strict CSP (font-src 'self'); no dependency on Google Fonts.
- * Latin subset only. Bodoni Moda = headlines, Hanken Grotesk = body/labels.
+ * Self-hosted fonts (Heritage Red design system). Served from /public so they
+ * satisfy the strict CSP (font-src 'self'); no dependency on Google Fonts.
+ * Latin subset only. Libre Caslon Text = headlines, Inter = body/labels.
  */
 @font-face {
-  font-family: 'Bodoni Moda';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url('/fonts/bodoni-moda-500.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Bodoni Moda';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url('/fonts/bodoni-moda-600.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Bodoni Moda';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url('/fonts/bodoni-moda-700.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Bodoni Moda';
-  font-style: italic;
-  font-weight: 300 600;
-  font-display: swap;
-  src: url('/fonts/bodoni-moda-italic-500.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Hanken Grotesk';
+  font-family: 'Libre Caslon Text';
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url('/fonts/hanken-grotesk-400.woff2') format('woff2');
+  src: url('/fonts/libre-caslon-text-400.woff2') format('woff2');
 }
 @font-face {
-  font-family: 'Hanken Grotesk';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url('/fonts/hanken-grotesk-500.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Hanken Grotesk';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url('/fonts/hanken-grotesk-600.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Hanken Grotesk';
+  font-family: 'Libre Caslon Text';
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url('/fonts/hanken-grotesk-700.woff2') format('woff2');
+  src: url('/fonts/libre-caslon-text-700.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Libre Caslon Text';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/libre-caslon-text-italic-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/inter-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/inter-500.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/inter-600.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/inter-700.woff2') format('woff2');
 }
 
 /* Hide Alpine-controlled elements until Alpine initializes. */
@@ -81,7 +74,7 @@ select:focus-visible,
 textarea:focus-visible,
 summary:focus-visible,
 [tabindex]:focus-visible {
-  outline: 2px solid #823b18; /* primary (terracotta) */
+  outline: 2px solid #8b0000; /* primary (heritage red) */
   outline-offset: 2px;
   border-radius: 2px;
 }
@@ -95,7 +88,7 @@ summary:focus-visible,
  *    surface colour underneath.
  */
 .ambient-shadow {
-  box-shadow: 0 20px 40px -10px rgba(130, 59, 24, 0.05);
+  box-shadow: 0 20px 40px -10px rgba(139, 0, 0, 0.05);
 }
 .jharoka-arch {
   border-top-left-radius: 50%;
@@ -155,7 +148,7 @@ summary:focus-visible,
   width: 1rem;
   border-radius: 9999px;
   background: #ffffff;
-  border: 2px solid #823b18; /* primary (terracotta) */
+  border: 2px solid #8b0000; /* primary (heritage red) */
   box-shadow: 0 1px 2px rgb(0 0 0 / 0.2);
   cursor: pointer;
   margin-top: 0;
@@ -166,12 +159,12 @@ summary:focus-visible,
   width: 1rem;
   border-radius: 9999px;
   background: #ffffff;
-  border: 2px solid #823b18;
+  border: 2px solid #8b0000;
   box-shadow: 0 1px 2px rgb(0 0 0 / 0.2);
   cursor: pointer;
 }
 .price-range:focus-visible::-webkit-slider-thumb {
-  outline: 2px solid #823b18;
+  outline: 2px solid #8b0000;
   outline-offset: 2px;
 }
 

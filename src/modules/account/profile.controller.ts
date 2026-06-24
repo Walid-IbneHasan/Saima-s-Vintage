@@ -11,6 +11,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Throttle } from '@nestjs/throttler';
 import { Response } from 'express';
 import { memoryStorage } from 'multer';
 import {
@@ -24,7 +25,11 @@ import {
   UploadsService,
 } from '../admin/uploads.service';
 import { CustomerAuthService } from '../customer-auth/customer-auth.service';
-import { ChangePasswordDto, ProfileDto } from '../customer-auth/dto';
+import {
+  ConfirmPasswordChangeDto,
+  ProfileDto,
+  RequestPasswordChangeDto,
+} from '../customer-auth/dto';
 import { AccountService } from './account.service';
 
 @Controller('account')
@@ -80,24 +85,59 @@ export class ProfileController {
     res.redirect('/account?saved=1');
   }
 
-  @Post('password')
-  async changePassword(
+  /** Step 1: validate current password and email a verification code. */
+  @Post('password/request')
+  @Throttle({ default: { limit: 15, ttl: 60_000 } })
+  async requestPasswordChange(
     @CurrentCustomer() me: AuthCustomer,
-    @Body() dto: ChangePasswordDto,
+    @Body() dto: RequestPasswordChangeDto,
     @Res() res: Response,
   ): Promise<void> {
     try {
-      await this.auth.changePassword(me.id, dto.currentPassword, dto.newPassword);
+      await this.auth.requestPasswordChangeOtp(me.id, dto.currentPassword);
+      await this.renderProfile(me.id, res, 200, { pwOtpStage: 'confirm', pwSent: true });
+    } catch (e) {
+      await this.renderProfile(me.id, res, 400, { pwError: (e as Error).message });
+    }
+  }
+
+  /** Step 2: verify the code (+ current password) and set the new password. */
+  @Post('password')
+  async changePassword(
+    @CurrentCustomer() me: AuthCustomer,
+    @Body() dto: ConfirmPasswordChangeDto,
+    @Res() res: Response,
+  ): Promise<void> {
+    try {
+      await this.auth.changePasswordWithOtp(
+        me.id,
+        dto.currentPassword,
+        dto.newPassword,
+        dto.code,
+      );
       res.redirect('/account?pw=1');
     } catch (e) {
-      const { customer, hasPassword, address } = await this.account.getProfile(me.id);
-      res.status(400).render('account/profile', {
-        title: 'My account',
-        customer,
-        hasPassword,
-        address,
+      await this.renderProfile(me.id, res, 400, {
         pwError: (e as Error).message,
+        pwOtpStage: 'confirm',
       });
     }
+  }
+
+  /** Re-render the account page in its current state (shared by both password steps). */
+  private async renderProfile(
+    meId: string,
+    res: Response,
+    status: number,
+    extra: Record<string, unknown> = {},
+  ): Promise<void> {
+    const { customer, hasPassword, address } = await this.account.getProfile(meId);
+    res.status(status).render('account/profile', {
+      title: 'My account',
+      customer,
+      hasPassword,
+      address,
+      ...extra,
+    });
   }
 }
