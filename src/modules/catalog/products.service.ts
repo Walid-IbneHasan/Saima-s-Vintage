@@ -151,8 +151,6 @@ export class ProductsService {
         sku: true,
         shortDescription: true,
         description: true,
-        brand: true,
-        condition: true,
         basePrice: true,
         salePrice: true,
         flashPrice: true,
@@ -162,6 +160,7 @@ export class ProductsService {
         seoTitle: true,
         seoDescription: true,
         images: {
+          where: { variantId: null },
           orderBy: [{ isPrimary: 'desc' }, { position: 'asc' }],
           select: { url: true, alt: true, width: true, height: true },
         },
@@ -172,10 +171,17 @@ export class ProductsService {
             id: true,
             name: true,
             sku: true,
+            size: true,
+            color: true,
             price: true,
             salePrice: true,
             stock: true,
             lowStockThreshold: true,
+            images: {
+              take: 1,
+              orderBy: { position: 'asc' },
+              select: { url: true, alt: true },
+            },
             attributeValues: {
               select: {
                 attributeValue: {

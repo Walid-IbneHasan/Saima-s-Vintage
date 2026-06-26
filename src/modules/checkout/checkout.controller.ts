@@ -94,7 +94,7 @@ export class CheckoutController {
 
     const order = await this.checkout.placeOrder(cart, dto, key, me?.id);
 
-    // Create the SSLCOMMERZ hosted-checkout session and send the customer there.
+    // Create the bKash hosted-checkout payment and send the customer there.
     const gatewayUrl = await this.payments.createPaymentSession(order.id);
     if (gatewayUrl) {
       res.redirect(gatewayUrl);

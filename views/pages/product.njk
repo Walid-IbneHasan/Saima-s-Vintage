@@ -14,20 +14,25 @@
     </ol>
   </nav>
 
-  <div class="grid gap-10 lg:grid-cols-2 lg:gap-16">
+  <div class="grid gap-10 lg:grid-cols-2 lg:gap-16"
+       x-data="{
+         variants: {{ variantsJson }},
+         gallery: {{ galleryJson }},
+         sel: {{ initialVariant }},
+         mainImg: '{{ initialImage }}',
+         get v() { return this.variants[this.sel] || null },
+         pickVariant(i) { this.sel = i; const v = this.variants[i]; this.mainImg = (v && v.image) || this.gallery[0] || this.mainImg; if (v) { const p = new URLSearchParams(); p.set('variant', v.id); if (v.size) p.set('size', v.size); if (v.color) p.set('color', v.color); history.replaceState(null, '', location.pathname + '?' + p.toString()); } },
+         pickThumb(u) { this.mainImg = u }
+       }">
     {# ── Gallery (sticky on desktop) ──────────────────────────────────────
-       Click a thumbnail to swap the main image (Alpine); the main image links
-       to the full-size file. No-JS: main shows the first image and each
-       thumbnail is a real link that opens the full image in a new tab. #}
-    <div class="lg:sticky lg:top-28 lg:self-start"
-         x-data="{ sel: '', pick(u) { this.sel = u; this.$refs.main.src = u; this.$refs.mainlink.href = u; } }"
-         x-init="sel = $refs.main ? $refs.main.src : ''">
-      <a x-ref="mainlink" href="{% if product.images.length %}{{ product.images[0].url }}{% else %}#{% endif %}"
-         {% if product.images.length %}target="_blank" rel="noopener"{% endif %}
+       The main image follows the selected variant (or a clicked thumbnail).
+       No-JS: shows the initial image; thumbnails open the full file in a tab. #}
+    <div class="lg:sticky lg:top-28 lg:self-start">
+      <a href="{% if initialImage %}{{ initialImage }}{% else %}#{% endif %}" :href="mainImg || '#'"
+         {% if initialImage %}target="_blank" rel="noopener"{% endif %}
          class="group block aspect-[4/5] overflow-hidden rounded-2xl border border-outline/20 bg-surface-container-low shadow-luxe-lg">
-        {% if product.images.length %}
-          <img x-ref="main" src="{{ product.images[0].url }}" alt="{{ product.images[0].alt or product.name }}"
-               {% if product.images[0].width %}width="{{ product.images[0].width }}" height="{{ product.images[0].height }}"{% endif %}
+        {% if initialImage %}
+          <img src="{{ initialImage }}" :src="mainImg" alt="{{ product.name }}"
                class="h-full w-full object-cover transition-transform duration-[900ms] ease-lux group-hover:scale-[1.04]" />
         {% else %}
           <div class="grid h-full w-full place-items-center">
@@ -39,8 +44,8 @@
         <div class="mt-4 grid grid-cols-4 gap-3 sm:grid-cols-5">
           {% for img in product.images %}
             <a href="{{ img.url }}" target="_blank" rel="noopener"
-               @click.prevent="pick($el.href)"
-               :class="sel === $el.href ? 'ring-2 ring-accent ring-offset-2 ring-offset-background' : 'opacity-75 hover:opacity-100'"
+               @click.prevent="pickThumb('{{ img.url }}')"
+               :class="mainImg === '{{ img.url }}' ? 'ring-2 ring-accent ring-offset-2 ring-offset-background' : 'opacity-75 hover:opacity-100'"
                class="block aspect-square overflow-hidden rounded-lg border border-outline/20 bg-surface-container-low transition"
                aria-label="View image {{ loop.index }}">
               <img src="{{ img.url }}" alt="{{ img.alt or product.name }}" loading="lazy" class="h-full w-full object-cover" />
@@ -65,21 +70,22 @@
         </a>
       {% endif %}
 
-      {% if product.brand or product.condition %}
-        <p class="mt-3 font-label-sm text-label-sm uppercase tracking-[0.12em] text-on-surface-variant">
-          {% if product.brand %}{{ product.brand }}{% endif %}
-          {% if product.brand and product.condition %} · {% endif %}
-          {% if product.condition %}Condition: {{ product.condition }}{% endif %}
-        </p>
-      {% endif %}
-
       <div class="mt-5 flex flex-wrap items-center gap-3">
-        <p class="font-display-lg text-3xl text-primary">{{ pricing.current | money(product.currency) }}</p>
-        {% if pricing.onSale %}
-          <p class="text-lg text-on-surface-variant line-through">{{ pricing.regular | money(product.currency) }}</p>
-          <span class="rounded-full bg-primary-container px-3 py-1 font-label-sm text-label-sm uppercase tracking-[0.12em] text-on-primary-container">−{{ pricing.discountPercent }}% off</span>
-        {% endif %}
+        <p class="font-display-lg text-3xl text-primary" x-text="v ? v.currentFmt : '{{ pricing.current | money(product.currency) }}'">{{ pricing.current | money(product.currency) }}</p>
+        <template x-if="v && v.onSale">
+          <p class="text-lg text-on-surface-variant line-through" x-text="v.regularFmt"></p>
+        </template>
+        <template x-if="v && v.onSale">
+          <span class="rounded-full bg-primary-container px-3 py-1 font-label-sm text-label-sm uppercase tracking-[0.12em] text-on-primary-container" x-text="'−' + v.discount + '% off'"></span>
+        </template>
       </div>
+
+      {# Stock status for the selected option. #}
+      <p class="mt-3 inline-flex items-center gap-1.5 text-sm" x-show="v" x-cloak>
+        <span x-show="v && v.stock > 5" class="inline-flex items-center gap-1.5 text-on-surface-variant"><span class="h-1.5 w-1.5 rounded-full bg-secondary"></span>In stock</span>
+        <span x-show="v && v.stock > 0 && v.stock <= 5" class="inline-flex items-center gap-1.5 font-medium text-accent-deep"><span class="h-1.5 w-1.5 rounded-full bg-accent"></span>Only <span x-text="v && v.stock"></span> left</span>
+        <span x-show="v && v.stock <= 0" class="font-medium text-error">Sold out</span>
+      </p>
 
       {% if flashEndsAtMs %}
         {# Flash-deal countdown — progressive enhancement (JS only). The discount
@@ -120,16 +126,31 @@
       <form action="/cart/items" method="post" class="mt-8 space-y-5">
         {% if csrfToken %}<input type="hidden" name="_csrf" value="{{ csrfToken }}" />{% endif %}
         {% if product.variants.length > 1 %}
-          <div>
-            <label for="variantId" class="block font-label-sm text-label-sm uppercase tracking-[0.12em] text-on-surface-variant">Option</label>
-            <select id="variantId" name="variantId" class="mt-2 w-full rounded-lg border border-outline bg-surface-container-lowest px-4 py-3 text-body-md text-on-surface transition-colors focus:border-accent-deep focus:ring-0">
+          <fieldset>
+            <legend class="block font-label-sm text-label-sm uppercase tracking-[0.12em] text-on-surface-variant">
+              Option<span x-show="v" x-cloak class="lowercase tracking-normal text-on-surface"> — <span class="font-medium" x-text="v && v.name"></span></span>
+            </legend>
+            <div class="mt-2.5 flex flex-wrap gap-2.5">
               {% for v in product.variants %}
-                <option value="{{ v.id }}" {% if v.stock <= 0 %}disabled{% endif %}>
-                  {{ v.name }}{% if v.stock <= 0 %} — sold out{% endif %}
-                </option>
+                <label class="cursor-pointer">
+                  <input type="radio" name="variantId" value="{{ v.id }}" class="peer sr-only"
+                         {% if loop.index0 == initialVariant %}checked{% endif %}
+                         {% if v.stock <= 0 %}disabled{% endif %}
+                         @change="pickVariant({{ loop.index0 }})" />
+                  <span class="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-outline px-4 py-2 text-sm font-medium text-on-surface transition hover:border-accent-deep peer-checked:border-accent peer-checked:bg-accent/10 peer-checked:text-accent-deep peer-checked:ring-1 peer-checked:ring-accent peer-focus-visible:ring-2 peer-focus-visible:ring-accent peer-disabled:cursor-not-allowed peer-disabled:text-on-surface-variant/40 peer-disabled:line-through peer-disabled:hover:border-outline">
+                    {% if v.images.length %}<img src="{{ v.images[0].url }}" alt="" class="-ml-1.5 h-6 w-6 rounded-full object-cover ring-1 ring-outline/20" />{% elif v.color %}<span class="-ml-1 h-4 w-4 shrink-0 rounded-full border border-outline/40" style="background-color: {{ v.color }}" title="{{ v.color }}" aria-hidden="true"></span>{% endif %}
+                    <span>{{ v.name }}{% if v.size %} · {{ v.size }}{% endif %}</span>
+                    {% if v.stock <= 0 %}<span class="font-normal text-on-surface-variant/60"> · Sold out</span>{% endif %}
+                  </span>
+                </label>
               {% endfor %}
-            </select>
-          </div>
+            </div>
+            <p class="mt-2.5 text-sm text-on-surface-variant" x-show="v && (v.size || v.color)" x-cloak>
+              <span x-show="v && v.size">Size: <span class="font-medium text-on-surface" x-text="v && v.size"></span></span>
+              <span x-show="v && v.size && v.color"> · </span>
+              <span x-show="v && v.color">Colour: <span class="font-medium text-on-surface" x-text="v && v.color"></span></span>
+            </p>
+          </fieldset>
         {% elif product.variants.length == 1 %}
           <input type="hidden" name="variantId" value="{{ product.variants[0].id }}" />
         {% endif %}
@@ -150,12 +171,10 @@
             </div>
           </div>
 
-          <button type="submit" {% if not inStock %}disabled{% endif %}
+          <button type="submit" {% if not inStock %}disabled{% endif %} :disabled="!v || v.stock <= 0"
                   class="group inline-flex min-h-[3.25rem] flex-1 items-center justify-center gap-2.5 rounded-full bg-primary px-8 py-4 font-label-md text-label-md uppercase tracking-[0.16em] text-on-primary shadow-luxe transition-colors duration-300 hover:bg-on-primary-fixed-variant disabled:cursor-not-allowed disabled:bg-surface-container-high disabled:text-on-surface-variant disabled:shadow-none">
-            {% if inStock %}
-              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 7h12l-1 13H7L6 7z" stroke-linejoin="round"/><path d="M9 7a3 3 0 016 0" stroke-linecap="round"/></svg>
-              Add to bag
-            {% else %}Sold out{% endif %}
+            <svg x-show="!v || v.stock > 0" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 7h12l-1 13H7L6 7z" stroke-linejoin="round"/><path d="M9 7a3 3 0 016 0" stroke-linecap="round"/></svg>
+            <span x-text="(v && v.stock > 0) ? 'Add to bag' : 'Sold out'">{% if inStock %}Add to bag{% else %}Sold out{% endif %}</span>
           </button>
         </div>
       </form>

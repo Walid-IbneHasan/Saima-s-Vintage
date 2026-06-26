@@ -32,14 +32,14 @@ export const envSchema = z.object({
 
   DATABASE_URL: z.string().min(1),
 
-  // SSLCOMMERZ
-  SSLCOMMERZ_STORE_ID: z.string().min(1),
-  SSLCOMMERZ_STORE_PASSWORD: z.string().min(1),
-  SSLCOMMERZ_IS_LIVE: boolish.default(false),
-  SSLCOMMERZ_SUCCESS_URL: z.string().url(),
-  SSLCOMMERZ_FAIL_URL: z.string().url(),
-  SSLCOMMERZ_CANCEL_URL: z.string().url(),
-  SSLCOMMERZ_IPN_URL: z.string().url(),
+  // bKash PGW Tokenized Checkout (merchant API credentials — server-side only).
+  BKASH_USERNAME: z.string().min(1),
+  BKASH_PASSWORD: z.string().min(1),
+  BKASH_APP_KEY: z.string().min(1),
+  BKASH_APP_SECRET: z.string().min(1),
+  BKASH_IS_LIVE: boolish.default(false),
+  // Where bKash returns the customer (GET, with ?paymentID&status).
+  BKASH_CALLBACK_URL: z.string().url(),
 
   DEFAULT_CURRENCY: z.string().min(1).default('BDT'),
 

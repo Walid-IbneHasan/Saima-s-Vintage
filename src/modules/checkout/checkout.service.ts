@@ -10,6 +10,7 @@ import {
 import { randomBytes } from 'crypto';
 import { PrismaService } from '../../prisma/prisma.service';
 import { resolveProductPricing, variantCurrent } from '../../common/pricing';
+import { variantLabel } from '../../common/variant-label';
 import { CouponsService } from '../coupons/coupons.service';
 import { InventoryService } from '../inventory/inventory.service';
 import { CheckoutDto } from './dto';
@@ -49,6 +50,8 @@ export class CheckoutService {
             id: true,
             sku: true,
             name: true,
+            size: true,
+            color: true,
             price: true,
             salePrice: true,
             product: {
@@ -81,7 +84,9 @@ export class CheckoutService {
       return {
         variantId: ci.variantId,
         productName: ci.variant.product.name,
-        variantName: ci.variant.name,
+        // Snapshot the full variant label (name · size · colour) so the admin
+        // sees exactly which option was bought, even if the variant changes later.
+        variantName: variantLabel(ci.variant) || ci.variant.name,
         sku: ci.variant.sku,
         unitPrice,
         quantity: ci.quantity,

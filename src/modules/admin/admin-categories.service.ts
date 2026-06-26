@@ -39,16 +39,16 @@ export class AdminCategoriesService {
     return this.prisma.category.findUnique({ where: { id } });
   }
 
-  async create(dto: CategoryDto): Promise<string> {
+  async create(dto: CategoryDto, imageUrl?: string): Promise<string> {
     const slug = await this.resolveSlug(dto.slug || dto.name);
     const category = await this.prisma.category.create({
-      data: this.data(dto, slug),
+      data: this.data(dto, slug, imageUrl),
       select: { id: true },
     });
     return category.id;
   }
 
-  async update(id: string, dto: CategoryDto): Promise<void> {
+  async update(id: string, dto: CategoryDto, imageUrl?: string): Promise<void> {
     const existing = await this.prisma.category.findUnique({
       where: { id },
       select: { slug: true },
@@ -58,7 +58,7 @@ export class AdminCategoriesService {
     const slug = await this.resolveSlug(dto.slug || dto.name, id);
     await this.prisma.category.update({
       where: { id },
-      data: this.data(dto, slug),
+      data: this.data(dto, slug, imageUrl),
     });
 
     if (existing.slug !== slug) {
@@ -70,7 +70,7 @@ export class AdminCategoriesService {
     await this.prisma.category.delete({ where: { id } });
   }
 
-  private data(dto: CategoryDto, slug: string) {
+  private data(dto: CategoryDto, slug: string, imageUrl?: string) {
     return {
       name: dto.name,
       slug,
@@ -78,6 +78,8 @@ export class AdminCategoriesService {
       parentId: dto.parentId || null,
       isActive: dto.isActive,
       sortOrder: dto.sortOrder ?? 0,
+      // Only overwrite the image when a new one was uploaded; otherwise keep it.
+      ...(imageUrl ? { imageUrl } : {}),
     };
   }
 

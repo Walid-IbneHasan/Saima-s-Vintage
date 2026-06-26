@@ -32,6 +32,41 @@ document.addEventListener('submit', (event) => {
   }
 });
 
+// Preserve scroll position across a form POST→redirect that lands back on the
+// same path (e.g. adding a variant or saving on the admin product edit page),
+// so the page stays exactly where it was instead of jumping to the top.
+// Auto-enabled on the product edit screen; opt in elsewhere with data-keep-scroll.
+const keepScrollHere = /^\/admin\/products\/[^/]+\/edit$/.test(location.pathname);
+document.addEventListener('submit', (event) => {
+  const form = event.target;
+  if (
+    form instanceof HTMLFormElement &&
+    !event.defaultPrevented &&
+    (keepScrollHere || form.hasAttribute('data-keep-scroll'))
+  ) {
+    try {
+      sessionStorage.setItem(
+        'keepScroll',
+        JSON.stringify({ p: location.pathname, y: window.scrollY }),
+      );
+    } catch {
+      /* sessionStorage unavailable — fall back to default scroll */
+    }
+  }
+});
+try {
+  const raw = sessionStorage.getItem('keepScroll');
+  if (raw) {
+    sessionStorage.removeItem('keepScroll');
+    const { p, y } = JSON.parse(raw) as { p: string; y: number };
+    if (p === location.pathname && typeof y === 'number') {
+      window.scrollTo(0, y);
+    }
+  }
+} catch {
+  /* ignore malformed/absent state */
+}
+
 const prefersReducedMotion = window.matchMedia(
   '(prefers-reduced-motion: reduce)',
 ).matches;

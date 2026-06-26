@@ -36,12 +36,6 @@ export class ProductDto {
   @IsOptional() @IsString()
   description?: string;
 
-  @IsOptional() @ToTrimmed() @IsString() @MaxLength(191)
-  brand?: string;
-
-  @IsOptional() @ToTrimmed() @IsString() @MaxLength(64)
-  condition?: string;
-
   @ToNumber() @IsNumber() @Min(0)
   basePrice!: number;
 
@@ -80,6 +74,11 @@ export class ProductDto {
   @IsOptional() @ToNumber() @IsInt() @Min(1)
   maxPerOrder?: number;
 
+  // Initial stock for the auto-created default variant (simple products).
+  // Only used on create; on edit, stock is managed per variant.
+  @IsOptional() @ToNumber() @IsInt() @Min(0)
+  stock?: number;
+
   @IsOptional() @IsString() @MaxLength(191)
   seoTitle?: string;
 
@@ -96,6 +95,12 @@ export class VariantDto {
 
   @IsString() @IsNotEmpty() @MaxLength(191)
   name!: string;
+
+  @IsOptional() @ToTrimmed() @IsString() @MaxLength(64)
+  size?: string;
+
+  @IsOptional() @ToTrimmed() @IsString() @MaxLength(64)
+  color?: string;
 
   @IsOptional() @ToNumber() @IsNumber() @Min(0)
   price?: number;

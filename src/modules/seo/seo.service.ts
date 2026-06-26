@@ -7,7 +7,6 @@ interface ProductForLd {
   slug: string;
   sku: string | null;
   shortDescription: string | null;
-  brand: string | null;
   basePrice: Prisma.Decimal;
   salePrice: Prisma.Decimal | null;
   flashPrice?: Prisma.Decimal | null;
@@ -52,7 +51,6 @@ export class SeoService {
       name: p.name,
       ...(p.shortDescription ? { description: p.shortDescription } : {}),
       ...(p.sku ? { sku: p.sku } : {}),
-      ...(p.brand ? { brand: { '@type': 'Brand', name: p.brand } } : {}),
       image: p.images.map((i) => this.abs(i.url)),
       offers: {
         '@type': 'Offer',

@@ -124,3 +124,14 @@ export function productPriceView(p: ProductPricing): PriceView {
 export function variantPriceView(v: VariantPricing, p: ProductPricing): PriceView {
   return priceView(variantRegular(v, p), variantCurrent(v, p));
 }
+
+/** Format a BDT amount the same way the `money` view filter does (for JSON/JS). */
+export function formatMoney(value: number | D | string | null, currency = 'BDT'): string {
+  const n = Number(value);
+  if (Number.isNaN(n)) return '';
+  const formatted = n.toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+  return currency === 'BDT' ? `৳${formatted}` : `${currency} ${formatted}`;
+}

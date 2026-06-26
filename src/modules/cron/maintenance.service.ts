@@ -3,6 +3,7 @@ import { CartStatus, OrderStatus, ReservationStatus } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { InventoryService } from '../inventory/inventory.service';
 import { JobsService } from '../jobs/jobs.service';
+import { PaymentsService } from '../payments/payments.service';
 
 @Injectable()
 export class MaintenanceService {
@@ -12,7 +13,19 @@ export class MaintenanceService {
     private readonly prisma: PrismaService,
     private readonly inventory: InventoryService,
     private readonly jobs: JobsService,
+    private readonly payments: PaymentsService,
   ) {}
+
+  /**
+   * Reconcile bKash payments stuck at SESSION_CREATED. bKash has no webhook, so
+   * this is the safety net for "customer paid but Execute/callback never
+   * completed": Query bKash and settle (or fail) accordingly. Idempotent.
+   */
+  reconcilePayments(
+    olderThanMinutes = 15,
+  ): Promise<{ reconciled: number; paid: number; failed: number }> {
+    return this.payments.reconcile(olderThanMinutes);
+  }
 
   /**
    * Expire unpaid orders whose reservations have passed their TTL: restock and

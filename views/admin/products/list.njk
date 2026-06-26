@@ -1,6 +1,12 @@
 {% extends "admin/layout.njk" %}
 
 {% block content %}
+{% if notice %}
+  <div class="mb-4 flex items-start gap-2 rounded-lg border border-secondary/30 bg-secondary-container px-4 py-3 text-sm text-on-secondary-container">
+    <svg class="mt-0.5 h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span>{{ notice }}</span>
+  </div>
+{% endif %}
 <div class="mb-4 flex items-center justify-between">
   <p class="text-sm text-on-surface-variant">{{ meta.total }} product(s)</p>
   <a href="/admin/products/new" class="rounded bg-primary px-4 py-2 font-label-md text-label-md uppercase tracking-widest text-on-primary hover:bg-on-primary-fixed-variant">New product</a>

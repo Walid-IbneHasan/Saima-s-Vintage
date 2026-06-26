@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
+import { BkashController } from './bkash.controller';
+import { BkashService } from './bkash.service';
 import { PaymentsService } from './payments.service';
-import { SslcommerzController } from './sslcommerz.controller';
-import { SslcommerzService } from './sslcommerz.service';
 
 @Module({
-  controllers: [SslcommerzController],
-  providers: [SslcommerzService, PaymentsService],
-  exports: [PaymentsService, SslcommerzService],
+  controllers: [BkashController],
+  providers: [BkashService, PaymentsService],
+  exports: [PaymentsService, BkashService],
 })
 export class PaymentsModule {}

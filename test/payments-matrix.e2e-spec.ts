@@ -1,21 +1,20 @@
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { PaymentEventType } from '@prisma/client';
+import { BkashService } from '../src/modules/payments/bkash.service';
 import { PaymentsService } from '../src/modules/payments/payments.service';
-import { SslcommerzService } from '../src/modules/payments/sslcommerz.service';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { createPendingOrder, resetDb } from './helpers/factories';
 import { createTestApp } from './helpers/test-app';
 
-describe('SSLCOMMERZ payments matrix (e2e)', () => {
+describe('bKash payments matrix (e2e)', () => {
   let app: NestExpressApplication;
   let prisma: PrismaService;
   let payments: PaymentsService;
-  let sslcommerz: SslcommerzService;
+  let bkash: BkashService;
 
   beforeAll(async () => {
     ({ app, prisma } = await createTestApp());
     payments = app.get(PaymentsService);
-    sslcommerz = app.get(SslcommerzService);
+    bkash = app.get(BkashService);
   });
 
   afterEach(() => jest.restoreAllMocks());
@@ -25,32 +24,41 @@ describe('SSLCOMMERZ payments matrix (e2e)', () => {
     await app.close();
   });
 
-  function mockValidate(resp: Record<string, unknown>) {
-    return jest
-      .spyOn(sslcommerz, 'validate')
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .mockResolvedValue(resp as any);
-  }
+  type Pending = {
+    orderId: string;
+    tranId: string;
+    bkashPaymentID: string;
+    amount: string;
+    variantId: string;
+  };
 
-  function validResponse(o: { tranId: string; amount: string }) {
+  function completed(o: Pending, over: Record<string, unknown> = {}) {
     return {
-      status: 'VALID',
-      tran_id: o.tranId,
-      val_id: 'V',
+      statusCode: '0000',
+      statusMessage: 'Successful',
+      paymentID: o.bkashPaymentID,
+      trxID: 'TRX-OK',
+      transactionStatus: 'Completed',
       amount: o.amount,
       currency: 'BDT',
-      risk_level: '0',
+      merchantInvoiceNumber: o.tranId,
+      customerMsisdn: '01770618576',
+      ...over,
     };
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function mockExecute(resp: Record<string, unknown>) {
+    return jest.spyOn(bkash, 'executePayment').mockResolvedValue(resp as any);
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function mockQuery(resp: Record<string, unknown>) {
+    return jest.spyOn(bkash, 'queryPayment').mockResolvedValue(resp as any);
+  }
+
   async function expectState(
-    o: { orderId: string; tranId: string; variantId: string },
-    expected: {
-      order: string;
-      payment: string;
-      reservation: string;
-      stock: number;
-    },
+    o: Pending,
+    expected: { order: string; payment: string; reservation: string; stock: number },
   ) {
     const order = await prisma.order.findUnique({ where: { id: o.orderId } });
     expect(order?.status).toBe(expected.order);
@@ -63,21 +71,17 @@ describe('SSLCOMMERZ payments matrix (e2e)', () => {
     });
     expect(reservation?.status).toBe(expected.reservation);
 
-    const variant = await prisma.productVariant.findUnique({
-      where: { id: o.variantId },
-    });
+    const variant = await prisma.productVariant.findUnique({ where: { id: o.variantId } });
     expect(variant?.stock).toBe(expected.stock);
   }
 
-  it('fails and restocks when validation status is invalid', async () => {
+  it('fails and restocks when the payment never completes', async () => {
     await resetDb(prisma);
     const o = await createPendingOrder(prisma);
-    mockValidate({
-      ...validResponse(o),
-      status: 'INVALID_TRANSACTION',
-    });
+    mockExecute({ statusCode: '2062', transactionStatus: 'Initiated' });
+    mockQuery({ statusCode: '2062', transactionStatus: 'Failed' });
 
-    const result = await payments.processValidation(o.tranId, 'V', PaymentEventType.IPN);
+    const result = await payments.handleCallback(o.bkashPaymentID, 'success');
 
     expect(result.outcome).toBe('failed');
     await expectState(o, {
@@ -88,15 +92,12 @@ describe('SSLCOMMERZ payments matrix (e2e)', () => {
     });
   });
 
-  it('fails and restocks when validation tran_id does not match', async () => {
+  it('fails and restocks when the captured invoice does not match', async () => {
     await resetDb(prisma);
     const o = await createPendingOrder(prisma);
-    mockValidate({
-      ...validResponse(o),
-      tran_id: 'WRONG',
-    });
+    mockExecute(completed(o, { merchantInvoiceNumber: 'WRONG-INVOICE' }));
 
-    const result = await payments.processValidation(o.tranId, 'V', PaymentEventType.IPN);
+    const result = await payments.handleCallback(o.bkashPaymentID, 'success');
 
     expect(result.outcome).toBe('failed');
     await expectState(o, {
@@ -107,15 +108,12 @@ describe('SSLCOMMERZ payments matrix (e2e)', () => {
     });
   });
 
-  it('holds for review when validation currency does not match', async () => {
+  it('holds for review when the captured currency does not match', async () => {
     await resetDb(prisma);
     const o = await createPendingOrder(prisma);
-    mockValidate({
-      ...validResponse(o),
-      currency: 'USD',
-    });
+    mockExecute(completed(o, { currency: 'USD' }));
 
-    const result = await payments.processValidation(o.tranId, 'V', PaymentEventType.IPN);
+    const result = await payments.handleCallback(o.bkashPaymentID, 'success');
 
     expect(result.outcome).toBe('review');
     await expectState(o, {
@@ -126,15 +124,12 @@ describe('SSLCOMMERZ payments matrix (e2e)', () => {
     });
   });
 
-  it('holds for review when validation amount does not match', async () => {
+  it('holds for review when the captured amount does not match', async () => {
     await resetDb(prisma);
     const o = await createPendingOrder(prisma);
-    mockValidate({
-      ...validResponse(o),
-      amount: '1',
-    });
+    mockExecute(completed(o, { amount: '1' }));
 
-    const result = await payments.processValidation(o.tranId, 'V', PaymentEventType.IPN);
+    const result = await payments.handleCallback(o.bkashPaymentID, 'success');
 
     expect(result.outcome).toBe('review');
     await expectState(o, {
@@ -145,77 +140,19 @@ describe('SSLCOMMERZ payments matrix (e2e)', () => {
     });
   });
 
-  it('holds for review when validation risk_level is 1', async () => {
-    await resetDb(prisma);
-    const o = await createPendingOrder(prisma);
-    mockValidate({
-      ...validResponse(o),
-      risk_level: '1',
-    });
-
-    const result = await payments.processValidation(o.tranId, 'V', PaymentEventType.IPN);
-
-    expect(result.outcome).toBe('review');
-    await expectState(o, {
-      order: 'PAYMENT_REVIEW',
-      payment: 'PAYMENT_REVIEW',
-      reservation: 'ACTIVE',
-      stock: 0,
-    });
-  });
-
-  it('returns unknown_tran when validation has no matching payment', async () => {
+  it('returns unknown_tran when the callback paymentID has no matching payment', async () => {
     await resetDb(prisma);
 
-    const result = await payments.processValidation(
-      'NO-SUCH-TRAN',
-      'V',
-      PaymentEventType.IPN,
-    );
+    const result = await payments.handleCallback('NO-SUCH-PAYMENT', 'success');
 
     expect(result.outcome).toBe('unknown_tran');
   });
 
-  it('re-validates a success redirect server-side and marks paid', async () => {
-    await resetDb(prisma);
-    const o = await createPendingOrder(prisma);
-    mockValidate(validResponse(o));
-
-    const result = await payments.handleSuccessRedirect({
-      tran_id: o.tranId,
-      val_id: 'V',
-      status: 'VALID',
-    });
-
-    expect(result.outcome).toBe('paid');
-    await expectState(o, {
-      order: 'PAID',
-      payment: 'PAID',
-      reservation: 'COMMITTED',
-      stock: 0,
-    });
-  });
-
-  it('fails and restocks on fail redirect', async () => {
+  it('cancels and restocks on a cancel callback', async () => {
     await resetDb(prisma);
     const o = await createPendingOrder(prisma);
 
-    const result = await payments.handleFailRedirect({ tran_id: o.tranId });
-
-    expect(result.outcome).toBe('failed');
-    await expectState(o, {
-      order: 'FAILED',
-      payment: 'FAILED',
-      reservation: 'RELEASED',
-      stock: 1,
-    });
-  });
-
-  it('cancels and restocks on cancel redirect', async () => {
-    await resetDb(prisma);
-    const o = await createPendingOrder(prisma);
-
-    const result = await payments.handleCancelRedirect({ tran_id: o.tranId });
+    const result = await payments.handleCallback(o.bkashPaymentID, 'cancel');
 
     expect(result.outcome).toBe('cancelled');
     await expectState(o, {
@@ -226,15 +163,11 @@ describe('SSLCOMMERZ payments matrix (e2e)', () => {
     });
   });
 
-  it('fails and restocks on failed IPN', async () => {
+  it('fails and restocks on a failure callback', async () => {
     await resetDb(prisma);
     const o = await createPendingOrder(prisma);
 
-    const result = await payments.handleIpn({
-      tran_id: o.tranId,
-      val_id: 'V',
-      status: 'FAILED',
-    });
+    const result = await payments.handleCallback(o.bkashPaymentID, 'failure');
 
     expect(result.outcome).toBe('failed');
     await expectState(o, {
@@ -243,5 +176,72 @@ describe('SSLCOMMERZ payments matrix (e2e)', () => {
       reservation: 'RELEASED',
       stock: 1,
     });
+  });
+
+  it('reconcile settles a stuck payment that bKash reports as Completed', async () => {
+    await resetDb(prisma);
+    const o = await createPendingOrder(prisma);
+    mockQuery(completed(o));
+
+    // Negative window so the just-created row is always past the cutoff.
+    const res = await payments.reconcile(-1);
+    expect(res.paid).toBe(1);
+
+    await expectState(o, {
+      order: 'PAID',
+      payment: 'PAID',
+      reservation: 'COMMITTED',
+      stock: 0,
+    });
+  });
+
+  it('reconcile fails+restocks a stuck payment that bKash reports as Failed', async () => {
+    await resetDb(prisma);
+    const o = await createPendingOrder(prisma);
+    mockQuery({ statusCode: '2062', transactionStatus: 'Failed' });
+
+    const res = await payments.reconcile(-1);
+    expect(res.failed).toBe(1);
+
+    await expectState(o, {
+      order: 'FAILED',
+      payment: 'FAILED',
+      reservation: 'RELEASED',
+      stock: 1,
+    });
+  });
+
+  it('refunds a captured payment: order/payment REFUNDED and items restocked', async () => {
+    await resetDb(prisma);
+    const o = await createPendingOrder(prisma);
+    mockExecute(completed(o));
+    await payments.handleCallback(o.bkashPaymentID, 'success');
+    await expectState(o, {
+      order: 'PAID',
+      payment: 'PAID',
+      reservation: 'COMMITTED',
+      stock: 0,
+    });
+
+    jest.spyOn(bkash, 'refund').mockResolvedValue({
+      statusCode: '0000',
+      statusMessage: 'Successful',
+      refundTrxID: 'REF-1',
+      originalTrxID: 'TRX-OK',
+      transactionStatus: 'Completed',
+      amount: o.amount,
+      currency: 'BDT',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any);
+
+    const result = await payments.refund(o.orderId);
+    expect(result.ok).toBe(true);
+
+    const order = await prisma.order.findUnique({ where: { id: o.orderId } });
+    expect(order?.status).toBe('REFUNDED');
+    const payment = await prisma.payment.findUnique({ where: { tranId: o.tranId } });
+    expect(payment?.status).toBe('REFUNDED');
+    const variant = await prisma.productVariant.findUnique({ where: { id: o.variantId } });
+    expect(variant?.stock).toBe(1); // restocked
   });
 });

@@ -16,7 +16,7 @@ const rnd = (n: number) => Math.floor(Math.random() * n);
 
 // Demo tables to wipe before reseeding (User is preserved/ upserted separately).
 const DEMO_TABLES = [
-  'AdminAuditLog', 'PaymentEvent', 'Payment', 'SslcommerzSession',
+  'AdminAuditLog', 'PaymentEvent', 'Payment',
   'CouponRedemption', 'Shipment', 'OrderItem', 'Order', 'Coupon',
   'InventoryReservation', 'InventoryMovement', 'LowStockNotification',
   'CartItem', 'Cart', 'Review', 'WishlistItem', 'Wishlist',

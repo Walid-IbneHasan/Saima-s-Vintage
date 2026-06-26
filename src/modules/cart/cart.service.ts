@@ -4,6 +4,7 @@ import { randomUUID } from 'crypto';
 import { Request, Response } from 'express';
 import { PrismaService } from '../../prisma/prisma.service';
 import { resolveProductPricing, variantCurrent } from '../../common/pricing';
+import { variantLabel } from '../../common/variant-label';
 
 const COOKIE = 'sv_cart';
 const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
@@ -155,6 +156,8 @@ export class CartService {
           select: {
             id: true,
             name: true,
+            size: true,
+            color: true,
             price: true,
             stock: true,
             product: {
@@ -189,6 +192,8 @@ export class CartService {
         productName: r.variant.product.name,
         productSlug: r.variant.product.slug,
         variantName: r.variant.name,
+        variant: variantLabel(r.variant),
+        color: r.variant.color,
         unitPrice: r.unitPriceSnapshot,
         regularPrice: regular,
         onSale: regular.greaterThan(r.unitPriceSnapshot),

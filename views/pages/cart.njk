@@ -19,7 +19,12 @@
               </a>
               <div class="min-w-0 flex-1">
                 <a href="/p/{{ item.productSlug }}" class="font-headline-sm text-lg text-on-surface transition-colors hover:text-accent-deep">{{ item.productName }}</a>
-                {% if item.variantName %}<p class="mt-0.5 text-sm text-on-surface-variant">{{ item.variantName }}</p>{% endif %}
+                {% if item.variant %}
+                  <p class="mt-0.5 inline-flex items-center gap-1.5 text-sm text-on-surface-variant">
+                    {% if item.color %}<span class="h-3 w-3 shrink-0 rounded-full border border-outline/40" style="background-color: {{ item.color }}" aria-hidden="true"></span>{% endif %}
+                    {{ item.variant }}
+                  </p>
+                {% endif %}
                 <p class="mt-1.5 flex flex-wrap items-center gap-2 text-sm">
                   <span class="text-on-surface">{{ item.unitPrice | money(cart.currency) }}</span>
                   {% if item.onSale %}<span class="text-on-surface-variant line-through">{{ item.regularPrice | money(cart.currency) }}</span>{% endif %}
