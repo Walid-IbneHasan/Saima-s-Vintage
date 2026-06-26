@@ -169,6 +169,34 @@ curl -fsS https://DOMAIN/health        # → {"status":"ok","db":"up",...}
 
 ---
 
+## Enable Google sign-in (optional)
+
+The "Continue with Google" button on `/login` and `/register` is **shown only when
+`GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` are set**. It works locally already;
+to turn it on for the live site:
+
+1. **Google Cloud Console** → <https://console.cloud.google.com> → *APIs & Services*
+   → *Credentials*. Use your existing **OAuth 2.0 Client ID** (or *Create credentials
+   → OAuth client ID → Web application*). Add:
+   - **Authorized JavaScript origins:** `https://DOMAIN`
+   - **Authorized redirect URIs:** `https://DOMAIN/auth/google/callback`
+     (must match exactly — this is the URL the app derives from `APP_URL`).
+2. On the *OAuth consent screen*, either add your testers under *Test users* or click
+   *Publish app* so any Google account can sign in.
+3. Put the two secrets in the production `.env` (leave `GOOGLE_CALLBACK_URL` blank —
+   it auto-derives from `APP_URL=https://DOMAIN`):
+   ```bash
+   GOOGLE_CLIENT_ID=xxxxxxxx.apps.googleusercontent.com
+   GOOGLE_CLIENT_SECRET=xxxxxxxx
+   ```
+4. Restart so it picks up the new env: `touch tmp/restart.txt` (or **RESTART** the
+   Node.js App in cPanel). The button appears immediately.
+
+> Customers who first signed up with email/password and later click "Continue with
+> Google" are linked to the same account by email — no duplicate is created.
+
+---
+
 ## Redeploys (after code changes)
 
 ```bash

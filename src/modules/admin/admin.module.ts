@@ -18,6 +18,9 @@ import { AdminProductsService } from './admin-products.service';
 import { AdminFormExceptionFilter } from './admin-form-exception.filter';
 import { AdminReviewsController } from './admin-reviews.controller';
 import { AdminReviewsService } from './admin-reviews.service';
+import { AdminUsersController } from './admin-users.controller';
+import { AdminUsersService } from './admin-users.service';
+import { AdminUsersFormFilter } from './admin-users-form.filter';
 import { AuditService } from './audit.service';
 import { AuthService } from './auth.service';
 import { UploadsService } from './uploads.service';
@@ -33,6 +36,7 @@ import { UploadsService } from './uploads.service';
     AdminOrdersController,
     AdminReviewsController,
     AdminAnalyticsController,
+    AdminUsersController,
   ],
   providers: [
     AuthService,
@@ -43,7 +47,9 @@ import { UploadsService } from './uploads.service';
     AdminCouponsService,
     AdminOrdersService,
     AdminReviewsService,
+    AdminUsersService,
     AdminFormExceptionFilter,
+    AdminUsersFormFilter,
     SessionAuthGuard,
     RolesGuard,
   ],
