@@ -107,6 +107,8 @@ SMTP_PORT=587
 SMTP_USER=
 SMTP_PASSWORD=
 SMTP_FROM="Saima's Vintage <no-reply@DOMAIN>"
+# Inbox that gets a copy of every confirmed order (defaults to saimasvintage@gmail.com).
+ORDER_NOTIFICATION_EMAIL=saimasvintage@gmail.com
 
 # Google OAuth (optional; leave blank to hide the Google button)
 GOOGLE_CLIENT_ID=
@@ -200,13 +202,20 @@ to turn it on for the live site:
 ## Redeploys (after code changes)
 
 ```bash
-# local
-npm run build && tar -czf deploy.tar.gz dist public prisma views scripts package.json package-lock.json app.js
+# local — exclude public/uploads so the bundle never overwrites live product images
+npm run build && tar -czf deploy.tar.gz --exclude='public/uploads' dist public prisma views scripts package.json package-lock.json app.js
 # upload + extract into APPROOT (overwrite), then over SSH:
 source .../activate && cd /home/CPUSER/APPROOT
-npm ci --omit=dev && npx prisma generate && npx prisma migrate deploy
+# npm ci / prisma generate only when dependencies or prisma/schema.prisma changed:
+npm ci --omit=dev && npx prisma generate
+npx prisma migrate deploy   # applies pending migrations only (no-op if none)
 touch tmp/restart.txt
 ```
+
+> Order/notification email needs SMTP configured in `.env` (`SMTP_HOST`, `SMTP_USER`,
+> `SMTP_PASSWORD`, `SMTP_FROM`) **and** the `run-jobs` cron running — every confirmed
+> order queues a confirmation to the customer plus a full-detail copy to
+> `ORDER_NOTIFICATION_EMAIL` (defaults to saimasvintage@gmail.com).
 
 ## Troubleshooting
 - **502 / app won't start** → app's `stderr.log` in `APPROOT`, and cPanel **Errors**.

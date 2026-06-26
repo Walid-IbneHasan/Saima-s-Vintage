@@ -49,6 +49,8 @@ export const envSchema = z.object({
   SMTP_USER: z.string().optional(),
   SMTP_PASSWORD: z.string().optional(),
   SMTP_FROM: z.string().optional(),
+  // Where new-order notifications are sent (defaults to saimasvintage@gmail.com).
+  ORDER_NOTIFICATION_EMAIL: z.string().optional(),
 
   // Inventory
   RESERVATION_TTL_MINUTES: z.coerce.number().int().positive().default(30),

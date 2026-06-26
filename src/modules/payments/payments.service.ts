@@ -86,6 +86,7 @@ export class PaymentsService {
    */
   async confirmCodOrder(orderId: string): Promise<void> {
     await this.jobs.enqueue('email.order_confirmation', { orderId });
+    await this.jobs.enqueue('email.new_order_store', { orderId });
   }
 
   /**
@@ -373,6 +374,7 @@ export class PaymentsService {
     // Enqueue the confirmation email only if THIS call won the claim (idempotent).
     if (claimed) {
       await this.jobs.enqueue('email.order_confirmation', { orderId });
+      await this.jobs.enqueue('email.new_order_store', { orderId });
     }
   }
 
