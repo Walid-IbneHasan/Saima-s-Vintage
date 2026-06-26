@@ -3,6 +3,8 @@ import {
   Body,
   Controller,
   Get,
+  NotFoundException,
+  Param,
   Post,
   Query,
   Res,
@@ -14,6 +16,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { Throttle } from '@nestjs/throttler';
 import { Response } from 'express';
 import { memoryStorage } from 'multer';
+import { buildPageMeta, parsePage } from '../../common/pagination';
 import {
   AuthCustomer,
   CurrentCustomer,
@@ -48,14 +51,48 @@ export class ProfileController {
     @Res() res: Response,
   ): Promise<void> {
     const { customer, hasPassword, address } = await this.account.getProfile(me.id);
+    const recentOrders = await this.account.recentOrders(me.id, 3);
     res.render('account/profile', {
       title: 'My account',
       customer,
       hasPassword,
       address,
+      recentOrders,
       welcome: q.welcome === '1',
       saved: q.saved === '1',
       pwSaved: q.pw === '1',
+    });
+  }
+
+  /** Full order history. */
+  @Get('orders')
+  async orders(
+    @CurrentCustomer() me: AuthCustomer,
+    @Query('page') page: string,
+    @Res() res: Response,
+  ): Promise<void> {
+    const params = parsePage(page, undefined, 10, 50);
+    const { items, total } = await this.account.listOrders(me.id, params);
+    res.render('account/orders', {
+      title: 'My orders',
+      orders: items,
+      meta: buildPageMeta(params.page, params.limit, total),
+      basePath: '/account/orders?',
+    });
+  }
+
+  /** A single order's detail, scoped to the signed-in customer. */
+  @Get('orders/:orderNumber')
+  async orderDetail(
+    @CurrentCustomer() me: AuthCustomer,
+    @Param('orderNumber') orderNumber: string,
+    @Res() res: Response,
+  ): Promise<void> {
+    const order = await this.account.getOrder(me.id, orderNumber);
+    if (!order) throw new NotFoundException('Order not found');
+    res.render('account/order-detail', {
+      title: `Order ${order.orderNumber}`,
+      order,
     });
   }
 

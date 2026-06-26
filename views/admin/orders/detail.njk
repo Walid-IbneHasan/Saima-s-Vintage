@@ -94,7 +94,7 @@
             <button class="w-full rounded border border-error px-4 py-2 font-label-md text-label-md uppercase tracking-widest text-error hover:bg-error-container hover:text-on-error-container">Cancel &amp; restock</button>
           </form>
         {% endif %}
-        {% if order.status in ['PAID', 'PROCESSING', 'SHIPPED', 'DELIVERED'] %}
+        {% if canRefund and order.status in ['PAID', 'PROCESSING', 'SHIPPED', 'DELIVERED'] %}
           <form action="/admin/orders/{{ order.id }}/refund" method="post" data-confirm="Refund the full amount to the customer's bKash account and restock the items?">
             <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
             <button class="w-full rounded border border-error px-4 py-2 font-label-md text-label-md uppercase tracking-widest text-error hover:bg-error-container hover:text-on-error-container">Refund via bKash</button>
@@ -111,7 +111,7 @@
       <h3 class="font-headline-md text-headline-md text-on-surface">Payments</h3>
       {% for p in order.payments %}
         <div class="mt-3 border-t border-outline/10 pt-3 text-sm text-on-surface first:border-t-0 first:pt-0">
-          <div class="flex justify-between"><span>{{ statusBadge(p.status) }}</span><span>{{ p.amount | money(p.currency) }}</span></div>
+          <div class="flex items-center justify-between gap-2"><span class="flex items-center gap-2">{{ statusBadge(p.status) }}<span class="rounded-full border border-outline/40 px-2 py-0.5 text-[10px] uppercase tracking-wider text-on-surface-variant">{% if p.provider == 'cod' %}Cash on Delivery{% else %}bKash{% endif %}</span></span><span>{{ p.amount | money(p.currency) }}</span></div>
           <p class="mt-1 text-xs text-on-surface-variant">ref: {{ p.tranId }}</p>
           {% if p.bkashTrxID %}<p class="text-xs text-on-surface-variant">bKash trxID: {{ p.bkashTrxID }}</p>{% endif %}
           {% if p.bkashPaymentID %}<p class="text-xs text-on-surface-variant">paymentID: {{ p.bkashPaymentID }}</p>{% endif %}

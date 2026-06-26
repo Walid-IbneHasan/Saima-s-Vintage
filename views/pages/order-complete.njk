@@ -5,7 +5,15 @@
   <div class="pointer-events-none absolute -right-24 -top-24 -z-10 h-80 w-80 rounded-full bg-accent/10 blur-3xl" aria-hidden="true"></div>
 
   <div class="mx-auto max-w-2xl px-margin-mobile py-16 text-center md:px-margin-desktop md:py-24" data-reveal>
-    {% if order.status == 'PAID' or order.status == 'PROCESSING' %}
+    {% set isCod = order.payments.length > 0 and order.payments[0].provider == 'cod' %}
+    {% if isCod %}
+      <div class="mx-auto grid h-20 w-20 place-items-center rounded-full border border-accent/30 bg-accent/5 text-accent-deep">
+        <svg class="h-9 w-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 7h12l-1 13H7L6 7z" stroke-linejoin="round"/><path d="M9 7a3 3 0 016 0" stroke-linecap="round"/></svg>
+      </div>
+      <p class="mt-7 eyebrow text-accent-deep">Order confirmed</p>
+      <h1 class="mt-4 font-display-lg text-headline-lg text-on-surface text-balance">Thank you — your order is confirmed!</h1>
+      <p class="mt-4 text-body-lg text-on-surface-variant">Order <span class="font-medium text-on-surface">{{ order.orderNumber }}</span> is being prepared. Please keep <span class="font-medium text-on-surface">{{ order.grandTotal | money(order.currency) }}</span> ready to pay in cash on delivery.</p>
+    {% elif order.status == 'PAID' or order.status == 'PROCESSING' %}
       <div class="mx-auto grid h-20 w-20 place-items-center rounded-full border border-accent/30 bg-accent/5 text-accent-deep">
         <svg class="h-9 w-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8.5 12l2.5 2.5 4.5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>

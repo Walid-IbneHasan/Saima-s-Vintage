@@ -112,7 +112,7 @@ export class JobsService {
   private async sendOrderConfirmation(orderId: string): Promise<void> {
     const order = await this.prisma.order.findUnique({
       where: { id: orderId },
-      include: { items: true },
+      include: { items: true, payments: true },
     });
     if (!order) return;
     const rows = order.items
@@ -121,9 +121,13 @@ export class JobsService {
           `<tr><td>${escapeHtml(i.productName)} (${escapeHtml(i.variantName)}) × ${i.quantity}</td><td style="text-align:right">৳${i.lineTotal}</td></tr>`,
       )
       .join('');
+    const isCod = order.payments.some((p) => p.provider === 'cod');
+    const intro = isCod
+      ? `<p>We've received your order and are preparing it. Please keep <strong>৳${order.grandTotal}</strong> ready to pay in cash when it's delivered.</p>`
+      : `<p>We've received your payment and are preparing your order.</p>`;
     const html = `
       <h2>Thank you for your order ${order.orderNumber}</h2>
-      <p>We've received your payment and are preparing your order.</p>
+      ${intro}
       <table cellpadding="6">${rows}</table>
       <p><strong>Total: ৳${order.grandTotal}</strong></p>`;
     await this.notifications.send(

@@ -42,21 +42,27 @@ export class AllExceptionsFilter implements ExceptionFilter {
       this.logger.warn(`${req.method} ${req.originalUrl} → ${status} ${rawMessage}`);
     }
 
-    // Unauthenticated admin requests → redirect to the admin login page.
+    // Unauthenticated admin requests → redirect to the admin login page. Clear
+    // the (stale/expired) cookie first so the login page doesn't bounce straight
+    // back here — otherwise an invalid-but-present cookie loops indefinitely
+    // (ERR_TOO_MANY_REDIRECTS).
     if (
       status === HttpStatus.UNAUTHORIZED &&
       req.originalUrl.startsWith('/admin') &&
       !req.originalUrl.startsWith('/admin/login')
     ) {
+      res.clearCookie('sv_admin', { path: '/' });
       res.redirect('/admin/login');
       return;
     }
 
-    // Unauthenticated customer-account requests → redirect to the customer login.
+    // Unauthenticated customer-account requests → redirect to the customer
+    // login, clearing the stale cookie so /login doesn't redirect back (loop).
     if (
       status === HttpStatus.UNAUTHORIZED &&
       req.originalUrl.startsWith('/account')
     ) {
+      res.clearCookie('sv_customer', { path: '/' });
       res.redirect('/login');
       return;
     }

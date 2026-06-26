@@ -16,60 +16,60 @@
 // ─────────────────────────────────────────────────────────────────────────────
 const atelier = {
   colors: {
-    // ── Brand: espresso ink. `primary` fills CTAs (with on-primary text) and
-    //    also reads as the primary text/price/logo colour. A warm near-black.
-    primary: '#241c14',
-    'on-primary': '#fbf7ef',
-    'primary-container': '#19120c', // deep chips (hero pill, sale chip)
-    'on-primary-container': '#ecd9b6', // warm gold-tinted light on deep chips
-    'primary-fixed': '#efe3cd',
-    'on-primary-fixed': '#1a120b',
-    'primary-fixed-dim': '#d9c39d',
-    'on-primary-fixed-variant': '#5a4a2c', // CTA hover fill (warm bronze)
-    'inverse-primary': '#d8b878', // gold — link hover / focus on dark surfaces
-    'surface-tint': '#a87c32', // brass accent tint
+    // ── Brand: red lacquer. `primary` fills CTAs (with on-primary text) and
+    //    also reads as the price/logo/accent colour. (Headings use on-surface.)
+    primary: '#a31621',
+    'on-primary': '#ffffff',
+    'primary-container': '#7a1019', // deep-red chips (sale chip, badges)
+    'on-primary-container': '#f6ddc8', // warm light on deep red
+    'primary-fixed': '#f7ddd6',
+    'on-primary-fixed': '#3a0a0e',
+    'primary-fixed-dim': '#e7b3ab',
+    'on-primary-fixed-variant': '#7a1019', // CTA hover fill (deeper red)
+    'inverse-primary': '#dcb978', // gold — link hover / focus on dark surfaces
+    'surface-tint': '#b08d3f', // gold accent tint
 
-    // ── Paper & surfaces (warm ivory family). Body sits on `background`; cards
-    //    pop on pure white (`surface-container-lowest`).
-    background: '#f7f3ea',
-    surface: '#f7f3ea',
+    // ── Paper & surfaces (white / warm-white family). Body sits on white;
+    //    sections alternate with warm-white "paper".
+    background: '#ffffff',
+    surface: '#ffffff',
     'surface-bright': '#ffffff',
-    'surface-dim': '#eae0d0',
+    'surface-dim': '#f1ebe3',
     'surface-container-lowest': '#ffffff',
-    'surface-container-low': '#f1eadd',
-    'surface-container': '#ece2d2',
-    'surface-container-high': '#e5dac6',
-    'surface-container-highest': '#ddd0b9',
-    'surface-variant': '#ece2d2',
-    'inverse-surface': '#2a221a',
-    'inverse-on-surface': '#f4eee1',
+    'surface-container-low': '#faf7f3', // paper
+    'surface-container': '#f6efe7',
+    'surface-container-high': '#f0e7db',
+    'surface-container-highest': '#e9ddcc',
+    'surface-variant': '#f5eee6',
+    'inverse-surface': '#3a0a0e', // wine
+    'inverse-on-surface': '#f6ece0',
 
     // ── Ink & secondary text (warm).
-    'on-surface': '#241c14',
-    'on-background': '#241c14',
-    'on-surface-variant': '#6b5d49', // secondary text — ~5.3:1 on ivory
-    secondary: '#5f5443',
+    'on-surface': '#2a1410', // ink — headings/body on white (~13:1)
+    'on-background': '#2a1410',
+    'on-surface-variant': '#6f5a54', // secondary text — ~6:1 on white
+    secondary: '#6f5a54',
     'on-secondary': '#ffffff',
-    'secondary-container': '#eae0cd',
-    'on-secondary-container': '#574c3c',
-    'secondary-fixed': '#efe6d4',
-    'secondary-fixed-dim': '#d4c8b2',
-    'on-secondary-fixed': '#221b12',
-    'on-secondary-fixed-variant': '#4a4030',
+    'secondary-container': '#f3e7df',
+    'on-secondary-container': '#5a4a44',
+    'secondary-fixed': '#f3e7df',
+    'secondary-fixed-dim': '#ddccc0',
+    'on-secondary-fixed': '#2a1410',
+    'on-secondary-fixed-variant': '#5a4a44',
 
-    // ── Borders / hairlines (warm).
-    outline: '#c5b69d',
-    'outline-variant': '#dccfb9',
+    // ── Borders / hairlines (warm, light).
+    outline: '#ddcfbf',
+    'outline-variant': '#ece2d6',
 
-    // ── Tertiary: rich espresso for the footer & dark sections.
-    tertiary: '#1e1812',
-    'on-tertiary': '#f6efe1',
-    'tertiary-container': '#2c2318',
-    'on-tertiary-container': '#c6b8a1', // warm muted body — ~7:1 on tertiary
-    'tertiary-fixed': '#e4dac6',
-    'tertiary-fixed-dim': '#c9bca4',
-    'on-tertiary-fixed': '#19130d',
-    'on-tertiary-fixed-variant': '#4a3f2d',
+    // ── Tertiary: deep wine for the footer & dark sections.
+    tertiary: '#3a0a0e',
+    'on-tertiary': '#f6ece0',
+    'tertiary-container': '#4a0d12',
+    'on-tertiary-container': '#d8c2a8', // warm muted body — ~7:1 on wine
+    'tertiary-fixed': '#f0d9c6',
+    'tertiary-fixed-dim': '#d8b9a0',
+    'on-tertiary-fixed': '#2a0a0c',
+    'on-tertiary-fixed-variant': '#7a1019',
 
     // ── Feedback.
     error: '#b0241c',
@@ -77,12 +77,28 @@ const atelier = {
     'error-container': '#f7ddd7',
     'on-error-container': '#5c130e',
 
-    // ── Additive accent scale (new — used in redesigned templates).
-    accent: '#a87c32',
-    'accent-soft': '#c9a24b',
-    'accent-bright': '#d8b878',
-    'accent-deep': '#7c5a1e', // ~5.4:1 on ivory — safe for small accent text
-    gold: '#a87c32',
+    // ── Additive accent scale (champagne gold).
+    accent: '#b08d3f',
+    'accent-soft': '#cdab63',
+    'accent-bright': '#dcb978',
+    'accent-deep': '#8a6d2e', // ~4.8:1 on white — safe for small gold text
+    gold: '#b08d3f',
+
+    // ── "Maison Rouge" light-luxury brand palette (additive; new names only,
+    //    so existing token classes are untouched). White ground, red accent,
+    //    champagne gold detail. Used by the redesigned navbar, footer & home.
+    'brand-red': '#a31621', // primary red — CTAs, accents (white text ≈6.5:1)
+    'brand-red-deep': '#7a1019', // hover / footer ground
+    'brand-red-soft': '#c4283b',
+    'brand-wine': '#3a0a0e', // deepest warm red-black
+    'brand-gold': '#b08d3f', // gold lines / decoration
+    'brand-gold-soft': '#cdab63',
+    'brand-gold-bright': '#dcb978',
+    'brand-bronze': '#8a6d2e', // small gold text on white (≈4.8:1)
+    'brand-ink': '#2a1410', // headings / body on white
+    'brand-ink-soft': '#6f5a54', // secondary text on white (≈6:1)
+    'brand-paper': '#faf7f3', // warm white section ground
+    'brand-cream': '#f6ece0', // light text on red grounds
   },
   borderRadius: {
     DEFAULT: '0.25rem',
@@ -118,14 +134,17 @@ const atelier = {
   },
 };
 
-const SERIF = ['"Libre Caslon Text"', 'Georgia', 'Cambria', 'Times New Roman', 'serif'];
+// "Maison Rouge" brand faces (self-hosted): Bodoni Moda display + Hanken
+// Grotesk UI. Swapping these here re-types the entire storefront at once.
+const SERIF = ['"Bodoni Moda"', 'Georgia', 'Cambria', 'Times New Roman', 'serif'];
 const SANS = [
-  '"Inter"',
+  '"Hanken Grotesk"',
   'ui-sans-serif',
   'system-ui',
   '-apple-system',
   'Segoe UI',
   'Roboto',
+  '"Inter"',
   'Helvetica Neue',
   'Arial',
   'sans-serif',
@@ -149,6 +168,10 @@ module.exports = {
       fontFamily: {
         sans: SANS,
         serif: SERIF,
+        // "Maison Rouge" brand faces — Bodoni Moda display + Hanken Grotesk UI.
+        // Additive tokens used by the redesigned navbar/footer/home.
+        'brand-serif': ['"Bodoni Moda"', 'Georgia', 'Cambria', 'serif'],
+        'brand-sans': ['"Hanken Grotesk"', 'ui-sans-serif', 'system-ui', 'Inter', 'sans-serif'],
         'display-lg': SERIF,
         'display-lg-mobile': SERIF,
         'headline-lg': SERIF,
@@ -165,12 +188,12 @@ module.exports = {
         // Refined tracking/leading for a more editorial, premium feel.
         'label-sm': ['12px', { lineHeight: '16px', letterSpacing: '0.1em', fontWeight: '500' }],
         'label-md': ['14px', { lineHeight: '18px', letterSpacing: '0.12em', fontWeight: '600' }],
-        'headline-sm': ['22px', { lineHeight: '30px', letterSpacing: '-0.008em', fontWeight: '400' }],
-        'headline-lg-mobile': ['32px', { lineHeight: '1.12', letterSpacing: '-0.012em', fontWeight: '400' }],
-        'headline-md': ['30px', { lineHeight: '38px', letterSpacing: '-0.014em', fontWeight: '400' }],
-        'display-lg-mobile': ['40px', { lineHeight: '1.04', letterSpacing: '-0.02em', fontWeight: '400' }],
-        'display-lg': ['68px', { lineHeight: '1.0', letterSpacing: '-0.032em', fontWeight: '400' }],
-        'headline-lg': ['42px', { lineHeight: '1.08', letterSpacing: '-0.02em', fontWeight: '400' }],
+        'headline-sm': ['22px', { lineHeight: '30px', letterSpacing: '-0.008em', fontWeight: '500' }],
+        'headline-lg-mobile': ['32px', { lineHeight: '1.12', letterSpacing: '-0.012em', fontWeight: '500' }],
+        'headline-md': ['30px', { lineHeight: '38px', letterSpacing: '-0.014em', fontWeight: '500' }],
+        'display-lg-mobile': ['40px', { lineHeight: '1.04', letterSpacing: '-0.02em', fontWeight: '500' }],
+        'display-lg': ['68px', { lineHeight: '1.0', letterSpacing: '-0.032em', fontWeight: '500' }],
+        'headline-lg': ['42px', { lineHeight: '1.08', letterSpacing: '-0.02em', fontWeight: '500' }],
         'body-md': ['16px', { lineHeight: '26px', fontWeight: '400' }],
         'body-lg': ['18px', { lineHeight: '30px', fontWeight: '400' }],
       },

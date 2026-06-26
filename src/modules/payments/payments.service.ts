@@ -79,6 +79,16 @@ export class PaymentsService {
   }
 
   /**
+   * Cash on Delivery confirmation. The order is already PROCESSING with a
+   * PENDING `cod` payment (created in checkout); here we just send the order
+   * confirmation email. Cash is captured later when an admin marks the order
+   * delivered.
+   */
+  async confirmCodOrder(orderId: string): Promise<void> {
+    await this.jobs.enqueue('email.order_confirmation', { orderId });
+  }
+
+  /**
    * Browser return from the bKash page (GET /payments/bkash/callback?paymentID&status).
    * Never trust `status` alone — on "success" we Execute server-side (the trust
    * boundary). Idempotent: terminal payments short-circuit.

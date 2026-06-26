@@ -1,0 +1,29 @@
+{% extends "layouts/base.njk" %}
+{% from "partials/order-card.njk" import orderCard %}
+
+{% block content %}
+<div class="mx-auto max-w-4xl px-margin-mobile py-14 md:px-margin-desktop md:py-20">
+  <a href="/account" class="link-underline inline-flex items-center gap-2 font-label-sm text-label-sm uppercase tracking-[0.14em] text-on-surface-variant transition-colors hover:text-accent-deep">
+    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Back to account
+  </a>
+
+  <div class="mt-4 flex flex-col gap-2">
+    <p class="eyebrow text-accent-deep">History</p>
+    <h1 class="font-display-lg text-[2.25rem] leading-tight text-on-surface md:text-headline-lg">Your orders</h1>
+    <p class="text-sm text-on-surface-variant">{{ meta.total }} order{% if meta.total != 1 %}s{% endif %}</p>
+  </div>
+
+  {% if orders.length %}
+    <div class="mt-10 space-y-3">
+      {% for order in orders %}{{ orderCard(order) }}{% endfor %}
+    </div>
+    {% include "partials/pagination.njk" %}
+  {% else %}
+    <div class="mt-10 rounded-2xl border border-dashed border-outline/40 bg-surface-container-lowest px-6 py-16 text-center">
+      <p class="text-on-surface-variant">You haven't placed any orders yet.</p>
+      <a href="/products" class="mt-5 inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3 font-label-md text-label-md uppercase tracking-[0.16em] text-on-primary shadow-luxe transition-colors duration-300 hover:bg-on-primary-fixed-variant">Browse the collection</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

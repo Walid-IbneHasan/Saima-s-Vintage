@@ -2,6 +2,7 @@
 import Alpine from 'alpinejs';
 import htmx from 'htmx.org';
 import { initHeroShader } from './hero-shader';
+import { initLuxHome } from './lux-home';
 
 declare global {
   interface Window {
@@ -22,6 +23,9 @@ document.documentElement.classList.add('js');
 
 // Hero background shader (no-op unless the home hero canvas is present).
 initHeroShader();
+
+// Premium home-page micro-interactions (no-op unless [data-lux] is present).
+initLuxHome();
 
 // Confirm destructive actions without inline handlers (CSP blocks inline
 // `onsubmit`). Any <form data-confirm="message"> prompts before submitting.

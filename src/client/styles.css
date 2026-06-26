@@ -28,6 +28,17 @@
   font-display: swap;
   src: url('/fonts/libre-caslon-text-italic-400.woff2') format('woff2');
 }
+/* "Maison Rouge" brand faces — Bodoni Moda (display) + Hanken Grotesk (UI).
+   Self-hosted, latin; available site-wide so the navbar/footer can use them. */
+@font-face { font-family: 'Bodoni Moda'; font-style: normal; font-weight: 500; font-display: swap; src: url('/fonts/bodoni-moda-500.woff2') format('woff2'); }
+@font-face { font-family: 'Bodoni Moda'; font-style: normal; font-weight: 600; font-display: swap; src: url('/fonts/bodoni-moda-600.woff2') format('woff2'); }
+@font-face { font-family: 'Bodoni Moda'; font-style: normal; font-weight: 700; font-display: swap; src: url('/fonts/bodoni-moda-700.woff2') format('woff2'); }
+@font-face { font-family: 'Bodoni Moda'; font-style: italic; font-weight: 500; font-display: swap; src: url('/fonts/bodoni-moda-italic-500.woff2') format('woff2'); }
+@font-face { font-family: 'Hanken Grotesk'; font-style: normal; font-weight: 400; font-display: swap; src: url('/fonts/hanken-grotesk-400.woff2') format('woff2'); }
+@font-face { font-family: 'Hanken Grotesk'; font-style: normal; font-weight: 500; font-display: swap; src: url('/fonts/hanken-grotesk-500.woff2') format('woff2'); }
+@font-face { font-family: 'Hanken Grotesk'; font-style: normal; font-weight: 600; font-display: swap; src: url('/fonts/hanken-grotesk-600.woff2') format('woff2'); }
+@font-face { font-family: 'Hanken Grotesk'; font-style: normal; font-weight: 700; font-display: swap; src: url('/fonts/hanken-grotesk-700.woff2') format('woff2'); }
+
 @font-face {
   font-family: 'Inter';
   font-style: normal;
@@ -60,9 +71,11 @@
 :root {
   /* Premium easing curve reused across the storefront. */
   --lux: cubic-bezier(0.22, 1, 0.36, 1);
-  --ink: #241c14;
-  --gold: #a87c32;
-  --gold-deep: #7c5a1e;
+  /* "Maison Rouge" — warm ink + champagne gold (drives focus ring, underline,
+     selection, slider). */
+  --ink: #2a1410;
+  --gold: #b08d3f;
+  --gold-deep: #8a6d2e;
 }
 
 /* Hide Alpine-controlled elements until Alpine initializes. */
@@ -81,10 +94,10 @@ html {
   }
 }
 
-/* Warm, on-brand text selection. */
+/* Warm, on-brand text selection (soft red). */
 ::selection {
-  background: rgba(168, 124, 50, 0.22);
-  color: #241c14;
+  background: rgba(163, 22, 33, 0.15);
+  color: #2a1410;
 }
 
 /*
@@ -104,6 +117,40 @@ summary:focus-visible,
   border-radius: 2px;
 }
 
+/*
+ * Brand the native form controls — @tailwindcss/forms defaults focus rings and
+ * checked checkboxes/radios to blue, which clashes with the red/gold theme.
+ * Kept in the base layer so per-input utilities (focus:border-primary, etc.)
+ * still win where templates set them; this only recolours the defaults.
+ */
+@layer base {
+  [type='text']:focus,
+  [type='email']:focus,
+  [type='password']:focus,
+  [type='search']:focus,
+  [type='tel']:focus,
+  [type='number']:focus,
+  [type='url']:focus,
+  [type='date']:focus,
+  [type='datetime-local']:focus,
+  [type='time']:focus,
+  [type='month']:focus,
+  [type='week']:focus,
+  textarea:focus,
+  select:focus {
+    border-color: var(--gold-deep);
+    --tw-ring-color: var(--gold-deep);
+  }
+  [type='checkbox'],
+  [type='radio'] {
+    color: #a31621; /* brand red — checked fill */
+  }
+  [type='checkbox']:focus,
+  [type='radio']:focus {
+    --tw-ring-color: #a31621;
+  }
+}
+
 /* Skip-link: hidden until focused, then pinned top-left over the header. */
 .skip-link {
   position: fixed;
@@ -112,8 +159,8 @@ summary:focus-visible,
   z-index: 200;
   transform: translateY(-150%);
   transition: transform 0.25s var(--lux);
-  background: #241c14;
-  color: #fbf7ef;
+  background: #2a1410;
+  color: #f6ece0;
   padding: 0.6rem 1.1rem;
   border-radius: 0.5rem;
   font-size: 13px;
@@ -180,9 +227,34 @@ summary:focus-visible,
   transform: scaleX(1);
 }
 
+/*
+ * Refined underline-on-hover in the element's own colour (currentColor), so it
+ * matches whatever the link recolours to on hover. Used by the redesigned
+ * navbar/footer. 300ms — within the micro-interaction budget.
+ */
+.ul-grow {
+  position: relative;
+}
+.ul-grow::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -4px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s var(--lux);
+}
+.ul-grow:hover::after,
+.ul-grow:focus-visible::after {
+  transform: scaleX(1);
+}
+
 /* Small uppercase tracked eyebrow label. */
 .eyebrow {
-  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  font-family: 'Hanken Grotesk', ui-sans-serif, system-ui, sans-serif;
   font-size: 12px;
   line-height: 1;
   font-weight: 600;
@@ -270,8 +342,8 @@ summary:focus-visible,
   height: 1.05rem;
   width: 1.05rem;
   border-radius: 9999px;
-  background: #241c14;
-  border: 2px solid #a87c32;
+  background: #2a1410;
+  border: 2px solid #b08d3f;
   box-shadow: 0 1px 3px rgb(36 28 20 / 0.3);
   cursor: pointer;
   margin-top: 0;
@@ -281,13 +353,13 @@ summary:focus-visible,
   height: 1.05rem;
   width: 1.05rem;
   border-radius: 9999px;
-  background: #241c14;
-  border: 2px solid #a87c32;
+  background: #2a1410;
+  border: 2px solid #b08d3f;
   box-shadow: 0 1px 3px rgb(36 28 20 / 0.3);
   cursor: pointer;
 }
 .price-range:focus-visible::-webkit-slider-thumb {
-  outline: 2px solid #7c5a1e;
+  outline: 2px solid #8a6d2e;
   outline-offset: 2px;
 }
 

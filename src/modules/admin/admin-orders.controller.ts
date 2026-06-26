@@ -63,10 +63,17 @@ export class AdminOrdersController {
       refund_ok: { kind: 'ok', text: 'Refund completed — the order has been refunded and items restocked.' },
       refund_failed: { kind: 'error', text: 'Refund failed at bKash. Nothing was changed — check the payment events.' },
     };
+    // bKash refunds only apply to a captured bKash payment (COD has no gateway).
+    const isCod = order.payments.some((p) => p.provider === 'cod');
+    const canRefund = order.payments.some(
+      (p) => p.provider === 'bkash' && p.status === 'PAID',
+    );
     res.render('admin/orders/detail', {
       title: `Order ${order.orderNumber}`,
       order,
       notice: notices[notice] ?? null,
+      isCod,
+      canRefund,
     });
   }
 

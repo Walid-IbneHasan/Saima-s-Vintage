@@ -13,7 +13,7 @@ import { resolveProductPricing, variantCurrent } from '../../common/pricing';
 import { variantLabel } from '../../common/variant-label';
 import { CouponsService } from '../coupons/coupons.service';
 import { InventoryService } from '../inventory/inventory.service';
-import { CheckoutDto } from './dto';
+import { CheckoutDto, PaymentMethod } from './dto';
 
 @Injectable()
 export class CheckoutService {
@@ -36,7 +36,9 @@ export class CheckoutService {
     dto: CheckoutDto,
     idempotencyKey: string,
     customerId?: string | null,
+    paymentMethod: PaymentMethod = 'bkash',
   ): Promise<Order> {
+    const isCod = paymentMethod === 'cod';
     const existing = await this.prisma.order.findUnique({
       where: { idempotencyKey },
     });
@@ -132,7 +134,11 @@ export class CheckoutService {
             customerId: customerId ?? null,
             email: dto.email,
             phone: dto.phone || dto.shipPhone || null,
-            status: OrderStatus.AWAITING_PAYMENT,
+            // COD orders are confirmed immediately (PROCESSING); bKash orders
+            // wait for the online payment (AWAITING_PAYMENT).
+            status: isCod
+              ? OrderStatus.PROCESSING
+              : OrderStatus.AWAITING_PAYMENT,
             currency: cart.currency,
             subtotal,
             discountTotal,
@@ -178,12 +184,20 @@ export class CheckoutService {
         await tx.payment.create({
           data: {
             orderId: order.id,
+            provider: isCod ? 'cod' : 'bkash',
             status: PaymentStatus.PENDING,
             amount: grandTotal,
             currency: cart.currency,
             tranId,
           },
         });
+
+        // COD is a confirmed sale at placement, so commit the reservations now
+        // (a bKash order commits them only once the payment is captured). This
+        // keeps the stock allocated and immune to the awaiting-payment expiry.
+        if (isCod) {
+          await this.inventory.commitReservations(order.id, tx);
+        }
 
         await tx.cart.update({
           where: { id: cart.id },

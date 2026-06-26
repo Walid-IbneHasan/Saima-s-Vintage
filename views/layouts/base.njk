@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#f7f3ea" />
+    <meta name="theme-color" content="#ffffff" />
     <title>{{ title or appName }}</title>
     {% if metaDescription %}<meta name="description" content="{{ metaDescription }}" />{% endif %}
     {% if canonical %}<link rel="canonical" href="{{ canonical }}" />{% endif %}
@@ -16,9 +16,9 @@
     <meta name="twitter:card" content="summary_large_image" />
     {% else %}<meta name="twitter:card" content="summary" />{% endif %}
 
-    {# Preload the two most critical above-the-fold fonts (display serif + body). #}
-    <link rel="preload" href="/fonts/libre-caslon-text-400.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="/fonts/inter-400.woff2" as="font" type="font/woff2" crossorigin />
+    {# Preload the critical brand faces (Bodoni Moda display + Hanken Grotesk UI). #}
+    <link rel="preload" href="/fonts/bodoni-moda-500.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/hanken-grotesk-400.woff2" as="font" type="font/woff2" crossorigin />
 
     <link rel="stylesheet" href="{{ asset('src/client/styles.css') }}" />
     {% if jsonLd %}{% for ld in jsonLd %}

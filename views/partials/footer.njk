@@ -1,7 +1,8 @@
-<footer class="relative w-full overflow-hidden bg-tertiary text-on-tertiary-container">
-  {# Soft brass glow + faint mandala motif for depth. #}
-  <div class="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-accent/10 blur-3xl" aria-hidden="true"></div>
-  <svg class="pointer-events-none absolute -bottom-20 -left-20 h-80 w-80 text-on-tertiary-container/[0.04]" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="0.8" aria-hidden="true">
+<footer class="relative w-full overflow-hidden bg-brand-wine text-brand-cream">
+  {# Soft red + gold glow and a faint mandala motif for depth. #}
+  <div class="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full" aria-hidden="true" style="background:radial-gradient(closest-side,rgba(196,40,59,.28),transparent);"></div>
+  <div class="pointer-events-none absolute -bottom-28 left-1/4 h-80 w-80 rounded-full" aria-hidden="true" style="background:radial-gradient(closest-side,rgba(176,141,63,.16),transparent);"></div>
+  <svg class="pointer-events-none absolute -bottom-20 -left-20 h-80 w-80 opacity-[0.06]" viewBox="0 0 100 100" fill="none" stroke-width="0.8" style="stroke:#dcb978;" aria-hidden="true">
     <circle cx="50" cy="50" r="47" stroke-dasharray="1.5 5"/><circle cx="50" cy="50" r="38"/><circle cx="50" cy="50" r="26" stroke-dasharray="2 5"/><circle cx="50" cy="50" r="12"/>
   </svg>
 
@@ -9,11 +10,11 @@
     {# ── Invitation band ─────────────────────────────────────────────── #}
     <div class="grid grid-cols-1 gap-10 py-16 md:grid-cols-2 md:items-end md:py-20">
       <div>
-        <p class="eyebrow text-accent-bright">The Atelier Letter</p>
-        <h2 class="mt-4 max-w-md font-display-lg text-[2rem] leading-[1.1] text-on-tertiary md:text-headline-lg">
-          Heritage finds, <span class="italic text-accent-bright">first.</span>
+        <p class="font-brand-sans text-[11px] font-semibold uppercase tracking-[0.32em] text-brand-gold-bright">The Atelier Letter</p>
+        <h2 class="mt-4 max-w-md font-brand-serif text-[2.1rem] font-medium leading-[1.08] text-brand-cream md:text-[2.6rem]">
+          Heritage finds, <span class="italic text-brand-gold-bright">first.</span>
         </h2>
-        <p class="mt-3 max-w-sm text-body-md text-on-tertiary-container/85">
+        <p class="mt-3 max-w-sm font-brand-sans text-brand-cream/80">
           New arrivals, restoration stories and private previews — a few times a month, never more.
         </p>
       </div>
@@ -21,12 +22,12 @@
       <form action="/newsletter" method="post" class="w-full md:justify-self-end md:max-w-md">
         <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
         <label for="footer-email" class="sr-only">Email address</label>
-        <div class="flex items-center gap-2 border-b border-white/20 pb-2 transition-colors focus-within:border-accent-bright">
+        <div class="flex items-center gap-2 border-b border-white/25 pb-2 transition-colors focus-within:border-brand-gold-bright">
           <input id="footer-email" type="email" name="email" required placeholder="you@email.com"
-                 class="w-full border-none bg-transparent px-0 py-1.5 text-body-md text-on-tertiary placeholder:text-on-tertiary-container/55 focus:ring-0" />
-          <button type="submit" class="shrink-0 font-label-md text-label-md uppercase tracking-[0.18em] text-accent-bright transition-colors hover:text-on-tertiary">Subscribe</button>
+                 class="w-full border-none bg-transparent px-0 py-1.5 font-brand-sans text-brand-cream placeholder:text-brand-cream/45 focus:ring-0" />
+          <button type="submit" class="shrink-0 font-brand-sans text-[13px] font-semibold uppercase tracking-[0.18em] text-brand-gold-bright transition-colors hover:text-white">Subscribe</button>
         </div>
-        <p class="mt-3 text-xs text-on-tertiary-container/60">By subscribing you agree to receive occasional emails. Unsubscribe anytime.</p>
+        <p class="mt-3 font-brand-sans text-xs text-brand-cream/55">By subscribing you agree to receive occasional emails. Unsubscribe anytime.</p>
       </form>
     </div>
 
@@ -36,61 +37,61 @@
     <div class="grid grid-cols-2 gap-x-8 gap-y-12 py-16 md:grid-cols-4 md:py-20">
       <div class="col-span-2 md:col-span-1">
         <a href="/" class="flex items-center gap-2.5" aria-label="{{ appName }} — home">
-          <span class="text-accent-bright" aria-hidden="true">
+          <span class="text-brand-gold-bright" aria-hidden="true">
             <svg class="h-7 w-7" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="20" cy="20" r="18" stroke-dasharray="1 4"/><circle cx="20" cy="20" r="12.5"/><circle cx="20" cy="20" r="4.5" fill="currentColor" stroke="none"/></svg>
           </span>
-          <span class="font-display-lg text-2xl text-on-tertiary">{{ appName }}</span>
+          <span class="font-brand-serif text-2xl font-medium text-brand-cream">{{ appName }}</span>
         </a>
-        <p class="mt-5 max-w-xs text-body-md text-on-tertiary-container/85">
+        <p class="mt-5 max-w-xs font-brand-sans text-brand-cream/80">
           Hand-picked vintage treasures and handcrafted Lippan &amp; Jharoka art, restored with a reverent hand by Saima.
         </p>
         <div class="mt-6 flex items-center gap-3">
-          <a href="https://instagram.com" target="_blank" rel="noopener" aria-label="Instagram" class="grid h-10 w-10 place-items-center rounded-full border border-white/15 text-on-tertiary-container transition-colors hover:border-accent-bright hover:text-accent-bright">
+          <a href="https://instagram.com" target="_blank" rel="noopener" aria-label="Instagram" class="grid h-10 w-10 place-items-center rounded-full border border-white/15 text-brand-cream/90 transition-colors hover:border-brand-gold-bright hover:text-brand-gold-bright">
             <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
           </a>
-          <a href="https://facebook.com" target="_blank" rel="noopener" aria-label="Facebook" class="grid h-10 w-10 place-items-center rounded-full border border-white/15 text-on-tertiary-container transition-colors hover:border-accent-bright hover:text-accent-bright">
+          <a href="https://facebook.com" target="_blank" rel="noopener" aria-label="Facebook" class="grid h-10 w-10 place-items-center rounded-full border border-white/15 text-brand-cream/90 transition-colors hover:border-brand-gold-bright hover:text-brand-gold-bright">
             <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M14 9h3V6h-3c-1.7 0-3 1.3-3 3v2H8.5v3H11v6h3v-6h2.5l.5-3H14v-1.5c0-.3.2-.5.5-.5z"/></svg>
           </a>
-          <a href="https://pinterest.com" target="_blank" rel="noopener" aria-label="Pinterest" class="grid h-10 w-10 place-items-center rounded-full border border-white/15 text-on-tertiary-container transition-colors hover:border-accent-bright hover:text-accent-bright">
+          <a href="https://pinterest.com" target="_blank" rel="noopener" aria-label="Pinterest" class="grid h-10 w-10 place-items-center rounded-full border border-white/15 text-brand-cream/90 transition-colors hover:border-brand-gold-bright hover:text-brand-gold-bright">
             <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-3.6 19.3c-.1-.8-.2-2 0-2.9l1.2-5.1s-.3-.6-.3-1.5c0-1.4.8-2.5 1.9-2.5.9 0 1.3.7 1.3 1.5 0 .9-.6 2.2-.9 3.5-.2 1 .5 1.9 1.5 1.9 1.9 0 3.2-2.4 3.2-5.2 0-2.2-1.5-3.8-4.1-3.8a4.7 4.7 0 00-4.9 4.7c0 .9.3 1.5.7 2 .2.2.2.3.1.6l-.2.9c-.1.3-.3.4-.6.2-1.1-.5-1.7-1.9-1.7-3.1 0-2.5 1.8-5.4 5.4-5.4 2.9 0 4.8 2.1 4.8 4.3 0 3-1.7 5.2-4.1 5.2-.8 0-1.6-.4-1.9-.9l-.5 2c-.2.7-.6 1.4-1 2A10 10 0 1012 2z"/></svg>
           </a>
         </div>
       </div>
 
       <div>
-        <h3 class="mb-5 font-label-sm text-label-sm uppercase tracking-[0.24em] text-on-tertiary">Shop</h3>
-        <ul class="space-y-3.5 text-body-md">
-          <li><a href="/products" class="link-underline text-on-tertiary-container transition-colors hover:text-accent-bright">All pieces</a></li>
-          <li><a href="/products?onSale=1" class="link-underline text-on-tertiary-container transition-colors hover:text-accent-bright">Flash Deals</a></li>
+        <h3 class="mb-5 font-brand-sans text-[12px] font-semibold uppercase tracking-[0.24em] text-brand-cream">Shop</h3>
+        <ul class="space-y-3.5 font-brand-sans">
+          <li><a href="/products" class="ul-grow text-brand-cream/80 transition-colors hover:text-brand-gold-bright">All pieces</a></li>
+          <li><a href="/products?onSale=1" class="ul-grow text-brand-cream/80 transition-colors hover:text-brand-gold-bright">Flash Deals</a></li>
           {% for cat in navCategories() %}{% if loop.index0 < 3 %}
-            <li><a href="/c/{{ cat.slug }}" class="link-underline text-on-tertiary-container transition-colors hover:text-accent-bright">{{ cat.name }}</a></li>
+            <li><a href="/c/{{ cat.slug }}" class="ul-grow text-brand-cream/80 transition-colors hover:text-brand-gold-bright">{{ cat.name }}</a></li>
           {% endif %}{% endfor %}
         </ul>
       </div>
 
       <div>
-        <h3 class="mb-5 font-label-sm text-label-sm uppercase tracking-[0.24em] text-on-tertiary">Atelier</h3>
-        <ul class="space-y-3.5 text-body-md">
-          <li><a href="/pages/about" class="link-underline text-on-tertiary-container transition-colors hover:text-accent-bright">Our story</a></li>
-          <li><a href="/search" class="link-underline text-on-tertiary-container transition-colors hover:text-accent-bright">Search</a></li>
-          <li><a href="/cart" class="link-underline text-on-tertiary-container transition-colors hover:text-accent-bright">Your cart</a></li>
-          <li><a href="/account" class="link-underline text-on-tertiary-container transition-colors hover:text-accent-bright">My account</a></li>
+        <h3 class="mb-5 font-brand-sans text-[12px] font-semibold uppercase tracking-[0.24em] text-brand-cream">Atelier</h3>
+        <ul class="space-y-3.5 font-brand-sans">
+          <li><a href="/pages/about" class="ul-grow text-brand-cream/80 transition-colors hover:text-brand-gold-bright">Our story</a></li>
+          <li><a href="/search" class="ul-grow text-brand-cream/80 transition-colors hover:text-brand-gold-bright">Search</a></li>
+          <li><a href="/cart" class="ul-grow text-brand-cream/80 transition-colors hover:text-brand-gold-bright">Your cart</a></li>
+          <li><a href="/account" class="ul-grow text-brand-cream/80 transition-colors hover:text-brand-gold-bright">My account</a></li>
         </ul>
       </div>
 
       <div>
-        <h3 class="mb-5 font-label-sm text-label-sm uppercase tracking-[0.24em] text-on-tertiary">Care</h3>
-        <ul class="space-y-3.5 text-body-md text-on-tertiary-container">
+        <h3 class="mb-5 font-brand-sans text-[12px] font-semibold uppercase tracking-[0.24em] text-brand-cream">Care</h3>
+        <ul class="space-y-3.5 font-brand-sans text-brand-cream/80">
           <li class="flex items-start gap-2.5">
-            <svg class="mt-0.5 h-4 w-4 shrink-0 text-accent-bright" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 7l8-4 8 4v6c0 5-3.5 7.5-8 9-4.5-1.5-8-4-8-9V7z" stroke-linejoin="round"/></svg>
+            <svg class="mt-0.5 h-4 w-4 shrink-0 text-brand-gold-bright" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 7l8-4 8 4v6c0 5-3.5 7.5-8 9-4.5-1.5-8-4-8-9V7z" stroke-linejoin="round"/></svg>
             <span>Restored &amp; authenticated</span>
           </li>
           <li class="flex items-start gap-2.5">
-            <svg class="mt-0.5 h-4 w-4 shrink-0 text-accent-bright" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M3 8h13v8H3zM16 11h3l2 2v3h-5z" stroke-linejoin="round"/><circle cx="7" cy="17" r="1.6"/><circle cx="18" cy="17" r="1.6"/></svg>
+            <svg class="mt-0.5 h-4 w-4 shrink-0 text-brand-gold-bright" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M3 8h13v8H3zM16 11h3l2 2v3h-5z" stroke-linejoin="round"/><circle cx="7" cy="17" r="1.6"/><circle cx="18" cy="17" r="1.6"/></svg>
             <span>Nationwide delivery</span>
           </li>
           <li class="flex items-start gap-2.5">
-            <svg class="mt-0.5 h-4 w-4 shrink-0 text-accent-bright" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 9h16v11H4zM4 9l2-5h12l2 5M12 4v5M9 13h6" stroke-linejoin="round"/></svg>
+            <svg class="mt-0.5 h-4 w-4 shrink-0 text-brand-gold-bright" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 9h16v11H4zM4 9l2-5h12l2 5M12 4v5M9 13h6" stroke-linejoin="round"/></svg>
             <span>Complimentary wrapping</span>
           </li>
         </ul>
@@ -99,10 +100,10 @@
 
     {# ── Legal / trust bar ───────────────────────────────────────────── #}
     <div class="flex flex-col items-center justify-between gap-4 border-t border-white/10 py-7 text-center md:flex-row md:text-left">
-      <p class="text-xs text-on-tertiary-container/70">&copy; {{ currentYear }} {{ appName }}. Handcrafted heritage, made to be lived with.</p>
-      <div class="flex items-center gap-2 text-on-tertiary-container/60">
-        <span class="text-[11px] uppercase tracking-[0.18em]">Secure checkout via</span>
-        <span class="rounded border border-white/15 px-2.5 py-1 font-label-sm text-[10px] uppercase tracking-[0.14em] text-on-tertiary-container/80">bKash</span>
+      <p class="font-brand-sans text-xs text-brand-cream/65">&copy; {{ currentYear }} {{ appName }}. Handcrafted heritage, made to be lived with.</p>
+      <div class="flex items-center gap-2 text-brand-cream/60">
+        <span class="font-brand-sans text-[11px] uppercase tracking-[0.18em]">Secure checkout via</span>
+        <span class="rounded border border-white/15 px-2.5 py-1 font-brand-sans text-[10px] uppercase tracking-[0.14em] text-brand-cream/80">bKash</span>
       </div>
     </div>
   </div>

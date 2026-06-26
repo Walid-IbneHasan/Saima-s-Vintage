@@ -81,6 +81,22 @@ export class AdminOrdersService {
         where: { orderId: id },
         data: { status: ShipmentStatus.DELIVERED, deliveredAt: new Date() },
       });
+      // Cash on Delivery: cash is collected on delivery, so settle the pending
+      // COD payment now (bKash orders are already PAID, so this no-ops them).
+      const cod = await this.prisma.payment.updateMany({
+        where: {
+          orderId: id,
+          provider: 'cod',
+          status: PaymentStatus.PENDING,
+        },
+        data: { status: PaymentStatus.PAID, validatedAt: new Date() },
+      });
+      if (cod.count > 0) {
+        await this.prisma.order.update({
+          where: { id },
+          data: { paidAt: new Date() },
+        });
+      }
     }
   }
 
