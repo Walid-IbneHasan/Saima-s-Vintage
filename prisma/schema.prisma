@@ -711,17 +711,6 @@ model WishlistItem {
   @@index([productId])
 }
 
-model NewsletterSubscriber {
-  id            String    @id @default(cuid())
-  email         String    @unique @db.VarChar(191)
-  isConfirmed   Boolean   @default(false)
-  confirmToken  String?   @db.VarChar(191)
-  unsubscribedAt DateTime?
-  createdAt     DateTime  @default(now())
-
-  @@index([isConfirmed])
-}
-
 // ──────────────────────────────── Ops / SEO ──────────────────────────────
 
 model AdminAuditLog {
