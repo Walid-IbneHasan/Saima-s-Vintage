@@ -7,6 +7,22 @@ import { PrismaService } from '../../prisma/prisma.service';
 export class PagesController {
   constructor(private readonly prisma: PrismaService) {}
 
+  /**
+   * Bespoke, on-brand About page. Declared before the `pages/:slug` catch-all so
+   * it always wins over any DB-backed page that happens to use the same slug.
+   */
+  @Get('pages/about')
+  about(@Res() res: Response): void {
+    const base = (process.env.APP_URL ?? '').replace(/\/$/, '');
+    res.render('pages/about', {
+      title: "Our Story — Saima's Vintage",
+      metaDescription:
+        "The story behind Saima's Vintage — how a love of Kutchi Lippan mirror art and Mughal Jharoka windows became a small atelier devoted to restoring heritage, one piece at a time.",
+      canonical: `${base}/pages/about`,
+      ogImage: `${base}/images/atelier-heritage-collection.webp`,
+    });
+  }
+
   @Get('pages/:slug')
   async page(@Param('slug') slug: string, @Res() res: Response): Promise<void> {
     await this.render(res, slug, 'page');

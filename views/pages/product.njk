@@ -201,8 +201,9 @@
             Description
             <svg class="h-4 w-4 text-on-surface-variant transition-transform duration-300 group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </summary>
-          {# Rich text is sanitized on admin write (Phase 1 admin), so `safe` is OK here. #}
-          <div class="prose prose-stone max-w-none pb-4 pt-1 text-on-surface-variant">{{ product.description | safe }}</div>
+          {# Rich text is sanitized on admin write (the trust boundary), so `safe`
+             is OK here. `richtext` turns plain-text line breaks into paragraphs. #}
+          <div class="prose prose-stone max-w-none pb-4 pt-1 text-on-surface-variant">{{ product.description | richtext | safe }}</div>
         </details>
       {% endif %}
 

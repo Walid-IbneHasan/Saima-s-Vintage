@@ -30,9 +30,9 @@
 
 <div class="mx-auto max-w-container-max px-margin-mobile py-12 md:px-margin-desktop md:py-16">
   <div class="flex flex-col gap-10 lg:flex-row lg:gap-12">
-    {# Sidebar filters #}
+    {# Filters — sticky sidebar on desktop, slide-in drawer on mobile #}
     <aside class="w-full shrink-0 lg:w-72">
-      <div class="lg:sticky lg:top-28">{% include "partials/product-filters.njk" %}</div>
+      {% include "partials/filter-shell.njk" %}
     </aside>
 
     {# Product canvas #}

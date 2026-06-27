@@ -82,6 +82,27 @@ function registerGlobals(env: nunjucks.Environment, isProd: boolean): void {
     return currency === 'BDT' ? `৳${formatted}` : `${currency} ${formatted}`;
   });
 
+  // Render admin-authored rich text. The description is already sanitized at
+  // save time (the trust boundary), so this is purely about line breaks: if the
+  // content is plain text (no block-level HTML), turn blank lines into <p>
+  // paragraphs and single newlines into <br> — so pressing Enter in the editor
+  // produces a visible line break. Content that already uses block tags
+  // (<p>, <ul>, headings…) is passed through untouched. Pair with `| safe`.
+  env.addFilter('richtext', (value: unknown) => {
+    const s = (value == null ? '' : String(value)).replace(/\r\n?/g, '\n').trim();
+    if (!s) return '';
+    if (
+      /<(?:p|div|h[1-6]|ul|ol|li|blockquote|hr|table|section|article)\b/i.test(s)
+    ) {
+      return s; // already structured HTML
+    }
+    return s
+      .split(/\n{2,}/)
+      .map((block) => `<p>${block.trim().replace(/\n/g, '<br>')}</p>`)
+      .filter((b) => b !== '<p></p>')
+      .join('\n');
+  });
+
   // Compact date/time for admin tables.
   env.addFilter('date', (value: unknown) => {
     if (!value) return '';

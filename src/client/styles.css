@@ -311,6 +311,68 @@ summary:focus-visible,
 }
 
 /*
+ * Filters auto-apply on change when JS is present; the Apply button is a no-JS
+ * fallback only.
+ */
+.js .filter-apply {
+  display: none;
+}
+
+/*
+ * Mobile filter drawer — progressive enhancement.
+ * Default / no-JS: the filter form is a normal in-flow column (stacked on
+ * mobile, sidebar on desktop). With JS on narrow screens it becomes a slide-in
+ * drawer toggled by Alpine via `.is-open`. The trigger/scrim/close affordances
+ * exist only in that mode.
+ */
+.filter-trigger,
+.filter-scrim,
+.filter-close {
+  display: none;
+}
+
+@media (max-width: 1023.98px) {
+  .js .filter-trigger {
+    display: block;
+  }
+  .js .filter-close {
+    display: grid;
+  }
+  .js .filter-panel {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 60;
+    width: min(88vw, 23rem);
+    padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    transform: translateX(-100%);
+    transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+    box-shadow: 0 24px 60px -20px rgb(42 20 16 / 0.5);
+  }
+  .js .filter-panel.is-open {
+    transform: translateX(0);
+  }
+  .js .filter-scrim.is-open {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 55;
+    background: rgb(42 20 16 / 0.45);
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .filter-panel {
+    transition: none !important;
+  }
+}
+
+/*
  * Dual-handle range: two <input type="range"> stacked in the same box. The
  * input itself ignores pointer events so clicks fall through to whichever
  * thumb is underneath; only the thumbs are interactive.

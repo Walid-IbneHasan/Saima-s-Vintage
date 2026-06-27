@@ -5,11 +5,17 @@
     <p class="mt-1 text-sm text-on-surface-variant">Find your perfect piece</p>
   </div>
 
-  {# Category quick-nav — links navigate directly to category pages. #}
+  {# Category quick-nav — links navigate directly to category pages. The one for
+     the page you're on is highlighted; a sub-category highlights its top-level
+     parent (since only top-level categories appear in this list). #}
+  {% set activeSlug = category.slug if category else null %}
+  {% set activeParent = category.parent.slug if (category and category.parent) else null %}
   <nav class="flex flex-col gap-1 px-4 py-5">
-    <a href="/products" class="rounded-full bg-primary px-4 py-2.5 font-label-md text-label-md uppercase tracking-[0.14em] text-on-primary">All items</a>
+    <a href="/products" aria-current="{{ 'page' if not activeSlug else 'false' }}"
+       class="rounded-full px-4 py-2.5 font-label-md text-label-md uppercase tracking-[0.14em] {{ 'bg-primary text-on-primary shadow-luxe' if not activeSlug else 'text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-accent-deep' }}">All items</a>
     {% for cat in navCategories() %}
-      <a href="/c/{{ cat.slug }}" class="rounded-full px-4 py-2.5 font-label-md text-label-md uppercase tracking-[0.14em] text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-accent-deep">{{ cat.name }}</a>
+      <a href="/c/{{ cat.slug }}" aria-current="{{ 'page' if (cat.slug == activeSlug) else 'false' }}"
+         class="rounded-full px-4 py-2.5 font-label-md text-label-md uppercase tracking-[0.14em] {{ 'bg-primary text-on-primary shadow-luxe' if (cat.slug == activeSlug or cat.slug == activeParent) else 'text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-accent-deep' }}">{{ cat.name }}</a>
     {% endfor %}
   </nav>
 
@@ -84,9 +90,15 @@
       </label>
     </div>
 
-    <div class="flex items-center gap-3 pt-1">
-      <button type="submit" class="flex-grow rounded-full bg-primary px-5 py-3 font-label-md text-label-md uppercase tracking-[0.16em] text-on-primary shadow-luxe transition-colors duration-300 hover:bg-on-primary-fixed-variant">Apply</button>
-      <a href="{{ formAction }}" class="link-underline px-1 font-label-md text-label-md uppercase tracking-[0.14em] text-on-surface-variant transition-colors hover:text-accent-deep">Clear</a>
+    {# Filters auto-apply on change when JS is on; this Apply button is a no-JS
+       fallback only (hidden via `.js .filter-apply`). #}
+    <div class="space-y-3 pt-1">
+      <button type="submit" class="filter-apply w-full items-center justify-center rounded-full bg-primary px-5 py-3 font-label-md text-label-md uppercase tracking-[0.16em] text-on-primary shadow-luxe transition-colors duration-300 hover:bg-on-primary-fixed-variant">Apply filters</button>
+      <a href="{{ formAction }}" @click="if (typeof sessionStorage !== 'undefined') sessionStorage.removeItem('svFiltersOpen')"
+         class="flex w-full items-center justify-center gap-2 rounded-full border border-outline/50 px-5 py-3 font-label-md text-label-md uppercase tracking-[0.14em] text-on-surface-variant transition-colors duration-300 hover:border-accent hover:text-accent-deep">
+        <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 3v5h5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Clear all
+      </a>
     </div>
   </div>
 </form>

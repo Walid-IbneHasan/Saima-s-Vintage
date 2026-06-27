@@ -54,8 +54,9 @@
     <label class="mt-4 block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Short description
       <textarea name="shortDescription" rows="2" maxlength="500" class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:ring-0">{{ product.shortDescription or '' }}</textarea>
     </label>
-    <label class="mt-4 block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Description (HTML allowed; sanitized on save)
-      <textarea name="description" rows="6" class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2 font-mono text-xs text-on-surface focus:border-primary focus:ring-0">{{ product.description | safe if product else '' }}</textarea>
+    <label class="mt-4 block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Description
+      <span class="mt-1 block font-body-md text-xs normal-case tracking-normal text-on-surface-variant/70">Press Enter for a new line, leave a blank line for a new paragraph. HTML is also supported and sanitized on save.</span>
+      <textarea name="description" rows="8" class="mt-1.5 w-full rounded border border-outline/30 bg-surface px-3 py-2 text-body-md leading-relaxed text-on-surface focus:border-primary focus:ring-0">{{ product.description | safe if product else '' }}</textarea>
     </label>
   </div>
 

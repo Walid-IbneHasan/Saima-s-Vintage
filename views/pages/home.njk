@@ -237,20 +237,18 @@
   {# ─── THE ATELIER (editorial split) ──────────────────────────────────── #}
   <section class="bg-paper py-20 md:py-28">
     <div class="mx-auto grid max-w-[1280px] grid-cols-1 items-center gap-14 px-5 md:px-16 lg:grid-cols-12 lg:gap-16">
-      <div class="relative lg:col-span-5" data-reveal>
-        {% set sp = featured[4] or featured[2] or featured[0] %}
-        {% set spImg = sp.image.url if (sp and sp.image) else '/images/products/jharoka-mud-art-window.webp' %}
-        <div class="lux-frame aspect-[4/5] w-full">
-          <img src="{{ spImg }}" alt="{{ (sp.image.alt or sp.name) if sp else 'Handcrafted Jharoka mud-art window' }}" loading="lazy" class="h-full w-full object-cover" />
+      <div class="relative lg:col-span-7" data-reveal>
+        <div class="lux-frame aspect-[16/10] w-full">
+          <img src="/images/atelier-heritage-collection.webp" alt="A curated arrangement of handcrafted Lippan mirror-art mandalas and Mughal Jharoka window frames" loading="lazy" class="h-full w-full object-cover" />
           <span class="lux-corner left-3 top-3 border-b-0 border-r-0" aria-hidden="true"></span>
           <span class="lux-corner bottom-3 right-3 border-l-0 border-t-0" aria-hidden="true"></span>
         </div>
-        <div class="lux-glass absolute -bottom-6 -right-3 z-[2] hidden rounded-2xl px-6 py-5 text-center sm:block">
-          <p class="lux-display text-3xl t-red lux-num"><span data-countup="100" data-suffix="+">100+</span></p>
-          <p class="lux-kicker mt-1 t-bronze">Pieces restored</p>
+        <div class="lux-glass absolute -bottom-6 left-4 z-[2] hidden items-center gap-3 rounded-2xl px-5 py-4 sm:flex">
+          <span class="lux-tick" style="background:var(--gold);"></span>
+          <p class="lux-kicker t-bronze">Lippan · Jharoka · Mandala</p>
         </div>
       </div>
-      <div class="lg:col-span-6 lg:col-start-7" data-reveal>
+      <div class="lg:col-span-5 lg:col-start-8" data-reveal>
         <span class="lux-eyebrow t-bronze">The atelier</span>
         <h2 class="lux-display lux-h2 t-ink mt-4 text-balance">Preserving the <span class="lux-serif italic t-red">poetry</span> of the past.</h2>
         <div class="mt-7 max-w-xl space-y-5 text-[1.05rem] leading-relaxed t-ink-2">
