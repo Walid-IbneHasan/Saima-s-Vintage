@@ -1,14 +1,20 @@
 {% extends "admin/layout.njk" %}
 
 {% block content %}
+{% if notice %}
+  <div class="mb-4 flex items-start gap-2 rounded-lg border border-secondary/30 bg-secondary-container px-4 py-3 text-sm text-on-secondary-container">
+    <svg class="mt-0.5 h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span>{{ notice }}</span>
+  </div>
+{% endif %}
 <div class="mb-4 flex items-center justify-between">
-  <p class="text-sm text-stone-500">{{ meta.total }} product(s)</p>
-  <a href="/admin/products/new" class="rounded bg-stone-900 px-4 py-2 text-sm text-white hover:bg-stone-700">New product</a>
+  <p class="text-sm text-on-surface-variant">{{ meta.total }} product(s)</p>
+  <a href="/admin/products/new" class="rounded bg-primary px-4 py-2 font-label-md text-label-md uppercase tracking-widest text-on-primary hover:bg-on-primary-fixed-variant">New product</a>
 </div>
 
-<div class="overflow-x-auto rounded-lg bg-white shadow-sm">
+<div class="overflow-x-auto rounded-lg border border-outline/10 bg-surface-container-lowest">
   <table class="w-full text-left text-sm">
-    <thead class="border-b border-stone-200 text-xs uppercase text-stone-500">
+    <thead class="border-b border-outline/20 text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider">
       <tr>
         <th class="px-4 py-3">Name</th>
         <th class="px-4 py-3">SKU</th>
@@ -20,14 +26,14 @@
     </thead>
     <tbody>
       {% for p in products %}
-      <tr class="border-b border-stone-100">
+      <tr class="border-b border-outline/10 hover:bg-surface-container-low text-sm text-on-surface">
         <td class="px-4 py-3">{{ p.name }}</td>
-        <td class="px-4 py-3 text-stone-500">{{ p.sku or '—' }}</td>
+        <td class="px-4 py-3 text-on-surface-variant">{{ p.sku or '—' }}</td>
         <td class="px-4 py-3">
           {% if p.salePrice %}
             <div class="flex flex-wrap items-center gap-2">
               <span>{{ p.salePrice | money(p.currency) }}</span>
-              <span class="text-stone-400 line-through">{{ p.basePrice | money(p.currency) }}</span>
+              <span class="text-on-surface-variant line-through">{{ p.basePrice | money(p.currency) }}</span>
             </div>
           {% else %}
             {{ p.basePrice | money(p.currency) }}
@@ -35,20 +41,20 @@
         </td>
         <td class="px-4 py-3">{{ p.variantCount }} var · {{ p.totalStock }}</td>
         <td class="px-4 py-3">
-          {% if p.isActive %}<span class="text-green-700">Active</span>{% else %}<span class="text-stone-400">Hidden</span>{% endif %}
-          {% if p.isFeatured %}<span class="ml-1 text-amber-600">★</span>{% endif %}
+          {% if p.isActive %}<span class="rounded-full bg-secondary-container px-3 py-1 font-label-sm text-label-sm uppercase tracking-wider text-on-secondary-container">Active</span>{% else %}<span class="rounded-full bg-tertiary-fixed px-3 py-1 font-label-sm text-label-sm uppercase tracking-wider text-on-tertiary-fixed-variant">Hidden</span>{% endif %}
+          {% if p.isFeatured %}<span class="ml-1 text-primary">★</span>{% endif %}
         </td>
         <td class="px-4 py-3 text-right">
-          <a href="/admin/products/{{ p.id }}/edit" class="text-amber-700 hover:underline">Edit</a>
+          <a href="/admin/products/{{ p.id }}/edit" class="text-primary hover:underline">Edit</a>
           <form action="/admin/products/{{ p.id }}/delete" method="post" class="ml-3 inline"
-                onsubmit="return confirm('Delete this product?')">
+                data-confirm="Delete this product?">
             <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-            <button class="text-red-600 hover:underline">Delete</button>
+            <button class="text-error hover:underline">Delete</button>
           </form>
         </td>
       </tr>
       {% else %}
-      <tr><td colspan="6" class="px-4 py-8 text-center text-stone-400">No products yet.</td></tr>
+      <tr><td colspan="6" class="px-4 py-8 text-center text-on-surface-variant">No products yet.</td></tr>
       {% endfor %}
     </tbody>
   </table>

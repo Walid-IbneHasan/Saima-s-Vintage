@@ -9,7 +9,7 @@ import { PrismaService } from '../../src/prisma/prisma.service';
 
 // Order doesn't matter — FK checks are disabled during truncation.
 const TABLES = [
-  'AdminAuditLog', 'PaymentEvent', 'Payment', 'SslcommerzSession',
+  'AdminAuditLog', 'PaymentEvent', 'Payment',
   'CouponRedemption', 'Shipment', 'OrderItem', 'Order', 'Coupon',
   'InventoryReservation', 'InventoryMovement', 'LowStockNotification',
   'CartItem', 'Cart', 'Review', 'WishlistItem', 'Wishlist',
@@ -95,15 +95,16 @@ export async function createProduct(
 }
 
 /**
- * Creates an order in AWAITING_PAYMENT with a PENDING payment, an ACTIVE
- * reservation, and decremented stock — i.e. the exact state after checkout,
- * ready for the SSLCOMMERZ validation flow. Returns the identifiers a payment
- * test needs (tranId + amount string for crafting validation responses).
+ * Creates an order in AWAITING_PAYMENT with a SESSION_CREATED payment (a bKash
+ * paymentID already assigned, as after createPaymentSession), an ACTIVE
+ * reservation, and decremented stock — i.e. the exact state when the customer
+ * returns from the bKash page. Returns the identifiers a payment test needs
+ * (tranId + bkashPaymentID + amount string for crafting Execute/Query responses).
  */
 export async function createPendingOrder(
   prisma: PrismaService,
   opts: { stock?: number; qty?: number; price?: string } = {},
-): Promise<{ orderId: string; orderNumber: string; tranId: string; amount: string; variantId: string }> {
+): Promise<{ orderId: string; orderNumber: string; tranId: string; bkashPaymentID: string; amount: string; variantId: string }> {
   const price = opts.price ?? '1000.00';
   const stock = opts.stock ?? 1;
   const qty = opts.qty ?? 1;
@@ -124,6 +125,7 @@ export async function createPendingOrder(
   });
   const variant = product.variants[0];
   const tranId = `TRAN-${tag}`;
+  const bkashPaymentID = `BKASH-${tag}`;
 
   const order = await prisma.$transaction(async (tx) => {
     const created = await tx.order.create({
@@ -169,10 +171,12 @@ export async function createPendingOrder(
     await tx.payment.create({
       data: {
         orderId: created.id,
-        status: PaymentStatus.PENDING,
+        status: PaymentStatus.SESSION_CREATED,
         amount,
         currency: 'BDT',
         tranId,
+        bkashPaymentID,
+        gatewayPageURL: 'https://sandbox.payment.bkash.com/redirect',
       },
     });
     return created;
@@ -182,6 +186,7 @@ export async function createPendingOrder(
     orderId: order.id,
     orderNumber: order.orderNumber,
     tranId,
+    bkashPaymentID,
     amount,
     variantId: variant.id,
   };

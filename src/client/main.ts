@@ -1,6 +1,8 @@
 // Progressive enhancement only — the storefront must work without this bundle.
 import Alpine from 'alpinejs';
 import htmx from 'htmx.org';
+import { initHeroShader } from './hero-shader';
+import { initLuxHome } from './lux-home';
 
 declare global {
   interface Window {
@@ -19,6 +21,56 @@ Alpine.start();
 // everything stays visible (the storefront is fully usable with JS disabled).
 document.documentElement.classList.add('js');
 
+// Hero background shader (no-op unless the home hero canvas is present).
+initHeroShader();
+
+// Premium home-page micro-interactions (no-op unless [data-lux] is present).
+initLuxHome();
+
+// Confirm destructive actions without inline handlers (CSP blocks inline
+// `onsubmit`). Any <form data-confirm="message"> prompts before submitting.
+document.addEventListener('submit', (event) => {
+  const form = event.target;
+  if (form instanceof HTMLFormElement && form.dataset.confirm) {
+    if (!window.confirm(form.dataset.confirm)) event.preventDefault();
+  }
+});
+
+// Preserve scroll position across a form POST→redirect that lands back on the
+// same path (e.g. adding a variant or saving on the admin product edit page),
+// so the page stays exactly where it was instead of jumping to the top.
+// Auto-enabled on the product edit screen; opt in elsewhere with data-keep-scroll.
+const keepScrollHere = /^\/admin\/products\/[^/]+\/edit$/.test(location.pathname);
+document.addEventListener('submit', (event) => {
+  const form = event.target;
+  if (
+    form instanceof HTMLFormElement &&
+    !event.defaultPrevented &&
+    (keepScrollHere || form.hasAttribute('data-keep-scroll'))
+  ) {
+    try {
+      sessionStorage.setItem(
+        'keepScroll',
+        JSON.stringify({ p: location.pathname, y: window.scrollY }),
+      );
+    } catch {
+      /* sessionStorage unavailable — fall back to default scroll */
+    }
+  }
+});
+try {
+  const raw = sessionStorage.getItem('keepScroll');
+  if (raw) {
+    sessionStorage.removeItem('keepScroll');
+    const { p, y } = JSON.parse(raw) as { p: string; y: number };
+    if (p === location.pathname && typeof y === 'number') {
+      window.scrollTo(0, y);
+    }
+  }
+} catch {
+  /* ignore malformed/absent state */
+}
+
 const prefersReducedMotion = window.matchMedia(
   '(prefers-reduced-motion: reduce)',
 ).matches;
@@ -36,12 +88,12 @@ if (!prefersReducedMotion && 'IntersectionObserver' in window) {
     { rootMargin: '0px 0px -10% 0px' },
   );
   document
-    .querySelectorAll('[data-reveal]')
+    .querySelectorAll('[data-reveal], [data-reveal-stagger]')
     .forEach((el) => observer.observe(el));
 } else {
   // Reduced motion (or no IO support): reveal everything immediately.
   document
-    .querySelectorAll('[data-reveal]')
+    .querySelectorAll('[data-reveal], [data-reveal-stagger]')
     .forEach((el) => el.classList.add('is-visible'));
 }
 

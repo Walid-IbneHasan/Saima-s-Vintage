@@ -8,7 +8,13 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import { buildPageMeta, parsePage } from '../../common/pagination';
-import { productPriceView } from '../../common/pricing';
+import {
+  formatMoney,
+  isFlashActive,
+  productPriceView,
+  resolveProductPricing,
+  variantPriceView,
+} from '../../common/pricing';
 import {
   filterQueryString,
   parseProductFilters,
@@ -140,16 +146,50 @@ export class CatalogController {
       { name: product.name, path: `/p/${product.slug}` },
     ];
 
+    const now = new Date();
+    const flashLive = isFlashActive(product, now);
+    const resolvedPricing = resolveProductPricing(product, now);
+
+    // Per-variant view data for the client-side selector (price/stock/image swap).
+    const variantViews = product.variants.map((v) => {
+      const pv = variantPriceView(v, resolvedPricing);
+      return {
+        id: v.id,
+        name: v.name,
+        size: v.size ?? null,
+        color: v.color ?? null,
+        stock: v.stock,
+        image: v.images[0]?.url ?? null,
+        currentFmt: formatMoney(pv.current, product.currency),
+        regularFmt: formatMoney(pv.regular, product.currency),
+        onSale: pv.onSale,
+        discount: pv.discountPercent,
+      };
+    });
+    // Pre-select the variant from ?variant=<id> (a shared/bookmarked link),
+    // else the first in-stock option (or the first if all are sold out).
+    const requested = query.variant
+      ? variantViews.findIndex((v) => v.id === query.variant)
+      : -1;
+    const firstInStock = variantViews.findIndex((v) => v.stock > 0);
+    const initialVariant =
+      requested >= 0 ? requested : firstInStock >= 0 ? firstInStock : 0;
+    const initialImage =
+      variantViews[initialVariant]?.image ?? product.images[0]?.url ?? '';
+
     res.render('pages/product', {
       title: product.seoTitle || product.name,
       metaDescription: product.seoDescription || product.shortDescription,
       canonical: this.seo.abs(`/p/${product.slug}`),
       ogImage: product.images[0] ? this.seo.abs(product.images[0].url) : undefined,
       product,
-      pricing: productPriceView({
-        basePrice: product.basePrice,
-        salePrice: product.salePrice,
-      }),
+      pricing: productPriceView(resolvedPricing),
+      variantsJson: JSON.stringify(variantViews),
+      galleryJson: JSON.stringify(product.images.map((i) => i.url)),
+      initialVariant,
+      initialImage,
+      flashEndsAt: flashLive ? product.flashEndAt : null,
+      flashEndsAtMs: flashLive && product.flashEndAt ? product.flashEndAt.getTime() : null,
       reviewStats,
       canReview,
       hasReviewed,

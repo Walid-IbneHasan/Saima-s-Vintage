@@ -26,6 +26,14 @@ export class CronController {
     return { expired: await this.maintenance.expireUnpaidOrders() };
   }
 
+  @Post('reconcile-payments')
+  @HttpCode(200)
+  reconcilePayments(
+    @Query('minutes') minutes?: string,
+  ): Promise<{ reconciled: number; paid: number; failed: number }> {
+    return this.maintenance.reconcilePayments(Number(minutes) || 15);
+  }
+
   @Post('low-stock-scan')
   @HttpCode(200)
   async lowStockScan(): Promise<{ flagged: number }> {

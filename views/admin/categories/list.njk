@@ -2,13 +2,13 @@
 
 {% block content %}
 <div class="mb-4 flex items-center justify-between">
-  <p class="text-sm text-stone-500">{{ categories.length }} category(ies)</p>
-  <a href="/admin/categories/new" class="rounded bg-stone-900 px-4 py-2 text-sm text-white hover:bg-stone-700">New category</a>
+  <p class="text-sm text-on-surface-variant">{{ categories.length }} category(ies)</p>
+  <a href="/admin/categories/new" class="rounded bg-primary px-4 py-2 font-label-md text-label-md uppercase tracking-widest text-on-primary hover:bg-on-primary-fixed-variant">New category</a>
 </div>
 
-<div class="overflow-x-auto rounded-lg bg-white shadow-sm">
+<div class="overflow-x-auto rounded-lg border border-outline/10 bg-surface-container-lowest">
   <table class="w-full text-left text-sm">
-    <thead class="border-b border-stone-200 text-xs uppercase text-stone-500">
+    <thead class="border-b border-outline/20 text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider">
       <tr>
         <th class="px-4 py-3">Name</th>
         <th class="px-4 py-3">Parent</th>
@@ -19,22 +19,22 @@
     </thead>
     <tbody>
       {% for c in categories %}
-      <tr class="border-b border-stone-100">
-        <td class="px-4 py-3">{{ c.name }} <span class="text-stone-400">/{{ c.slug }}</span></td>
-        <td class="px-4 py-3 text-stone-500">{{ c.parent.name or '—' }}</td>
+      <tr class="border-b border-outline/10 hover:bg-surface-container-low text-sm text-on-surface">
+        <td class="px-4 py-3">{{ c.name }} <span class="text-on-surface-variant">/{{ c.slug }}</span></td>
+        <td class="px-4 py-3 text-on-surface-variant">{{ c.parent.name or '—' }}</td>
         <td class="px-4 py-3">{{ c._count.products }}</td>
-        <td class="px-4 py-3">{% if c.isActive %}<span class="text-green-700">Active</span>{% else %}<span class="text-stone-400">Hidden</span>{% endif %}</td>
+        <td class="px-4 py-3">{% if c.isActive %}<span class="rounded-full bg-secondary-container px-3 py-1 font-label-sm text-label-sm uppercase tracking-wider text-on-secondary-container">Active</span>{% else %}<span class="rounded-full bg-tertiary-fixed px-3 py-1 font-label-sm text-label-sm uppercase tracking-wider text-on-tertiary-fixed-variant">Hidden</span>{% endif %}</td>
         <td class="px-4 py-3 text-right">
-          <a href="/admin/categories/{{ c.id }}/edit" class="text-amber-700 hover:underline">Edit</a>
+          <a href="/admin/categories/{{ c.id }}/edit" class="text-primary hover:underline">Edit</a>
           <form action="/admin/categories/{{ c.id }}/delete" method="post" class="ml-3 inline"
-                onsubmit="return confirm('Delete this category?')">
+                data-confirm="Delete this category?">
             <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-            <button class="text-red-600 hover:underline">Delete</button>
+            <button class="text-error hover:underline">Delete</button>
           </form>
         </td>
       </tr>
       {% else %}
-      <tr><td colspan="5" class="px-4 py-8 text-center text-stone-400">No categories yet.</td></tr>
+      <tr><td colspan="5" class="px-4 py-8 text-center text-on-surface-variant">No categories yet.</td></tr>
       {% endfor %}
     </tbody>
   </table>

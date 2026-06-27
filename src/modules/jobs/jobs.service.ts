@@ -92,6 +92,8 @@ export class JobsService {
     switch (job.type) {
       case 'email.order_confirmation':
         return this.sendOrderConfirmation(String(payload.orderId));
+      case 'email.new_order_store':
+        return this.sendStoreOrderNotification(String(payload.orderId));
       case 'email.generic':
         return this.notifications.send(
           String(payload.to),
@@ -112,7 +114,7 @@ export class JobsService {
   private async sendOrderConfirmation(orderId: string): Promise<void> {
     const order = await this.prisma.order.findUnique({
       where: { id: orderId },
-      include: { items: true },
+      include: { items: true, payments: true },
     });
     if (!order) return;
     const rows = order.items
@@ -121,14 +123,78 @@ export class JobsService {
           `<tr><td>${escapeHtml(i.productName)} (${escapeHtml(i.variantName)}) × ${i.quantity}</td><td style="text-align:right">৳${i.lineTotal}</td></tr>`,
       )
       .join('');
+    const isCod = order.payments.some((p) => p.provider === 'cod');
+    const intro = isCod
+      ? `<p>We've received your order and are preparing it. Please keep <strong>৳${order.grandTotal}</strong> ready to pay in cash when it's delivered.</p>`
+      : `<p>We've received your payment and are preparing your order.</p>`;
     const html = `
       <h2>Thank you for your order ${order.orderNumber}</h2>
-      <p>We've received your payment and are preparing your order.</p>
+      ${intro}
       <table cellpadding="6">${rows}</table>
       <p><strong>Total: ৳${order.grandTotal}</strong></p>`;
     await this.notifications.send(
       order.email,
       `Order ${order.orderNumber} confirmed`,
+      html,
+    );
+  }
+
+  /**
+   * Sends the full order details to the store inbox so the shop is notified of
+   * every confirmed order. Recipient is ORDER_NOTIFICATION_EMAIL (defaults to
+   * saimasvintage@gmail.com). Runs as its own job so it retries independently
+   * of the customer's confirmation email.
+   */
+  private async sendStoreOrderNotification(orderId: string): Promise<void> {
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+      include: { items: true, payments: true },
+    });
+    if (!order) return;
+
+    const to = process.env.ORDER_NOTIFICATION_EMAIL || 'saimasvintage@gmail.com';
+    const method = order.payments.some((p) => p.provider === 'cod')
+      ? 'Cash on Delivery'
+      : 'bKash';
+    const rows = order.items
+      .map(
+        (i) =>
+          `<tr><td>${escapeHtml(i.productName)} (${escapeHtml(i.variantName)})</td><td>${escapeHtml(i.sku)}</td><td style="text-align:center">${i.quantity}</td><td style="text-align:right">৳${i.unitPrice}</td><td style="text-align:right">৳${i.lineTotal}</td></tr>`,
+      )
+      .join('');
+    const shipLines = [
+      order.shipLine1,
+      order.shipLine2,
+      [order.shipCity, order.shipDistrict].filter(Boolean).join(', '),
+      order.shipPostalCode,
+      order.shipCountry,
+    ]
+      .filter(Boolean)
+      .map((l) => escapeHtml(String(l)))
+      .join('<br>');
+    const discountLine =
+      order.discountTotal && Number(order.discountTotal) > 0
+        ? ` &middot; Discount: −৳${order.discountTotal}${order.couponCode ? ` (${escapeHtml(order.couponCode)})` : ''}`
+        : '';
+
+    const html = `
+      <h2>New order ${order.orderNumber}</h2>
+      <p><strong>Total:</strong> ৳${order.grandTotal} &middot; <strong>Payment:</strong> ${method} &middot; <strong>Status:</strong> ${order.status}</p>
+      <h3>Customer</h3>
+      <p>${escapeHtml(order.shipName)}<br>${escapeHtml(order.email)}${order.phone ? `<br>${escapeHtml(order.phone)}` : ''}</p>
+      <h3>Ship to</h3>
+      <p>${escapeHtml(order.shipName)}<br>${shipLines}<br>${escapeHtml(order.shipPhone)}</p>
+      <h3>Items</h3>
+      <table cellpadding="6" cellspacing="0" border="1">
+        <thead><tr><th align="left">Item</th><th>SKU</th><th>Qty</th><th>Unit</th><th>Total</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <p>Subtotal: ৳${order.subtotal}${discountLine} &middot; Shipping: ৳${order.shippingTotal}</p>
+      <p><strong>Grand total: ৳${order.grandTotal}</strong></p>`;
+
+    await this.notifications.send(
+      to,
+      `New order ${order.orderNumber} — ৳${order.grandTotal} (${method})`,
       html,
     );
   }

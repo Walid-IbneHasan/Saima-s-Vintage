@@ -60,6 +60,24 @@ export class ChangePasswordDto {
   newPassword!: string;
 }
 
+// Step 1 of the logged-in password change: validate current password + email a code.
+export class RequestPasswordChangeDto {
+  @IsOptional() @IsString() @MaxLength(200)
+  currentPassword?: string;
+}
+
+// Step 2: confirm with the emailed 6-digit code + the new password.
+export class ConfirmPasswordChangeDto {
+  @IsOptional() @IsString() @MaxLength(200)
+  currentPassword?: string;
+
+  @IsString() @MinLength(8, { message: 'Password must be at least 8 characters' }) @MaxLength(200)
+  newPassword!: string;
+
+  @IsString() @Length(6, 6, { message: 'Enter the 6-digit code' })
+  code!: string;
+}
+
 export class ProfileDto {
   @IsString() @IsNotEmpty() @MaxLength(191)
   name!: string;

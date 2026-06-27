@@ -1,16 +1,30 @@
 {% extends "layouts/base.njk" %}
 
 {% block content %}
-<div class="mx-auto max-w-md px-4 py-16">
-  <h1 class="font-serif text-3xl">Forgot password</h1>
-  <p class="mt-2 text-sm text-stone-500">Enter your email and we'll send a 6-digit reset code.</p>
-  <form action="/forgot" method="post" class="mt-6 space-y-4">
-    <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-    <label class="block text-sm font-medium">Email
-      <input name="email" type="email" required class="mt-1 w-full rounded border-stone-300" />
-    </label>
-    <button class="w-full rounded-full bg-stone-900 px-6 py-3 text-white hover:bg-stone-700">Send reset code</button>
-  </form>
-  <p class="mt-6 text-sm text-stone-500"><a href="/login" class="text-amber-700 hover:underline">Back to login</a></p>
-</div>
+<section class="relative flex min-h-[78vh] items-center justify-center overflow-hidden px-margin-mobile py-16 md:px-margin-desktop md:py-24">
+  <div class="pointer-events-none absolute -left-32 top-1/4 -z-10 h-[26rem] w-[26rem] rounded-full bg-accent/10 blur-3xl" aria-hidden="true"></div>
+  <div class="pointer-events-none absolute -right-24 bottom-0 -z-10 h-72 w-72 rounded-full bg-accent/[0.07] blur-3xl" aria-hidden="true"></div>
+
+  <div class="w-full max-w-md" data-reveal>
+    <div class="mb-8 text-center">
+      <p class="eyebrow text-accent-deep">Account recovery</p>
+      <h1 class="mt-4 font-display-lg text-headline-lg text-on-surface">Forgot password</h1>
+      <p class="mt-3 text-body-md text-on-surface-variant">Enter your email and we'll send a 6-digit reset code.</p>
+    </div>
+
+    <div class="rounded-2xl border border-outline/30 bg-surface-container-lowest p-8 shadow-luxe">
+      <form action="/forgot" method="post" class="space-y-5">
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+        <label class="block">
+          <span class="block font-label-sm text-label-sm uppercase tracking-[0.12em] text-on-surface-variant">Email</span>
+          <input name="email" type="email" required autocomplete="email"
+                 class="mt-2 w-full rounded-lg border border-outline bg-surface-container-lowest px-4 py-3 text-body-md text-on-surface placeholder:text-on-surface-variant/50 transition-colors focus:border-accent-deep focus:ring-0" />
+        </label>
+        <button class="w-full rounded-full bg-primary px-6 py-3.5 font-label-md text-label-md uppercase tracking-[0.16em] text-on-primary shadow-luxe transition-colors duration-300 hover:bg-on-primary-fixed-variant">Send reset code</button>
+      </form>
+    </div>
+
+    <p class="mt-7 text-center text-sm text-on-surface-variant"><a href="/login" class="link-underline text-accent-deep">Back to login</a></p>
+  </div>
+</section>
 {% endblock %}

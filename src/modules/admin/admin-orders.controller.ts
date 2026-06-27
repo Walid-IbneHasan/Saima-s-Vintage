@@ -52,10 +52,29 @@ export class AdminOrdersController {
   }
 
   @Get(':id')
-  async detail(@Param('id') id: string, @Res() res: Response): Promise<void> {
+  async detail(
+    @Param('id') id: string,
+    @Query('notice') notice: string,
+    @Res() res: Response,
+  ): Promise<void> {
     const order = await this.orders.getDetail(id);
     if (!order) throw new NotFoundException('Order not found');
-    res.render('admin/orders/detail', { title: `Order ${order.orderNumber}`, order });
+    const notices: Record<string, { kind: string; text: string }> = {
+      refund_ok: { kind: 'ok', text: 'Refund completed — the order has been refunded and items restocked.' },
+      refund_failed: { kind: 'error', text: 'Refund failed at bKash. Nothing was changed — check the payment events.' },
+    };
+    // bKash refunds only apply to a captured bKash payment (COD has no gateway).
+    const isCod = order.payments.some((p) => p.provider === 'cod');
+    const canRefund = order.payments.some(
+      (p) => p.provider === 'bkash' && p.status === 'PAID',
+    );
+    res.render('admin/orders/detail', {
+      title: `Order ${order.orderNumber}`,
+      order,
+      notice: notices[notice] ?? null,
+      isCod,
+      canRefund,
+    });
   }
 
   @Post(':id/processing')
@@ -88,6 +107,13 @@ export class AdminOrdersController {
     await this.orders.approveReview(id);
     await this.audit.log({ userId: u.id, action: 'order.approve_review', entityType: 'Order', entityId: id, req });
     res.redirect(`/admin/orders/${id}`);
+  }
+
+  @Post(':id/refund')
+  async refund(@Param('id') id: string, @CurrentUser() u: AuthUser, @Req() req: Request, @Res() res: Response): Promise<void> {
+    const result = await this.orders.refund(id);
+    await this.audit.log({ userId: u.id, action: 'order.refund', entityType: 'Order', entityId: id, after: { ok: result.ok }, req });
+    res.redirect(`/admin/orders/${id}?notice=${result.ok ? 'refund_ok' : 'refund_failed'}`);
   }
 
   private async transition(

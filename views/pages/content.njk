@@ -1,9 +1,17 @@
 {% extends "layouts/base.njk" %}
 
 {% block content %}
-<article class="mx-auto max-w-3xl px-4 py-12">
-  <h1 class="font-serif text-3xl">{{ page.title }}</h1>
-  {% if page.excerpt %}<p class="mt-2 text-stone-500">{{ page.excerpt }}</p>{% endif %}
-  <div class="prose mt-6 max-w-none text-stone-700">{{ page.body | safe }}</div>
+<article class="mx-auto max-w-3xl px-margin-mobile py-16 md:px-margin-desktop md:py-24" data-reveal>
+  <header class="text-center">
+    <p class="eyebrow text-accent-deep">Saima's Vintage</p>
+    <h1 class="mt-5 font-display-lg text-display-sm leading-[1.1] text-on-surface text-balance md:text-headline-lg">{{ page.title }}</h1>
+    {% if page.excerpt %}
+      <p class="mx-auto mt-5 max-w-xl text-body-lg text-on-surface-variant">{{ page.excerpt }}</p>
+    {% endif %}
+  </header>
+
+  <hr class="hairline-gold mx-auto mt-10 w-24" />
+
+  <div class="prose prose-stone mt-10 max-w-none text-on-surface">{{ page.body | safe }}</div>
 </article>
 {% endblock %}

@@ -1,6 +1,7 @@
 import {
   IsArray,
   IsBoolean,
+  IsEmail,
   IsIn,
   IsInt,
   IsNotEmpty,
@@ -9,6 +10,7 @@ import {
   IsString,
   MaxLength,
   Min,
+  MinLength,
 } from 'class-validator';
 import { ToArray, ToBool, ToNumber, ToTrimmed } from '../../common/transforms';
 
@@ -18,6 +20,30 @@ export class LoginDto {
 
   @IsString() @IsNotEmpty() @MaxLength(200)
   password!: string;
+}
+
+// Admin team members live in the User model (Role ADMIN | STAFF). "Moderator"
+// is the customer-facing label for STAFF — kept as STAFF internally so existing
+// @Roles(STAFF) access across the admin keeps working without an enum migration.
+export class CreateUserDto {
+  @ToTrimmed() @IsEmail({}, { message: 'Enter a valid email address.' }) @MaxLength(191)
+  email!: string;
+
+  @ToTrimmed() @IsString() @IsNotEmpty() @MaxLength(191)
+  name!: string;
+
+  @IsString()
+  @MinLength(8, { message: 'Password must be at least 8 characters.' })
+  @MaxLength(200)
+  password!: string;
+
+  @IsIn(['ADMIN', 'STAFF'], { message: 'Choose a valid role.' })
+  role!: 'ADMIN' | 'STAFF';
+}
+
+export class UpdateUserRoleDto {
+  @IsIn(['ADMIN', 'STAFF'], { message: 'Choose a valid role.' })
+  role!: 'ADMIN' | 'STAFF';
 }
 
 export class ProductDto {
@@ -36,17 +62,22 @@ export class ProductDto {
   @IsOptional() @IsString()
   description?: string;
 
-  @IsOptional() @ToTrimmed() @IsString() @MaxLength(191)
-  brand?: string;
-
-  @IsOptional() @ToTrimmed() @IsString() @MaxLength(64)
-  condition?: string;
-
   @ToNumber() @IsNumber() @Min(0)
   basePrice!: number;
 
   @IsOptional() @ToNumber() @IsNumber() @Min(0)
   salePrice?: number;
+
+  // Flash deal: a time-bound discounted price. flashEndAt is required when
+  // flashPrice is set (enforced in the service).
+  @IsOptional() @ToNumber() @IsNumber() @Min(0)
+  flashPrice?: number;
+
+  @IsOptional() @ToTrimmed() @IsString()
+  flashStartAt?: string;
+
+  @IsOptional() @ToTrimmed() @IsString()
+  flashEndAt?: string;
 
   @IsOptional() @ToTrimmed() @IsString() @MaxLength(8)
   currency?: string;
@@ -69,6 +100,11 @@ export class ProductDto {
   @IsOptional() @ToNumber() @IsInt() @Min(1)
   maxPerOrder?: number;
 
+  // Initial stock for the auto-created default variant (simple products).
+  // Only used on create; on edit, stock is managed per variant.
+  @IsOptional() @ToNumber() @IsInt() @Min(0)
+  stock?: number;
+
   @IsOptional() @IsString() @MaxLength(191)
   seoTitle?: string;
 
@@ -85,6 +121,12 @@ export class VariantDto {
 
   @IsString() @IsNotEmpty() @MaxLength(191)
   name!: string;
+
+  @IsOptional() @ToTrimmed() @IsString() @MaxLength(64)
+  size?: string;
+
+  @IsOptional() @ToTrimmed() @IsString() @MaxLength(64)
+  color?: string;
 
   @IsOptional() @ToNumber() @IsNumber() @Min(0)
   price?: number;

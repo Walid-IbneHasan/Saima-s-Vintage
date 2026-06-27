@@ -1,83 +1,327 @@
 {% extends "layouts/base.njk" %}
 
+{# ════════════════════════════════════════════════════════════════════════════
+   HOME — "Maison Rouge" light-luxury redesign.
+   White ground · red as the dominant accent · champagne-gold detailing.
+   Clean rectangular shapes (no arches), refined 300ms hovers, generous
+   whitespace. Scoped under `.lux` so it stays self-contained; the brand fonts
+   (Bodoni Moda / Hanken Grotesk) are now loaded globally. Motion is
+   reduced-motion-guarded; reveals reuse the global IntersectionObserver.
+   ════════════════════════════════════════════════════════════════════════════ #}
+
+{% block head %}
+<style>
+.lux{
+  --red:#a31621; --red-deep:#7a1019; --red-soft:#c4283b; --wine:#3a0a0e;
+  --gold:#b08d3f; --gold-soft:#cdab63; --gold-bright:#dcb978; --bronze:#8a6d2e;
+  --ink:#2a1410; --ink-2:#6f5a54; --paper:#faf7f3; --cream:#f6ece0;
+  --line:rgba(42,20,16,.10); --line-gold:rgba(176,141,63,.40);
+  --e:cubic-bezier(.22,1,.36,1);
+  font-family:'Hanken Grotesk',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
+  color:var(--ink); background:#fff; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+}
+.lux ::selection{background:rgba(163,22,33,.14);color:var(--ink);}
+.lux img{display:block;}
+
+/* type */
+.lux-serif{font-family:'Bodoni Moda',Georgia,'Times New Roman',serif;}
+.lux-display{font-family:'Bodoni Moda',Georgia,serif;font-weight:500;line-height:1.05;letter-spacing:-.01em;}
+.lux-eyebrow{font-weight:600;font-size:.72rem;line-height:1;letter-spacing:.34em;text-transform:uppercase;}
+.lux-kicker{font-weight:600;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;}
+.lux-h1{font-size:clamp(2.8rem,6.6vw,5.7rem);}
+.lux-h2{font-size:clamp(2rem,4.2vw,3.35rem);}
+.lux-quote{font-size:clamp(1.55rem,3.4vw,2.7rem);line-height:1.34;}
+.lux-num{font-variant-numeric:tabular-nums;}
+
+/* colour helpers */
+.lux .t-ink{color:var(--ink);} .lux .t-ink-2{color:var(--ink-2);}
+.lux .t-red{color:var(--red);} .lux .t-bronze{color:var(--bronze);} .lux .t-gold{color:var(--gold);}
+.lux .t-cream{color:var(--cream);} .lux .t-cream-80{color:rgba(246,236,224,.82);} .lux .t-gold-br{color:var(--gold-bright);}
+.lux .bg-paper{background:var(--paper);} .lux .bg-red{background:var(--red);} .lux .bg-wine{background:var(--wine);}
+
+/* primary red button */
+.lux-btn{display:inline-flex;align-items:center;justify-content:center;gap:.6rem;min-height:3.4rem;padding:0 2rem;border-radius:999px;background:var(--red);color:#fff;font-weight:600;font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;box-shadow:0 12px 28px -14px rgba(163,22,33,.65);transition:background-color .3s var(--e),transform .3s var(--e),box-shadow .3s var(--e);cursor:pointer;}
+.lux-btn:hover{background:var(--red-deep);transform:translateY(-2px);box-shadow:0 18px 34px -14px rgba(122,16,25,.7);}
+.lux-btn:active{transform:translateY(0);}
+.lux-btn .ar{transition:transform .3s var(--e);}
+.lux-btn:hover .ar{transform:translateX(4px);}
+
+/* ghost buttons */
+.lux-ghost{display:inline-flex;align-items:center;gap:.6rem;min-height:3.4rem;padding:0 1.8rem;border-radius:999px;border:1px solid var(--line);color:var(--ink);font-weight:600;font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;transition:border-color .3s var(--e),color .3s var(--e),transform .3s var(--e);}
+.lux-ghost:hover{border-color:var(--red);color:var(--red);transform:translateY(-2px);}
+.lux-ghost .ar{transition:transform .3s var(--e);} .lux-ghost:hover .ar{transform:translateX(4px);}
+.lux-ghost-cream{display:inline-flex;align-items:center;gap:.6rem;min-height:3.4rem;padding:0 1.8rem;border-radius:999px;border:1px solid rgba(246,236,224,.3);color:var(--cream);font-weight:600;font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;transition:border-color .3s var(--e),color .3s var(--e),transform .3s var(--e);}
+.lux-ghost-cream:hover{border-color:var(--gold-bright);color:var(--gold-bright);transform:translateY(-2px);}
+
+/* animated link */
+.lux-link{position:relative;display:inline-flex;align-items:center;gap:.5rem;font-weight:600;font-size:.76rem;letter-spacing:.18em;text-transform:uppercase;}
+.lux-link::after{content:'';position:absolute;left:0;bottom:-5px;height:1px;width:100%;background:currentColor;transform:scaleX(0);transform-origin:left;transition:transform .35s var(--e);}
+.lux-link:hover::after,.lux-link:focus-visible::after{transform:scaleX(1);}
+.lux-link .ar{transition:transform .3s var(--e);} .lux-link:hover .ar{transform:translateX(4px);}
+
+/* hairline + small marks */
+.lux-rule{height:1px;border:0;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.6;}
+.lux-tick{width:7px;height:7px;border-radius:99px;background:var(--red);}
+
+/* clean rectangular product card (caption below) */
+.lux-shot{position:relative;overflow:hidden;border-radius:16px;background:var(--paper);border:1px solid var(--line);}
+.lux-shot img{transition:transform .65s var(--e);}
+.lux-card:hover .lux-shot img{transform:scale(1.045);}
+.lux-shot::before{content:'';position:absolute;inset:11px;border:1px solid transparent;border-radius:8px;pointer-events:none;z-index:1;transition:border-color .4s var(--e);}
+.lux-card:hover .lux-shot::before{border-color:rgba(246,236,224,.55);}
+.lux-card{transition:transform .35s var(--e);}
+@media (prefers-reduced-motion:no-preference){.lux-card:hover{transform:translateY(-4px);}}
+.lux-price{font-family:'Bodoni Moda',serif;font-weight:600;color:var(--red);}
+.lux-chip{display:inline-flex;align-items:center;gap:.4rem;padding:.32rem .7rem;border-radius:999px;font-weight:600;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;}
+
+/* editorial image frame (hero / atelier) */
+.lux-frame{position:relative;overflow:hidden;border-radius:18px;border:1px solid var(--line);box-shadow:0 40px 80px -44px rgba(42,20,16,.4);}
+.lux-frame img{transition:transform .8s var(--e);}
+.lux-corner{position:absolute;width:26px;height:26px;border:1.5px solid var(--gold);}
+
+/* glass price card (sits over imagery) */
+.lux-glass{background:rgba(255,255,255,.78);backdrop-filter:blur(12px) saturate(130%);-webkit-backdrop-filter:blur(12px) saturate(130%);border:1px solid rgba(255,255,255,.7);box-shadow:0 18px 40px -22px rgba(42,20,16,.4);}
+
+/* category tile (overlay caption, clean rect) */
+.lux-cat{position:relative;overflow:hidden;border-radius:16px;border:1px solid var(--line);}
+.lux-cat img{transition:transform .7s var(--e);}
+.lux-cat:hover img{transform:scale(1.05);}
+
+/* hero entrance (pure CSS) */
+@media (prefers-reduced-motion:no-preference){
+  .lux-rise{opacity:0;transform:translateY(18px);animation:luxRise .85s var(--e) forwards;}
+  .lux-d1{animation-delay:.08s;} .lux-d2{animation-delay:.18s;} .lux-d3{animation-delay:.28s;} .lux-d4{animation-delay:.38s;}
+  @keyframes luxRise{to{opacity:1;transform:none;}}
+}
+.lux-scrollcue{width:1px;height:42px;background:linear-gradient(var(--gold),transparent);}
+</style>
+{% endblock %}
+
 {% block content %}
-<section class="bg-gradient-to-b from-amber-50 to-stone-50">
-  <div class="mx-auto grid max-w-6xl gap-8 px-4 py-20 md:grid-cols-2 md:items-center">
-    <div class="hero-fade">
-      <p class="mb-3 text-sm font-medium uppercase tracking-widest text-amber-700">Curated · Vintage · One of a kind</p>
-      <h1 class="font-serif text-4xl leading-tight text-stone-900 md:text-5xl">
-        Timeless pieces, hand-picked by Saima.
-      </h1>
-      <p class="mt-4 max-w-md text-stone-600">
-        Each item is unique and limited to a single piece. When it's gone, it's gone.
-      </p>
-      <div class="mt-8 flex gap-3">
-        <a href="/search" class="rounded-full bg-stone-900 px-6 py-3 text-sm font-medium text-white hover:bg-stone-700">
-          Shop the collection
+<div class="lux" data-lux>
+
+  {# ─── HERO ───────────────────────────────────────────────────────────── #}
+  <section class="relative overflow-hidden bg-white">
+    <div class="pointer-events-none absolute right-0 top-0 -z-0 h-[40rem] w-[40rem] translate-x-1/3 -translate-y-1/4 rounded-full" aria-hidden="true" style="background:radial-gradient(closest-side,rgba(163,22,33,.06),transparent);"></div>
+    <div class="relative z-[1] mx-auto grid w-full max-w-[1280px] grid-cols-1 items-center gap-12 px-5 pb-16 pt-14 md:px-16 md:pb-24 md:pt-20 lg:grid-cols-12 lg:gap-10">
+      <div class="lg:col-span-6">
+        <span class="lux-rise lux-d1 inline-flex items-center gap-3">
+          <span class="lux-tick"></span>
+          <span class="lux-eyebrow t-bronze">New Collection · Lippan &amp; Jharoka</span>
+        </span>
+        <h1 class="lux-rise lux-d2 lux-display lux-h1 t-ink mt-6 text-balance">
+          The art of <span class="lux-serif italic t-red">heritage</span>, kept alive.
+        </h1>
+        <p class="lux-rise lux-d2 mt-7 max-w-md text-[1.05rem] leading-relaxed t-ink-2">
+          One-of-a-kind Lippan mirror art and Mughal Jharoka decor — sought out,
+          reverently restored, and brought home to be admired for generations.
+        </p>
+        <div class="lux-rise lux-d3 mt-9 flex flex-wrap items-center gap-4">
+          <a href="/products" class="lux-btn">
+            <span>Shop the collection</span>
+            <svg class="ar h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a href="/pages/about" class="lux-ghost">Our story</a>
+        </div>
+        <dl class="lux-rise lux-d4 mt-12 grid max-w-md grid-cols-3 gap-6 border-t pt-7" style="border-color:var(--line);">
+          <div><dt class="lux-display text-3xl t-red lux-num"><span data-countup="100" data-suffix="+">100+</span></dt><dd class="lux-kicker mt-1 t-ink-2">Pieces restored</dd></div>
+          <div><dt class="lux-display text-3xl t-red lux-num"><span data-countup="40" data-suffix="+">40+</span></dt><dd class="lux-kicker mt-1 t-ink-2">Artisan years</dd></div>
+          <div><dt class="lux-display text-3xl t-red">1/1</dt><dd class="lux-kicker mt-1 t-ink-2">Every piece</dd></div>
+        </dl>
+      </div>
+
+      {% set hero = featured[0] %}
+      <div class="lux-rise lux-d3 relative lg:col-span-5 lg:col-start-8">
+        <div class="lux-frame relative aspect-[4/5] w-full">
+          {% set heroImg = hero.image.url if (hero and hero.image) else '/images/products/lippan-mandala-marigold.avif' %}
+          <a href="{% if hero %}/p/{{ hero.slug }}{% else %}/products{% endif %}" class="block h-full w-full">
+            <img src="{{ heroImg }}" alt="{{ (hero.image.alt or hero.name) if hero else 'Handcrafted Lippan mirror art' }}" class="h-full w-full object-cover" fetchpriority="high" />
+          </a>
+          <span class="lux-corner left-3 top-3 border-b-0 border-r-0" aria-hidden="true"></span>
+          <span class="lux-corner bottom-3 right-3 border-l-0 border-t-0" aria-hidden="true"></span>
+        </div>
+        {# overlapping price card (modern, no arch) #}
+        {% if hero %}
+        <a href="/p/{{ hero.slug }}" class="lux-glass absolute -bottom-5 -left-4 z-[2] flex items-center gap-4 rounded-2xl px-5 py-3.5 sm:-left-6">
+          <div>
+            <p class="lux-kicker t-bronze">Featured piece</p>
+            <p class="lux-display mt-0.5 text-base t-ink">{{ hero.name }}</p>
+          </div>
+          <span class="lux-price text-lg">{{ hero.pricing.current | money(hero.currency) }}</span>
         </a>
-        <a href="/pages/about" class="rounded-full border border-stone-300 px-6 py-3 text-sm font-medium hover:border-stone-400">
-          Our story
-        </a>
+        {% endif %}
+        {# one-of-a-kind tag #}
+        <span class="absolute -right-3 -top-3 z-[2] inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 shadow-[0_10px_24px_-12px_rgba(42,20,16,.4)]" style="border:1px solid var(--line-gold);">
+          <span class="lux-tick" style="background:var(--gold);"></span>
+          <span class="lux-kicker t-bronze">One of a kind</span>
+        </span>
       </div>
     </div>
-    {% set heroProduct = featured[0] %}
-    <a href="{% if heroProduct %}/p/{{ heroProduct.slug }}{% else %}/search{% endif %}"
-       class="tilt-3d relative block aspect-[4/5] overflow-hidden rounded-2xl bg-gradient-to-br from-stone-200 to-amber-100">
-      {% if heroProduct and heroProduct.image %}
-        <img src="{{ heroProduct.image.url }}" alt="{{ heroProduct.image.alt or heroProduct.name }}"
-             class="h-full w-full object-cover" />
-      {% else %}
-        <img src="https://picsum.photos/seed/sv-hero/800/1000" alt="Vintage collection"
-             class="h-full w-full object-cover" />
-      {% endif %}
-      {% if heroProduct %}
-        <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/55 to-transparent p-4">
-          <p class="text-sm font-medium text-white">{{ heroProduct.name }}</p>
-          <p class="text-sm text-white/90">
-            {{ heroProduct.pricing.current | money(heroProduct.currency) }}
-            {% if heroProduct.pricing.onSale %}
-              <span class="ml-1 text-white/70 line-through">{{ heroProduct.pricing.regular | money(heroProduct.currency) }}</span>
-            {% endif %}
-          </p>
-        </div>
-      {% endif %}
-    </a>
-  </div>
-</section>
+  </section>
 
-<section class="mx-auto max-w-6xl px-4 py-16">
-  <h2 class="font-serif text-2xl">Featured finds</h2>
-  {% if featured.length %}
-    <div class="mt-6 grid grid-cols-2 gap-6 md:grid-cols-4" data-reveal>
-      {% for p in featured %}{% include "partials/product-card.njk" %}{% endfor %}
+  {# ─── TRUST STRIP (clean, gold dividers) ─────────────────────────────── #}
+  <section class="bg-paper border-y" style="border-color:var(--line);">
+    <div class="mx-auto grid max-w-[1280px] grid-cols-2 px-5 md:grid-cols-4 md:px-16">
+      {% set feats = [
+        { t:'Handcrafted', d:'Traditional Kutch artistry', i:'spark' },
+        { t:'Restored & verified', d:'Authenticated heritage', i:'shield' },
+        { t:'Nationwide delivery', d:'Shipped with care', i:'truck' },
+        { t:'Gift wrapped', d:'Complimentary, always', i:'gift' }
+      ] %}
+      {% for f in feats %}
+      <div class="flex items-center gap-3.5 px-2 py-6 md:px-6 {% if loop.index0 == 1 or loop.index0 == 3 %}border-l{% endif %} {% if loop.index0 >= 2 %}border-t md:border-t-0{% endif %} {% if loop.index0 >= 1 %}md:border-l{% endif %}" style="border-color:var(--line-gold);">
+        <span class="grid h-11 w-11 shrink-0 place-items-center rounded-full t-red" style="border:1px solid var(--line-gold);">
+          {% if f.i == 'spark' %}<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 3l2 6 6 2-6 2-2 6-2-6-6-2 6-2z" stroke-linejoin="round"/></svg>
+          {% elif f.i == 'shield' %}<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 7l8-4 8 4v6c0 5-3.5 7.5-8 9-4.5-1.5-8-4-8-9V7z" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          {% elif f.i == 'truck' %}<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 8h13v8H3zM16 11h3l2 2v3h-5z" stroke-linejoin="round"/><circle cx="7" cy="17" r="1.7"/><circle cx="18" cy="17" r="1.7"/></svg>
+          {% else %}<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 9h16v11H4zM4 9l2-5h12l2 5M12 4v5M9 13h6" stroke-linejoin="round"/></svg>{% endif %}
+        </span>
+        <div class="min-w-0">
+          <p class="lux-kicker t-ink">{{ f.t }}</p>
+          <p class="mt-1 text-sm t-ink-2">{{ f.d }}</p>
+        </div>
+      </div>
+      {% endfor %}
     </div>
-  {% else %}
-    <p class="mt-4 text-stone-500">New arrivals coming soon.</p>
-  {% endif %}
-</section>
+  </section>
 
-<section class="mx-auto max-w-6xl px-4 pb-16">
-  <h2 class="font-serif text-2xl">Shop by category</h2>
-  <div class="mt-6 grid grid-cols-2 gap-6 md:grid-cols-3">
-    {% for category in categories %}
-      <a href="/c/{{ category.slug }}" class="group block overflow-hidden rounded-xl border border-stone-200 bg-white transition hover:shadow-lg">
-        <div class="aspect-[4/3] overflow-hidden bg-stone-200">
-          {% if category.imageUrl %}
-            <img src="{{ category.imageUrl }}" alt="{{ category.name }}" loading="lazy"
-                 class="h-full w-full object-cover transition duration-300 group-hover:scale-105" />
-          {% endif %}
+  {# ─── THE COLLECTION (caption-below grid) ────────────────────────────── #}
+  <section id="collection" class="bg-white py-20 md:py-28">
+    <div class="mx-auto max-w-[1280px] px-5 md:px-16">
+      <div class="mb-12 flex flex-col items-start justify-between gap-6 md:mb-16 md:flex-row md:items-end" data-reveal>
+        <div>
+          <span class="lux-eyebrow t-bronze">Curated this season</span>
+          <h2 class="lux-display lux-h2 t-ink mt-4">The Collection</h2>
+          <p class="mt-3 max-w-md text-[1.02rem] leading-relaxed t-ink-2">A rotating selection of our latest finds — each one lovingly restored and waiting for its next home.</p>
         </div>
-        <div class="flex items-center justify-between gap-2 p-4">
-          <div>
-            <p class="font-serif text-lg text-stone-900">{{ category.name }}</p>
-            {% if category.description %}
-              <p class="mt-0.5 line-clamp-1 text-sm text-stone-500">{{ category.description }}</p>
+        <a href="/products" class="lux-link t-red">View all<svg class="ar h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      </div>
+
+      {% set shown = featured.slice(1, 9) %}
+      {% if shown.length == 0 %}{% set shown = featured.slice(0, 8) %}{% endif %}
+      {% if shown.length %}
+      <div class="grid grid-cols-2 gap-x-5 gap-y-9 md:gap-x-7 lg:grid-cols-4" data-reveal-stagger>
+        {% for p in shown %}{% if loop.index0 < 8 %}
+        <a href="/p/{{ p.slug }}" class="lux-card group block">
+          <div class="lux-shot aspect-[4/5] w-full">
+            {% if p.image %}
+            <img src="{{ p.image.url }}" alt="{{ p.image.alt or p.name }}" loading="lazy" class="h-full w-full object-cover" />
+            {% else %}
+            <div class="h-full w-full" style="background:linear-gradient(160deg,#f6ece0,#ece0cd);"></div>
+            {% endif %}
+            {% if p.pricing.onSale %}
+            <span class="lux-chip absolute left-3 top-3 z-[2]" style="background:var(--red);color:#fff;">−{{ p.pricing.discountPercent }}%</span>
+            {% elif not p.inStock %}
+            <span class="lux-chip absolute left-3 top-3 z-[2]" style="background:rgba(42,20,16,.78);color:#fff;">Sold out</span>
             {% endif %}
           </div>
-          <span class="shrink-0 text-sm font-medium text-amber-700 group-hover:underline">View more →</span>
+          <div class="mt-4 flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <h3 class="lux-display text-[1.05rem] leading-snug t-ink">{{ p.name }}</h3>
+              <p class="lux-kicker mt-1 t-ink-2">One of a kind</p>
+            </div>
+            <div class="shrink-0 text-right">
+              <span class="lux-price text-[1.05rem]">{{ p.pricing.current | money(p.currency) }}</span>
+              {% if p.pricing.onSale %}<span class="block text-xs t-ink-2 line-through">{{ p.pricing.regular | money(p.currency) }}</span>{% endif %}
+            </div>
+          </div>
+        </a>
+        {% endif %}{% endfor %}
+      </div>
+      {% else %}
+      <p class="text-[1.02rem] t-ink-2">New arrivals coming soon.</p>
+      {% endif %}
+    </div>
+  </section>
+
+  {# ─── THE ATELIER (editorial split) ──────────────────────────────────── #}
+  <section class="bg-paper py-20 md:py-28">
+    <div class="mx-auto grid max-w-[1280px] grid-cols-1 items-center gap-14 px-5 md:px-16 lg:grid-cols-12 lg:gap-16">
+      <div class="relative lg:col-span-7" data-reveal>
+        <div class="lux-frame aspect-[16/10] w-full">
+          <img src="/images/atelier-heritage-collection.webp" alt="A curated arrangement of handcrafted Lippan mirror-art mandalas and Mughal Jharoka window frames" loading="lazy" class="h-full w-full object-cover" />
+          <span class="lux-corner left-3 top-3 border-b-0 border-r-0" aria-hidden="true"></span>
+          <span class="lux-corner bottom-3 right-3 border-l-0 border-t-0" aria-hidden="true"></span>
         </div>
+        <div class="lux-glass absolute -bottom-6 left-4 z-[2] hidden items-center gap-3 rounded-2xl px-5 py-4 sm:flex">
+          <span class="lux-tick" style="background:var(--gold);"></span>
+          <p class="lux-kicker t-bronze">Lippan · Jharoka · Mandala</p>
+        </div>
+      </div>
+      <div class="lg:col-span-5 lg:col-start-8" data-reveal>
+        <span class="lux-eyebrow t-bronze">The atelier</span>
+        <h2 class="lux-display lux-h2 t-ink mt-4 text-balance">Preserving the <span class="lux-serif italic t-red">poetry</span> of the past.</h2>
+        <div class="mt-7 max-w-xl space-y-5 text-[1.05rem] leading-relaxed t-ink-2">
+          <p>Every piece in Saima's Vintage is more than a decorative object; it is a fragment of history. We seek out authentic vintage treasures and handcrafted heritage art, and bring them home to be admired again.</p>
+          <p>Each find is cleaned, restored and cared for with a reverent hand — preserving its original, soulful patina so it can endure for generations to come.</p>
+        </div>
+        <a href="/pages/about" class="lux-ghost mt-9">Read our story<svg class="ar h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      </div>
+    </div>
+  </section>
+
+  {# ─── MANIFESTO (the one red band) ───────────────────────────────────── #}
+  <section class="relative overflow-hidden bg-wine py-24 md:py-32">
+    <div class="pointer-events-none absolute inset-0 -z-0" aria-hidden="true" style="background:radial-gradient(60% 70% at 50% 22%,rgba(196,40,59,.32),transparent 70%);"></div>
+    <svg class="pointer-events-none absolute left-1/2 top-1/2 z-0 h-[42rem] w-[42rem] -translate-x-1/2 -translate-y-1/2 opacity-[.10]" viewBox="0 0 100 100" fill="none" stroke-width="0.4" style="stroke:var(--gold-bright);" aria-hidden="true">
+      <circle cx="50" cy="50" r="48" stroke-dasharray="1 4"/><circle cx="50" cy="50" r="38"/><circle cx="50" cy="50" r="28" stroke-dasharray="2 5"/><circle cx="50" cy="50" r="17"/>
+    </svg>
+    <div class="relative z-[1] mx-auto max-w-3xl px-5 text-center md:px-16" data-reveal>
+      <span class="lux-serif block text-7xl leading-none t-gold-br" aria-hidden="true">&ldquo;</span>
+      <blockquote class="lux-serif lux-quote t-cream -mt-3 italic text-balance">
+        Every piece is a fragment of history — sought out, restored with a reverent hand, and made to be lived with for generations to come.
+      </blockquote>
+      <div class="mx-auto mt-8 h-px w-16" style="background:var(--gold-bright);opacity:.75;"></div>
+      <p class="lux-kicker t-gold-br mt-6">Saima — Founder &amp; Curator</p>
+    </div>
+  </section>
+
+  {# ─── SHOP BY CATEGORY (clean overlay tiles) ─────────────────────────── #}
+  {% if categories.length %}
+  <section class="bg-white py-20 md:py-28">
+    <div class="mx-auto max-w-[1280px] px-5 md:px-16">
+      <div class="mb-14 text-center" data-reveal>
+        <span class="lux-eyebrow t-bronze">Explore by craft</span>
+        <h2 class="lux-display lux-h2 t-ink mt-4">Shop by Category</h2>
+      </div>
+      <div class="grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-4" data-reveal-stagger>
+        {% for category in categories %}{% if loop.index0 < 4 %}
+        <a href="/c/{{ category.slug }}" class="lux-cat group block aspect-[3/4]">
+          {% if category.imageUrl %}
+          <img src="{{ category.imageUrl }}" alt="{{ category.name }}" loading="lazy" class="h-full w-full object-cover" />
+          {% else %}
+          <div class="h-full w-full" style="background:linear-gradient(160deg,#a31621,#3a0a0e);"></div>
+          {% endif %}
+          <div class="pointer-events-none absolute inset-0" style="background:linear-gradient(to top,rgba(42,10,12,.82),rgba(42,10,12,.05) 62%,transparent);"></div>
+          <div class="absolute inset-x-0 bottom-0 p-6 text-center">
+            <h3 class="lux-display text-2xl t-cream">{{ category.name }}</h3>
+            <span class="lux-link t-gold-br mt-3 justify-center">Explore<svg class="ar h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
+        </a>
+        {% endif %}{% endfor %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  {# ─── CLOSING CTA (clean, light) ─────────────────────────────────────── #}
+  <section class="bg-paper py-20 text-center md:py-28">
+    <div class="mx-auto max-w-2xl px-5 md:px-16" data-reveal>
+      <div class="mx-auto mb-7 flex items-center justify-center gap-4">
+        <span class="h-px w-12" style="background:var(--gold);opacity:.6;"></span>
+        <span class="lux-eyebrow t-bronze">Bring heritage home</span>
+        <span class="h-px w-12" style="background:var(--gold);opacity:.6;"></span>
+      </div>
+      <h2 class="lux-display t-ink text-balance" style="font-size:clamp(1.9rem,3.8vw,3.1rem);">
+        A piece of history, waiting for <span class="lux-serif italic t-red">its next chapter.</span>
+      </h2>
+      <p class="mx-auto mt-5 max-w-md text-[1.02rem] t-ink-2">Discover the full collection of restored, one-of-a-kind treasures.</p>
+      <a href="/products" class="lux-btn mx-auto mt-9">
+        <span>Explore the collection</span>
+        <svg class="ar h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>
-    {% endfor %}
-  </div>
-</section>
+    </div>
+  </section>
+
+</div>
 {% endblock %}

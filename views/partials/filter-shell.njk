@@ -1,0 +1,46 @@
+{# ════════════════════════════════════════════════════════════════════════════
+   FILTER SHELL — wraps the product filter form.
+   · Desktop (lg+): a normal sticky sidebar column.
+   · Mobile (<lg) + JS: a slide-in drawer toggled by a "Filter & Sort" bar,
+     with scrim, Escape-to-close, and body-scroll lock. Because filters now
+     auto-apply (no Apply button), the open state is remembered across the
+     auto-apply reload so several filters can be changed in a row.
+   · Mobile + no JS: the form renders in-flow with its no-JS Apply button.
+   Drawer visuals live in styles.css (`.filter-trigger/.filter-scrim/.filter-
+   panel/.filter-close`), gated on the `.js` class for graceful degradation.
+   ════════════════════════════════════════════════════════════════════════════ #}
+{% set activeCount = (1 if filters.inStock else 0) + (1 if filters.onSale else 0) + (1 if (filters.priceMin or filters.priceMax) else 0) %}
+
+<div x-data="{ drawer: false }"
+     x-init="if (sessionStorage.getItem('svFiltersOpen') === '1' && window.innerWidth < 1024) drawer = true; $watch('drawer', v => { if (!v) sessionStorage.removeItem('svFiltersOpen') })"
+     @keydown.escape.window="drawer = false"
+     x-effect="document.body.classList.toggle('overflow-hidden', drawer)"
+     @change.debounce.350ms="if (drawer) sessionStorage.setItem('svFiltersOpen', '1'); if ($event.target.form) { $event.target.form.requestSubmit ? $event.target.form.requestSubmit() : $event.target.form.submit(); }"
+     class="lg:sticky lg:top-28">
+
+  {# Mobile trigger bar — shown only on narrow screens with JS #}
+  <div class="filter-trigger mb-4">
+    <button type="button" @click="drawer = true"
+            class="flex w-full items-center justify-center gap-2.5 rounded-full border border-outline/40 bg-surface-container-lowest px-5 py-3.5 font-label-md text-label-md uppercase tracking-[0.16em] text-on-surface shadow-luxe transition-colors hover:border-accent">
+      <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 5h18M6 12h12M10 19h4" stroke-linecap="round"/></svg>
+      Filter &amp; Sort
+      {% if activeCount %}<span class="ml-1 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-primary px-1.5 text-[0.7rem] font-semibold leading-none text-on-primary">{{ activeCount }}</span>{% endif %}
+    </button>
+  </div>
+
+  {# Scrim — shown only behind the open drawer #}
+  <div class="filter-scrim" :class="{ 'is-open': drawer }" @click="drawer = false" aria-hidden="true"></div>
+
+  {# The filter form: sticky sidebar (desktop) / slide-in drawer (mobile) #}
+  <div class="filter-panel bg-surface lg:bg-transparent"
+       :class="{ 'is-open': drawer }"
+       :role="drawer ? 'dialog' : null"
+       :aria-modal="drawer ? 'true' : null"
+       aria-label="Product filters">
+    <button type="button" @click="drawer = false" aria-label="Close filters"
+            class="filter-close absolute right-3.5 top-4 z-10 h-9 w-9 place-items-center rounded-full border border-outline/40 bg-surface text-on-surface-variant transition-colors hover:text-accent-deep">
+      <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"/></svg>
+    </button>
+    {% include "partials/product-filters.njk" %}
+  </div>
+</div>

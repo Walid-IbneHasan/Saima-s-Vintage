@@ -1,66 +1,142 @@
 {% extends "layouts/base.njk" %}
+{% from "partials/order-card.njk" import orderCard %}
 
 {% block content %}
-<div class="mx-auto max-w-3xl px-4 py-12">
-  <h1 class="font-serif text-3xl">My account</h1>
-  {% if welcome %}<p class="mt-3 rounded bg-green-50 px-3 py-2 text-sm text-green-700">Welcome! Your email is verified.</p>{% endif %}
-  {% if saved %}<p class="mt-3 rounded bg-green-50 px-3 py-2 text-sm text-green-700">Profile updated.</p>{% endif %}
-  {% if pwSaved %}<p class="mt-3 rounded bg-green-50 px-3 py-2 text-sm text-green-700">Password updated.</p>{% endif %}
+<div class="mx-auto max-w-5xl px-margin-mobile py-14 md:px-margin-desktop md:py-20">
 
-  <div class="mt-6 grid gap-6 md:grid-cols-3">
-    {# Profile #}
-    <form action="/account?_csrf={{ csrfToken }}" method="post" enctype="multipart/form-data" class="space-y-4 rounded-lg border border-stone-200 bg-white p-6 md:col-span-2">
-      <h2 class="text-base font-medium">Profile details</h2>
-      <div class="flex items-center gap-4">
-        <div class="h-16 w-16 shrink-0 overflow-hidden rounded-full bg-stone-200">
-          {% if customer.imageUrl %}<img src="{{ customer.imageUrl }}" alt="{{ customer.name }}" class="h-full w-full object-cover" />{% endif %}
+  {# ── Account header ──────────────────────────────────────────────────── #}
+  <div class="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+    <div class="flex items-center gap-5">
+      <div class="h-16 w-16 shrink-0 overflow-hidden rounded-full border border-outline/40 bg-surface-container ring-2 ring-accent/20 ring-offset-2 ring-offset-surface md:h-20 md:w-20">
+        {% if customer.imageUrl %}<img src="{{ customer.imageUrl }}" alt="{{ customer.name }}" class="h-full w-full object-cover" />
+        {% else %}<div class="grid h-full w-full place-items-center text-on-surface-variant/50"><svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6" stroke-linecap="round"/></svg></div>{% endif %}
+      </div>
+      <div>
+        <p class="eyebrow text-accent-deep">Your atelier</p>
+        <h1 class="mt-2 font-display-lg text-[2rem] leading-tight text-on-surface md:text-headline-lg">
+          {% if customer.name %}Hello, {{ customer.name }}{% else %}My account{% endif %}
+        </h1>
+        <p class="mt-1 text-sm text-on-surface-variant">{{ customer.email }}{% if customer.emailVerifiedAt %} · <span class="text-accent-deep">Verified</span>{% endif %}</p>
+      </div>
+    </div>
+    <form action="/logout" method="post" class="shrink-0">
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+      <button class="inline-flex items-center gap-2 rounded-full border border-outline px-5 py-2.5 font-label-md text-label-md uppercase tracking-[0.14em] text-on-surface transition-colors hover:border-accent hover:text-accent-deep">
+        Log out
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M16 17l5-5-5-5M21 12H9M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </form>
+  </div>
+
+  {% if welcome %}<p class="mt-6 rounded-lg border border-accent/30 bg-accent/5 px-4 py-3 text-sm text-on-surface">Welcome! Your email is verified.</p>{% endif %}
+  {% if saved %}<p class="mt-6 rounded-lg border border-accent/30 bg-accent/5 px-4 py-3 text-sm text-on-surface">Profile updated.</p>{% endif %}
+  {% if pwSaved %}<p class="mt-6 rounded-lg border border-accent/30 bg-accent/5 px-4 py-3 text-sm text-on-surface">Password updated.</p>{% endif %}
+
+  {# ── Recent orders ───────────────────────────────────────────────────── #}
+  <section class="mt-10">
+    <div class="mb-4 flex items-end justify-between gap-4">
+      <h2 class="font-headline-md text-xl text-on-surface">Your orders</h2>
+      {% if recentOrders.length %}<a href="/account/orders" class="link-underline font-label-md text-label-md uppercase tracking-[0.14em] text-primary transition-colors hover:text-accent-deep">View all</a>{% endif %}
+    </div>
+    {% if recentOrders.length %}
+      <div class="space-y-3">
+        {% for order in recentOrders %}{{ orderCard(order) }}{% endfor %}
+      </div>
+    {% else %}
+      <div class="rounded-2xl border border-dashed border-outline/40 bg-surface-container-lowest px-6 py-12 text-center">
+        <div class="mx-auto grid h-14 w-14 place-items-center rounded-full border border-outline/40 text-on-surface-variant/60">
+          <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 7h12l-1 13H7L6 7z" stroke-linejoin="round"/><path d="M9 7a3 3 0 016 0" stroke-linecap="round"/></svg>
         </div>
-        <label class="text-sm">Profile photo
-          <input type="file" name="avatar" accept="image/jpeg,image/png,image/webp,image/avif" class="mt-1 block text-sm" />
+        <p class="mt-4 text-on-surface-variant">You haven't placed any orders yet.</p>
+        <a href="/products" class="mt-5 inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3 font-label-md text-label-md uppercase tracking-[0.16em] text-on-primary shadow-luxe transition-colors duration-300 hover:bg-on-primary-fixed-variant">Start shopping</a>
+      </div>
+    {% endif %}
+  </section>
+
+  <div class="mt-12 grid gap-6 lg:grid-cols-3">
+    {# Profile #}
+    <form action="/account?_csrf={{ csrfToken }}" method="post" enctype="multipart/form-data" class="space-y-5 rounded-2xl border border-outline/30 bg-surface-container-lowest p-7 shadow-luxe lg:col-span-2 md:p-8">
+      <h2 class="font-headline-md text-xl text-on-surface">Profile details</h2>
+
+      <div class="flex items-center gap-5">
+        <div class="h-20 w-20 shrink-0 overflow-hidden rounded-full border border-outline/40 bg-surface-container ring-2 ring-accent/20 ring-offset-2 ring-offset-surface-container-lowest">
+          {% if customer.imageUrl %}<img src="{{ customer.imageUrl }}" alt="{{ customer.name }}" class="h-full w-full object-cover" />
+          {% else %}<div class="grid h-full w-full place-items-center text-on-surface-variant/50"><svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6" stroke-linecap="round"/></svg></div>{% endif %}
+        </div>
+        <label class="block">
+          <span class="block font-label-sm text-label-sm uppercase tracking-[0.12em] text-on-surface-variant">Profile photo</span>
+          <input type="file" name="avatar" accept="image/jpeg,image/png,image/webp,image/avif" class="mt-2 block w-full text-sm text-on-surface-variant file:mr-3 file:cursor-pointer file:rounded-full file:border-0 file:bg-surface-container-high file:px-4 file:py-2 file:font-label-sm file:text-label-sm file:uppercase file:tracking-[0.1em] file:text-on-surface hover:file:bg-surface-container-highest" />
         </label>
       </div>
-      <label class="block text-sm font-medium">Name
-        <input name="name" required value="{{ customer.name }}" class="mt-1 w-full rounded border-stone-300" />
+
+      <label class="block">
+        <span class="block font-label-sm text-label-sm uppercase tracking-[0.12em] text-on-surface-variant">Name</span>
+        <input name="name" required value="{{ customer.name }}" class="mt-2 w-full rounded-lg border border-outline bg-surface-container-lowest px-4 py-3 text-body-md text-on-surface placeholder:text-on-surface-variant/50 transition-colors focus:border-accent-deep focus:ring-0" />
       </label>
-      <label class="block text-sm font-medium">Email
-        <input value="{{ customer.email }}" disabled class="mt-1 w-full rounded border-stone-200 bg-stone-50 text-stone-500" />
-        {% if customer.emailVerifiedAt %}<span class="mt-1 block text-xs text-green-700">✓ Verified</span>{% endif %}
+      <label class="block">
+        <span class="block font-label-sm text-label-sm uppercase tracking-[0.12em] text-on-surface-variant">Email</span>
+        <input value="{{ customer.email }}" disabled class="mt-2 w-full rounded-lg border border-outline/40 bg-surface-container px-4 py-3 text-body-md text-on-surface-variant" />
+        {% if customer.emailVerifiedAt %}<span class="mt-1.5 inline-flex items-center gap-1.5 text-xs text-accent-deep"><svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>Verified</span>{% endif %}
       </label>
-      <label class="block text-sm font-medium">Phone
-        <input name="phone" value="{{ customer.phone or '' }}" class="mt-1 w-full rounded border-stone-300" />
+      <label class="block">
+        <span class="block font-label-sm text-label-sm uppercase tracking-[0.12em] text-on-surface-variant">Phone</span>
+        <input name="phone" type="tel" value="{{ customer.phone or '' }}" class="mt-2 w-full rounded-lg border border-outline bg-surface-container-lowest px-4 py-3 text-body-md text-on-surface placeholder:text-on-surface-variant/50 transition-colors focus:border-accent-deep focus:ring-0" />
       </label>
-      <div class="grid gap-3 md:grid-cols-2">
-        <label class="block text-sm font-medium md:col-span-2">Address
-          <input name="addressLine1" value="{{ address.line1 or '' }}" placeholder="House, road, area" class="mt-1 w-full rounded border-stone-300" />
+
+      <div class="grid gap-4 md:grid-cols-2">
+        <label class="block md:col-span-2">
+          <span class="block font-label-sm text-label-sm uppercase tracking-[0.12em] text-on-surface-variant">Address</span>
+          <input name="addressLine1" value="{{ address.line1 or '' }}" placeholder="House, road, area" class="mt-2 w-full rounded-lg border border-outline bg-surface-container-lowest px-4 py-3 text-body-md text-on-surface placeholder:text-on-surface-variant/50 transition-colors focus:border-accent-deep focus:ring-0" />
         </label>
-        <label class="block text-sm font-medium">City
-          <input name="city" value="{{ address.city or '' }}" class="mt-1 w-full rounded border-stone-300" />
+        <label class="block">
+          <span class="block font-label-sm text-label-sm uppercase tracking-[0.12em] text-on-surface-variant">City</span>
+          <input name="city" value="{{ address.city or '' }}" class="mt-2 w-full rounded-lg border border-outline bg-surface-container-lowest px-4 py-3 text-body-md text-on-surface placeholder:text-on-surface-variant/50 transition-colors focus:border-accent-deep focus:ring-0" />
         </label>
-        <label class="block text-sm font-medium">District
-          <input name="district" value="{{ address.district or '' }}" class="mt-1 w-full rounded border-stone-300" />
+        <label class="block">
+          <span class="block font-label-sm text-label-sm uppercase tracking-[0.12em] text-on-surface-variant">District</span>
+          <input name="district" value="{{ address.district or '' }}" class="mt-2 w-full rounded-lg border border-outline bg-surface-container-lowest px-4 py-3 text-body-md text-on-surface placeholder:text-on-surface-variant/50 transition-colors focus:border-accent-deep focus:ring-0" />
         </label>
-        <label class="block text-sm font-medium">Postal code
-          <input name="postalCode" value="{{ address.postalCode or '' }}" class="mt-1 w-full rounded border-stone-300" />
+        <label class="block">
+          <span class="block font-label-sm text-label-sm uppercase tracking-[0.12em] text-on-surface-variant">Postal code</span>
+          <input name="postalCode" value="{{ address.postalCode or '' }}" class="mt-2 w-full rounded-lg border border-outline bg-surface-container-lowest px-4 py-3 text-body-md text-on-surface placeholder:text-on-surface-variant/50 transition-colors focus:border-accent-deep focus:ring-0" />
         </label>
       </div>
-      <button class="rounded-full bg-stone-900 px-6 py-2.5 text-sm text-white hover:bg-stone-700">Save changes</button>
+      <button class="rounded-full bg-primary px-7 py-3.5 font-label-md text-label-md uppercase tracking-[0.16em] text-on-primary shadow-luxe transition-colors duration-300 hover:bg-on-primary-fixed-variant">Save changes</button>
     </form>
 
-    {# Security #}
-    <form action="/account/password" method="post" class="space-y-4 rounded-lg border border-stone-200 bg-white p-6">
+    {# Security — password change is a two-step, email-OTP-verified flow. #}
+    <form action="{% if pwOtpStage == 'confirm' %}/account/password{% else %}/account/password/request{% endif %}" method="post" class="h-fit space-y-4 rounded-2xl border border-outline/30 bg-surface-container-lowest p-7 shadow-luxe md:p-8">
       <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-      <h2 class="text-base font-medium">{% if hasPassword %}Change password{% else %}Set a password{% endif %}</h2>
-      {% if pwError %}<p class="rounded bg-red-50 px-3 py-2 text-sm text-red-700">{{ pwError }}</p>{% endif %}
-      {% if not hasPassword %}<p class="text-xs text-stone-500">Your account uses Google sign-in. Set a password to also log in with email.</p>{% endif %}
+      <h2 class="font-headline-md text-xl text-on-surface">{% if hasPassword %}Change password{% else %}Set a password{% endif %}</h2>
+      {% if pwError %}<p class="rounded-lg border border-error/20 bg-error-container px-4 py-3 text-sm text-on-error-container">{{ pwError }}</p>{% endif %}
+      {% if not hasPassword %}<p class="text-xs text-on-surface-variant">Your account uses Google sign-in. Set a password to also log in with email.</p>{% endif %}
+      {% if pwOtpStage == 'confirm' and pwSent %}
+        <p class="rounded-lg border border-accent/30 bg-accent/5 px-4 py-3 text-sm text-on-surface">We sent a 6-digit code to <strong>{{ customer.email }}</strong>. Enter it below to confirm — it expires in 10 minutes.</p>
+      {% endif %}
+
       {% if hasPassword %}
-        <label class="block text-sm font-medium">Current password
-          <input name="currentPassword" type="password" required class="mt-1 w-full rounded border-stone-300" />
+        <label class="block">
+          <span class="block font-label-sm text-label-sm uppercase tracking-[0.12em] text-on-surface-variant">Current password</span>
+          <input name="currentPassword" type="password" required autocomplete="current-password" class="mt-2 w-full rounded-lg border border-outline bg-surface-container-lowest px-4 py-3 text-body-md text-on-surface placeholder:text-on-surface-variant/50 transition-colors focus:border-accent-deep focus:ring-0" />
         </label>
       {% endif %}
-      <label class="block text-sm font-medium">New password
-        <input name="newPassword" type="password" required minlength="8" class="mt-1 w-full rounded border-stone-300" />
-      </label>
-      <button class="rounded-full border border-stone-300 px-6 py-2.5 text-sm hover:border-stone-400">Update password</button>
+
+      {% if pwOtpStage == 'confirm' %}
+        <label class="block">
+          <span class="block font-label-sm text-label-sm uppercase tracking-[0.12em] text-on-surface-variant">New password</span>
+          <input name="newPassword" type="password" required minlength="8" autocomplete="new-password" class="mt-2 w-full rounded-lg border border-outline bg-surface-container-lowest px-4 py-3 text-body-md text-on-surface placeholder:text-on-surface-variant/50 transition-colors focus:border-accent-deep focus:ring-0" />
+        </label>
+        <label class="block">
+          <span class="block font-label-sm text-label-sm uppercase tracking-[0.12em] text-on-surface-variant">Verification code</span>
+          <input name="code" inputmode="numeric" maxlength="6" required autocomplete="one-time-code" class="mt-2 w-full rounded-lg border border-outline bg-surface-container-lowest px-4 py-3 text-center text-body-lg tracking-[0.5em] text-on-surface transition-colors focus:border-accent-deep focus:ring-0" />
+        </label>
+        <div class="flex flex-wrap items-center gap-4 pt-1">
+          <button class="rounded-full bg-primary px-6 py-3 font-label-md text-label-md uppercase tracking-[0.16em] text-on-primary shadow-luxe transition-colors duration-300 hover:bg-on-primary-fixed-variant">Confirm change</button>
+          <button type="submit" formaction="/account/password/request" formnovalidate class="link-underline font-label-sm text-label-sm uppercase tracking-[0.12em] text-on-surface-variant transition-colors hover:text-accent-deep">Resend code</button>
+        </div>
+      {% else %}
+        <button class="w-full rounded-full border border-outline px-6 py-3 font-label-md text-label-md uppercase tracking-[0.16em] text-on-surface transition-colors duration-300 hover:border-accent hover:text-accent-deep">Send verification code</button>
+      {% endif %}
     </form>
   </div>
 </div>

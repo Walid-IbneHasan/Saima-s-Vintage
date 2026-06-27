@@ -1,0 +1,83 @@
+{% extends "layouts/base.njk" %}
+{% from "partials/order-status.njk" import statusBadge %}
+
+{% block content %}
+{% set isCod = order.payments.length > 0 and order.payments[0].provider == 'cod' %}
+<div class="mx-auto max-w-3xl px-margin-mobile py-14 md:px-margin-desktop md:py-20">
+  <a href="/account/orders" class="link-underline inline-flex items-center gap-2 font-label-sm text-label-sm uppercase tracking-[0.14em] text-on-surface-variant transition-colors hover:text-accent-deep">
+    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    All orders
+  </a>
+
+  <div class="mt-4 flex flex-wrap items-center gap-3">
+    <h1 class="font-display-lg text-[2rem] leading-tight text-on-surface md:text-headline-lg">{{ order.orderNumber }}</h1>
+    {{ statusBadge(order.status) }}
+  </div>
+  <p class="mt-1.5 text-sm text-on-surface-variant">Placed {{ order.createdAt | date }} · {% if isCod %}Cash on Delivery{% else %}bKash{% endif %}</p>
+
+  {% if isCod and order.status not in ['DELIVERED', 'CANCELLED', 'REFUNDED'] %}
+  <p class="mt-5 rounded-lg border border-accent/30 bg-accent/5 px-4 py-3 text-sm text-on-surface">Please keep <strong>{{ order.grandTotal | money(order.currency) }}</strong> ready to pay in cash when your order is delivered.</p>
+  {% endif %}
+
+  {# ── Items ───────────────────────────────────────────────────────────── #}
+  <div class="mt-8 rounded-2xl border border-outline/30 bg-surface-container-lowest p-6 shadow-luxe md:p-7">
+    <h2 class="font-headline-md text-lg text-on-surface">Items</h2>
+    <div class="mt-4 space-y-4">
+      {% for i in order.items %}
+      {% set vimg = i.variant.images[0].url if (i.variant and i.variant.images.length) else '' %}
+      {% set pimg = i.variant.product.images[0].url if (i.variant and i.variant.product and i.variant.product.images.length) else '' %}
+      {% set img = vimg or pimg %}
+      {% set slug = i.variant.product.slug if (i.variant and i.variant.product) else '' %}
+      <div class="flex items-center gap-4">
+        <div class="h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-outline/30 bg-surface-container">
+          {% if img %}<img src="{{ img }}" alt="{{ i.productName }}" class="h-full w-full object-cover" />
+          {% else %}<div class="grid h-full w-full place-items-center text-on-surface-variant/40"><svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M4 7h16v13H4zM4 7l2-3h12l2 3" stroke-linejoin="round"/></svg></div>{% endif %}
+        </div>
+        <div class="min-w-0 flex-1">
+          {% if slug %}<a href="/p/{{ slug }}" class="font-medium text-on-surface hover:text-accent-deep">{{ i.productName }}</a>
+          {% else %}<p class="font-medium text-on-surface">{{ i.productName }}</p>{% endif %}
+          <p class="text-sm text-on-surface-variant">{{ i.variantName }} · {{ i.unitPrice | money(order.currency) }} × {{ i.quantity }}</p>
+        </div>
+        <span class="shrink-0 font-medium text-on-surface">{{ i.lineTotal | money(order.currency) }}</span>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="mt-5 space-y-1.5 border-t border-outline/20 pt-5 text-sm">
+      <div class="flex justify-between"><span class="text-on-surface-variant">Subtotal</span><span class="text-on-surface">{{ order.subtotal | money(order.currency) }}</span></div>
+      {% if order.discountTotal and order.discountTotal > 0 %}<div class="flex justify-between text-accent-deep"><span>Discount{% if order.couponCode %} ({{ order.couponCode }}){% endif %}</span><span>−{{ order.discountTotal | money(order.currency) }}</span></div>{% endif %}
+      <div class="flex justify-between"><span class="text-on-surface-variant">Shipping</span><span class="text-on-surface">{{ order.shippingTotal | money(order.currency) }}</span></div>
+      <div class="flex justify-between border-t border-outline/20 pt-3 font-display-lg text-lg"><span class="text-on-surface">Total</span><span class="text-primary">{{ order.grandTotal | money(order.currency) }}</span></div>
+    </div>
+  </div>
+
+  {# ── Delivery + payment ──────────────────────────────────────────────── #}
+  <div class="mt-6 grid gap-6 sm:grid-cols-2">
+    <div class="rounded-2xl border border-outline/30 bg-surface-container-lowest p-6 shadow-luxe">
+      <h2 class="font-headline-md text-lg text-on-surface">Delivery</h2>
+      <div class="mt-3 text-sm text-on-surface">
+        <p class="font-medium">{{ order.shipName }}</p>
+        <p class="text-on-surface-variant">{{ order.shipLine1 }}{% if order.shipLine2 %}, {{ order.shipLine2 }}{% endif %}</p>
+        <p class="text-on-surface-variant">{{ order.shipCity }}{% if order.shipDistrict %}, {{ order.shipDistrict }}{% endif %}{% if order.shipPostalCode %} · {{ order.shipPostalCode }}{% endif %}</p>
+        <p class="text-on-surface-variant">{{ order.shipCountry }}</p>
+        {% if order.shipPhone %}<p class="mt-1 text-on-surface-variant">{{ order.shipPhone }}</p>{% endif %}
+      </div>
+      {% for s in order.shipments %}
+        <p class="mt-3 text-xs text-on-surface-variant">Shipment: {{ s.status }}{% if s.shippedAt %} · shipped {{ s.shippedAt | date }}{% endif %}{% if s.deliveredAt %} · delivered {{ s.deliveredAt | date }}{% endif %}</p>
+      {% endfor %}
+    </div>
+
+    <div class="rounded-2xl border border-outline/30 bg-surface-container-lowest p-6 shadow-luxe">
+      <h2 class="font-headline-md text-lg text-on-surface">Payment</h2>
+      {% for p in order.payments %}
+        <div class="mt-3 flex items-center justify-between gap-3 text-sm">
+          <span class="flex items-center gap-2">{{ statusBadge(p.status) }}<span class="text-on-surface-variant">{% if p.provider == 'cod' %}Cash on Delivery{% else %}bKash{% endif %}</span></span>
+          <span class="text-on-surface">{{ p.amount | money(p.currency) }}</span>
+        </div>
+      {% else %}
+        <p class="mt-3 text-sm text-on-surface-variant">No payment recorded.</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

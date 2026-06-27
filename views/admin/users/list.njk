@@ -1,0 +1,126 @@
+{% extends "admin/layout.njk" %}
+
+{% block content %}
+{% set isAdmin = me.role == 'ADMIN' %}
+
+{% if error %}
+<div class="mb-4 rounded-lg border border-error/30 bg-error-container/40 px-4 py-3 text-sm text-on-error-container" role="alert">
+  {{ error }}
+</div>
+{% endif %}
+
+<div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+  <div>
+    <p class="text-sm text-on-surface-variant">{{ users.length }} team member(s)</p>
+    {% if not isAdmin %}
+    <p class="mt-1 text-xs text-on-surface-variant">Read-only — only admins can add, remove or re-role team members.</p>
+    {% endif %}
+  </div>
+</div>
+
+{% if isAdmin %}
+{# ---- Add a team member ---- #}
+<section class="mb-8 rounded-lg border border-outline/10 bg-surface-container-lowest p-5">
+  <h2 class="font-display-lg text-title-md text-on-surface">Add team member</h2>
+  <p class="mt-1 text-sm text-on-surface-variant">They sign in at <span class="font-mono">/admin</span> with the email and password you set here.</p>
+  <form action="/admin/users" method="post" class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+
+    <label class="block text-sm">
+      <span class="mb-1 block font-label-md text-on-surface-variant">Name <span class="text-error">*</span></span>
+      <input name="name" type="text" required maxlength="191" value="{{ form.name | default('') }}"
+        class="w-full rounded border border-outline/30 bg-surface px-3 py-2 text-on-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30" />
+    </label>
+
+    <label class="block text-sm">
+      <span class="mb-1 block font-label-md text-on-surface-variant">Email <span class="text-error">*</span></span>
+      <input name="email" type="email" required autocomplete="off" maxlength="191" value="{{ form.email | default('') }}"
+        class="w-full rounded border border-outline/30 bg-surface px-3 py-2 text-on-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30" />
+    </label>
+
+    <label class="block text-sm">
+      <span class="mb-1 block font-label-md text-on-surface-variant">Password <span class="text-error">*</span></span>
+      <input name="password" type="password" required minlength="8" autocomplete="new-password" maxlength="200"
+        class="w-full rounded border border-outline/30 bg-surface px-3 py-2 text-on-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30" />
+      <span class="mt-1 block text-xs text-on-surface-variant">Minimum 8 characters.</span>
+    </label>
+
+    <label class="block text-sm">
+      <span class="mb-1 block font-label-md text-on-surface-variant">Role <span class="text-error">*</span></span>
+      <select name="role"
+        class="w-full rounded border border-outline/30 bg-surface px-3 py-2 text-on-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30">
+        <option value="STAFF" {% if form.role == 'STAFF' or not form.role %}selected{% endif %}>Moderator</option>
+        <option value="ADMIN" {% if form.role == 'ADMIN' %}selected{% endif %}>Admin</option>
+      </select>
+      <span class="mt-1 block text-xs text-on-surface-variant">Moderators can manage the store but not the team.</span>
+    </label>
+
+    <div class="sm:col-span-2 lg:col-span-4">
+      <button class="rounded bg-primary px-5 py-2.5 font-label-md text-label-md uppercase tracking-widest text-on-primary hover:bg-on-primary-fixed-variant">Add member</button>
+    </div>
+  </form>
+</section>
+{% endif %}
+
+{# ---- Team table ---- #}
+<div class="overflow-x-auto rounded-lg border border-outline/10 bg-surface-container-lowest">
+  <table class="w-full text-left text-sm">
+    <thead class="border-b border-outline/20 font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">
+      <tr>
+        <th class="px-4 py-3">Name</th>
+        <th class="px-4 py-3">Email</th>
+        <th class="px-4 py-3">Role</th>
+        <th class="px-4 py-3">Last login</th>
+        {% if isAdmin %}<th class="px-4 py-3 text-right">Actions</th>{% endif %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for u in users %}
+      {% set isSelf = u.id == me.id %}
+      <tr class="border-b border-outline/10 text-sm text-on-surface hover:bg-surface-container-low">
+        <td class="px-4 py-3 font-medium">
+          {{ u.name }}
+          {% if isSelf %}<span class="ml-1 text-xs text-on-surface-variant">(you)</span>{% endif %}
+          {% if not u.isActive %}<span class="ml-1 rounded-full bg-tertiary-fixed px-2 py-0.5 text-xs uppercase tracking-wider text-on-tertiary-fixed-variant">Disabled</span>{% endif %}
+        </td>
+        <td class="px-4 py-3 text-on-surface-variant">{{ u.email }}</td>
+        <td class="px-4 py-3">
+          {% if u.role == 'ADMIN' %}
+          <span class="rounded-full bg-primary-container px-3 py-1 font-label-sm text-label-sm uppercase tracking-wider text-on-primary-container">Admin</span>
+          {% else %}
+          <span class="rounded-full bg-secondary-container px-3 py-1 font-label-sm text-label-sm uppercase tracking-wider text-on-secondary-container">Moderator</span>
+          {% endif %}
+        </td>
+        <td class="px-4 py-3 text-on-surface-variant">{{ (u.lastLoginAt | date) or '—' }}</td>
+        {% if isAdmin %}
+        <td class="px-4 py-3">
+          {% if isSelf %}
+          <span class="block text-right text-xs text-on-surface-variant">—</span>
+          {% else %}
+          <div class="flex items-center justify-end gap-2">
+            <form action="/admin/users/{{ u.id }}/role" method="post" class="inline">
+              <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+              {% if u.role == 'ADMIN' %}
+              <input type="hidden" name="role" value="STAFF" />
+              <button class="rounded border border-outline/30 px-3 py-1.5 text-xs font-label-sm uppercase tracking-wider text-on-surface-variant hover:border-primary hover:text-primary">Make moderator</button>
+              {% else %}
+              <input type="hidden" name="role" value="ADMIN" />
+              <button class="rounded border border-outline/30 px-3 py-1.5 text-xs font-label-sm uppercase tracking-wider text-on-surface-variant hover:border-primary hover:text-primary">Make admin</button>
+              {% endif %}
+            </form>
+            <form action="/admin/users/{{ u.id }}/delete" method="post" class="inline" data-confirm="Delete {{ u.name }}? This cannot be undone.">
+              <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+              <button class="rounded px-3 py-1.5 text-xs font-label-sm uppercase tracking-wider text-error hover:underline">Delete</button>
+            </form>
+          </div>
+          {% endif %}
+        </td>
+        {% endif %}
+      </tr>
+      {% else %}
+      <tr><td colspan="{% if isAdmin %}5{% else %}4{% endif %}" class="px-4 py-8 text-center text-on-surface-variant">No team members yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

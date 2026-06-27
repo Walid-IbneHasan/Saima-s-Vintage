@@ -1,9 +1,21 @@
 {% extends "layouts/base.njk" %}
 
 {% block content %}
-<section class="mx-auto flex max-w-xl flex-col items-center px-4 py-24 text-center">
-  <p class="font-serif text-6xl text-stone-300">{{ status }}</p>
-  <h1 class="mt-4 text-2xl font-medium">{{ message }}</h1>
-  <a href="/" class="mt-8 rounded-full bg-stone-900 px-6 py-3 text-sm text-white">Back to home</a>
+<section class="relative flex min-h-[72vh] items-center justify-center overflow-hidden px-margin-mobile py-24 text-center md:px-margin-desktop">
+  <div class="pointer-events-none absolute -left-24 top-1/4 -z-10 h-[24rem] w-[24rem] rounded-full bg-accent/10 blur-3xl" aria-hidden="true"></div>
+  <div class="pointer-events-none absolute -right-20 bottom-1/4 -z-10 h-64 w-64 rounded-full bg-accent/[0.07] blur-3xl" aria-hidden="true"></div>
+
+  <div class="flex max-w-xl flex-col items-center" data-reveal>
+    <p class="font-display-lg text-[6rem] leading-none text-on-surface text-balance md:text-[8rem]">
+      <span class="text-accent">{{ status }}</span>
+    </p>
+    <hr class="hairline-gold mt-6 w-20" />
+    <h1 class="mt-6 font-headline-sm text-2xl text-on-surface md:text-3xl">{{ message }}</h1>
+    <p class="mt-4 max-w-md text-body-md text-on-surface-variant">The page you were looking for may have moved, sold, or never existed. Let's get you back home.</p>
+    <a href="/" class="group mt-10 inline-flex items-center justify-center gap-2.5 rounded-full bg-primary px-9 py-3.5 font-label-md text-label-md uppercase tracking-[0.16em] text-on-primary shadow-luxe transition-colors duration-300 hover:bg-on-primary-fixed-variant">
+      Back to home
+      <svg class="h-4 w-4 transition-transform duration-300 ease-lux group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+  </div>
 </section>
 {% endblock %}

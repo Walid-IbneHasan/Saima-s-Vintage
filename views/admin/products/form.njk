@@ -1,56 +1,94 @@
 {% extends "admin/layout.njk" %}
 
 {% block content %}
-{% set action = "/admin/products/" + product.id if product else "/admin/products" %}
-<form action="{{ action }}" method="post" class="max-w-3xl space-y-5">
+{% set action = "/admin/products/" + product.id if product.id else "/admin/products" %}
+
+{% if notice %}
+  <div class="mb-5 flex items-start gap-2 rounded-lg border border-secondary/30 bg-secondary-container px-4 py-3 text-sm text-on-secondary-container">
+    <svg class="mt-0.5 h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span>{{ notice }}</span>
+  </div>
+{% endif %}
+
+<form id="product-form" action="{{ action }}" method="post" class="max-w-3xl space-y-5">
   <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
 
-  <div class="rounded-lg bg-white p-6 shadow-sm">
-    <label class="block text-sm font-medium">Name
-      <input name="name" required value="{{ product.name or '' }}" class="mt-1 w-full rounded border-stone-300" />
+  {% if error %}
+    <div class="flex items-start gap-2 rounded-lg border border-error/30 bg-error-container px-4 py-3 text-sm text-on-error-container">
+      <svg class="mt-0.5 h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01" stroke-linecap="round"/></svg>
+      <span>{{ error }}</span>
+    </div>
+  {% endif %}
+
+  <div class="rounded-lg border border-outline/10 bg-surface-container-lowest p-6">
+    <label class="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Name
+      <input name="name" required maxlength="191" value="{{ product.name or '' }}" class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:ring-0" />
     </label>
     <div class="mt-4 grid gap-4 md:grid-cols-2">
-      <label class="block text-sm font-medium">Slug (optional)
-        <input name="slug" value="{{ product.slug or '' }}" placeholder="auto from name" class="mt-1 w-full rounded border-stone-300" />
+      <label class="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Slug (optional)
+        <input name="slug" maxlength="191" value="{{ product.slug or '' }}" placeholder="auto from name" class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:ring-0" />
       </label>
-      <label class="block text-sm font-medium">SKU
-        <input name="sku" value="{{ product.sku or '' }}" class="mt-1 w-full rounded border-stone-300" />
+      <label class="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">SKU
+        <input name="sku" maxlength="191" value="{{ product.sku or '' }}" class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:ring-0" />
       </label>
     </div>
     <div class="mt-4 grid gap-4 md:grid-cols-3">
-      <label class="block text-sm font-medium">Base price (BDT)
+      <label class="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Base price (BDT)
         <input name="basePrice" type="number" step="0.01" min="0" required
-               value="{{ product.basePrice or '' }}" class="mt-1 w-full rounded border-stone-300" />
+               value="{{ product.basePrice or '' }}" class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:ring-0" />
       </label>
-      <label class="block text-sm font-medium">Discounted price
+      <label class="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Discounted price
         <input name="salePrice" type="number" step="0.01" min="0"
-               value="{{ product.salePrice or '' }}" class="mt-1 w-full rounded border-stone-300" />
+               value="{{ product.salePrice or '' }}" class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:ring-0" />
       </label>
-      <label class="block text-sm font-medium">Currency
-        <input name="currency" value="{{ product.currency or 'BDT' }}" class="mt-1 w-full rounded border-stone-300" />
-      </label>
-    </div>
-    <div class="mt-4 grid gap-4 md:grid-cols-2">
-      <label class="block text-sm font-medium">Brand
-        <input name="brand" value="{{ product.brand or '' }}" class="mt-1 w-full rounded border-stone-300" />
-      </label>
-      <label class="block text-sm font-medium">Condition
-        <input name="condition" value="{{ product.condition or '' }}" placeholder="e.g. Excellent" class="mt-1 w-full rounded border-stone-300" />
+      <label class="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Currency
+        <input name="currency" maxlength="8" value="{{ product.currency or 'BDT' }}" class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:ring-0" />
       </label>
     </div>
-    <label class="mt-4 block text-sm font-medium">Short description
-      <textarea name="shortDescription" rows="2" class="mt-1 w-full rounded border-stone-300">{{ product.shortDescription or '' }}</textarea>
+    {% if not product.id %}
+      <label class="mt-4 block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Stock (units available)
+        <input name="stock" type="number" min="0" step="1" value="{{ product.stock or 0 }}" class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:ring-0 md:max-w-xs" />
+        <span class="mt-1 block text-xs text-on-surface-variant/80">How many you have in stock. After saving you can add size/colour <strong>variants</strong> (each with its own stock) in the Variants section, or just edit this in the default variant.</span>
+      </label>
+    {% endif %}
+    <label class="mt-4 block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Short description
+      <textarea name="shortDescription" rows="2" maxlength="500" class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:ring-0">{{ product.shortDescription or '' }}</textarea>
     </label>
-    <label class="mt-4 block text-sm font-medium">Description (HTML allowed; sanitized on save)
-      <textarea name="description" rows="6" class="mt-1 w-full rounded border-stone-300 font-mono text-xs">{{ product.description | safe if product else '' }}</textarea>
+    <label class="mt-4 block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Description
+      <span class="mt-1 block font-body-md text-xs normal-case tracking-normal text-on-surface-variant/70">Press Enter for a new line, leave a blank line for a new paragraph. HTML is also supported and sanitized on save.</span>
+      <textarea name="description" rows="8" class="mt-1.5 w-full rounded border border-outline/30 bg-surface px-3 py-2 text-body-md leading-relaxed text-on-surface focus:border-primary focus:ring-0">{{ product.description | safe if product else '' }}</textarea>
     </label>
   </div>
 
-  <div class="rounded-lg bg-white p-6 shadow-sm">
-    <p class="mb-2 text-sm font-medium">Categories</p>
+  {# ---- Flash deal (time-bound discount) ---- #}
+  <div class="rounded-lg border border-outline/10 bg-surface-container-lowest p-6">
+    <div class="flex flex-wrap items-center justify-between gap-2">
+      <h2 class="font-headline-md text-headline-md text-on-surface">Flash deal</h2>
+      <span class="rounded-full bg-primary-container px-3 py-1 font-label-sm text-label-sm uppercase tracking-wider text-on-primary-container">Time-limited</span>
+    </div>
+    <p class="mt-1 text-sm text-on-surface-variant">Set a discounted price and an end time. The deal goes live within the window and automatically disappears once it ends — no further action needed.</p>
+    <div class="mt-4 grid gap-4 md:grid-cols-3">
+      <label class="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Flash price (BDT)
+        <input name="flashPrice" type="number" step="0.01" min="0" value="{{ product.flashPrice or '' }}" placeholder="blank = off"
+               class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:ring-0" />
+      </label>
+      <label class="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Starts at (optional)
+        <input name="flashStartAt" type="datetime-local" value="{{ product.flashStartAt | dtLocal }}"
+               class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:ring-0" />
+      </label>
+      <label class="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Ends at <span class="text-error">(required with a flash price)</span>
+        <input name="flashEndAt" type="datetime-local" value="{{ product.flashEndAt | dtLocal }}"
+               class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:ring-0" />
+      </label>
+    </div>
+    <p class="mt-2 text-xs text-on-surface-variant">Leave the flash price <strong>blank</strong> to disable. When you set a flash price you <strong>must</strong> set an end time (the deal disappears after it). Blank start = live immediately. The flash price must be lower than the base price to show as a deal. Times use the server's timezone.</p>
+  </div>
+
+  <div class="rounded-lg border border-outline/10 bg-surface-container-lowest p-6">
+    <p class="mb-2 font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Categories</p>
     <div class="grid grid-cols-2 gap-2 md:grid-cols-3">
       {% for c in categories %}
-        <label class="flex items-center gap-2 text-sm">
+        <label class="flex items-center gap-2 text-sm text-on-surface">
           <input type="checkbox" name="categoryIds" value="{{ c.id }}"
                  {% if c.id in selectedCategoryIds %}checked{% endif %} />
           {{ c.name }}
@@ -59,88 +97,199 @@
     </div>
   </div>
 
-  <div class="rounded-lg bg-white p-6 shadow-sm">
+  <div class="rounded-lg border border-outline/10 bg-surface-container-lowest p-6">
     <div class="flex flex-wrap gap-6">
-      <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="isActive" {% if product.isActive %}checked{% endif %} /> Active (visible)</label>
-      <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="isFeatured" {% if product.isFeatured %}checked{% endif %} /> Featured</label>
-      <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="allowBackorder" {% if product.allowBackorder %}checked{% endif %} /> Allow backorder</label>
+      <label class="flex items-center gap-2 text-sm text-on-surface"><input type="checkbox" name="isActive" {% if product.isActive %}checked{% endif %} /> Active (visible)</label>
+      <label class="flex items-center gap-2 text-sm text-on-surface"><input type="checkbox" name="isFeatured" {% if product.isFeatured %}checked{% endif %} /> Featured</label>
+      <label class="flex items-center gap-2 text-sm text-on-surface"><input type="checkbox" name="allowBackorder" {% if product.allowBackorder %}checked{% endif %} /> Allow backorder</label>
     </div>
     <div class="mt-4 grid gap-4 md:grid-cols-3">
-      <label class="block text-sm font-medium">Featured order
-        <input name="featuredOrder" type="number" value="{{ product.featuredOrder or 0 }}" class="mt-1 w-full rounded border-stone-300" />
+      <label class="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Featured order
+        <input name="featuredOrder" type="number" min="0" step="1" value="{{ product.featuredOrder or 0 }}" class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:ring-0" />
+        <span class="mt-1 block text-xs text-on-surface-variant/80">Lower numbers show first in the featured grid.</span>
       </label>
-      <label class="block text-sm font-medium">Min per order
-        <input name="minPerOrder" type="number" min="1" value="{{ product.minPerOrder or 1 }}" class="mt-1 w-full rounded border-stone-300" />
+      <label class="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Min per order
+        <input name="minPerOrder" type="number" min="1" step="1" value="{{ product.minPerOrder or 1 }}" class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:ring-0" />
       </label>
-      <label class="block text-sm font-medium">Max per order (blank = unlimited)
-        <input name="maxPerOrder" type="number" min="1" value="{{ product.maxPerOrder or '' }}" class="mt-1 w-full rounded border-stone-300" />
+      <label class="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Max per order (blank = unlimited)
+        <input name="maxPerOrder" type="number" min="1" step="1" value="{{ product.maxPerOrder or '' }}" class="mt-1 w-full rounded border border-outline/30 bg-surface px-3 py-2 text-body-md text-on-surface focus:border-primary focus:ring-0" />
       </label>
     </div>
   </div>
 
-  <div class="flex gap-3">
-    <button type="submit" class="rounded bg-stone-900 px-5 py-2.5 text-sm text-white hover:bg-stone-700">
-      {{ 'Save changes' if product else 'Create product' }}
-    </button>
-    <a href="/admin/products" class="rounded border border-stone-300 px-5 py-2.5 text-sm">Cancel</a>
-  </div>
+  {% if not product.id %}
+    <div class="flex items-start gap-2 rounded-lg border border-dashed border-outline/30 bg-surface-container-low/40 p-4 text-sm text-on-surface-variant">
+      <svg class="mt-0.5 h-4 w-4 shrink-0 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 16l5-5 4 4 3-3 6 6M3 8h18" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Save the product first — then you can upload <strong>multiple images</strong> (the first one becomes the thumbnail) and add variants on the next screen.</span>
+    </div>
+  {% endif %}
 </form>
 
-{% if product %}
-  {# ---- Variants ---- #}
-  <div class="mt-8 max-w-3xl rounded-lg bg-white p-6 shadow-sm">
-    <h2 class="text-base font-medium">Variants</h2>
-    <div class="mt-3 space-y-2">
-      {% for v in product.variants %}
-      <div class="flex flex-wrap items-end gap-2 border-t border-stone-100 pt-2">
-        <form action="/admin/products/{{ product.id }}/variants/{{ v.id }}" method="post" class="flex flex-wrap items-end gap-2">
-          <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-          <label class="text-xs">SKU<input name="sku" value="{{ v.sku }}" class="mt-1 block w-32 rounded border-stone-300 text-xs" /></label>
-          <label class="text-xs">Name<input name="name" value="{{ v.name }}" class="mt-1 block w-32 rounded border-stone-300 text-xs" /></label>
-          <label class="text-xs">Price<input name="price" type="number" step="0.01" value="{{ v.price or '' }}" placeholder="base" class="mt-1 block w-24 rounded border-stone-300 text-xs" /></label>
-          <label class="text-xs">Sale<input name="salePrice" type="number" step="0.01" value="{{ v.salePrice or '' }}" placeholder="sale" class="mt-1 block w-24 rounded border-stone-300 text-xs" /></label>
-          <label class="text-xs">Stock<input name="stock" type="number" value="{{ v.stock }}" class="mt-1 block w-20 rounded border-stone-300 text-xs" /></label>
-          <button class="rounded bg-stone-200 px-3 py-2 text-xs hover:bg-stone-300">Save</button>
-        </form>
-        <form action="/admin/products/{{ product.id }}/variants/{{ v.id }}/delete" method="post" onsubmit="return confirm('Delete variant?')">
-          <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-          <button class="rounded px-2 py-2 text-xs text-red-600 hover:underline">Delete</button>
-        </form>
-      </div>
-      {% endfor %}
-      {% if not product.variants.length %}<p class="text-sm text-stone-400">No variants yet — add one below.</p>{% endif %}
-    </div>
+{% if product.id %}
+  {# ---- Images (multi-upload, reorderable) ---- #}
+  <div id="images" class="mt-8 max-w-3xl scroll-mt-24 rounded-lg border border-outline/10 bg-surface-container-lowest p-6">
+    <h2 class="font-headline-md text-headline-md text-on-surface">Images</h2>
+    <p class="mt-1 text-sm text-on-surface-variant">The <strong>first</strong> image is the thumbnail shown across the store. Reorder with the arrows, or “Make thumbnail”.</p>
 
-    <form action="/admin/products/{{ product.id }}/variants" method="post" class="mt-4 flex flex-wrap items-end gap-2 border-t border-stone-200 pt-4">
-      <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-      <label class="text-xs">SKU<input name="sku" required class="mt-1 block w-32 rounded border-stone-300 text-xs" /></label>
-      <label class="text-xs">Name<input name="name" required value="Default" class="mt-1 block w-32 rounded border-stone-300 text-xs" /></label>
-      <label class="text-xs">Price<input name="price" type="number" step="0.01" placeholder="base" class="mt-1 block w-24 rounded border-stone-300 text-xs" /></label>
-      <label class="text-xs">Sale<input name="salePrice" type="number" step="0.01" placeholder="sale" class="mt-1 block w-24 rounded border-stone-300 text-xs" /></label>
-      <label class="text-xs">Stock<input name="stock" type="number" value="0" class="mt-1 block w-20 rounded border-stone-300 text-xs" /></label>
-      <button class="rounded bg-stone-900 px-3 py-2 text-xs text-white">Add variant</button>
+    {% if product.images.length %}
+      <ul class="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+        {% for img in product.images %}
+          <li class="group overflow-hidden rounded-xl border {% if loop.first %}border-primary/50 ring-1 ring-primary/30{% else %}border-outline/20{% endif %} bg-surface">
+            <div class="relative aspect-square">
+              <img src="{{ img.url }}" alt="" class="h-full w-full object-cover" />
+              {% if loop.first %}
+                <span class="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-primary px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-on-primary shadow-sm">
+                  <svg class="h-3 w-3" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.9 6.3 6.8.6-5.1 4.5 1.5 6.6L12 17.3 5.9 20.6l1.5-6.6L2.3 8.9l6.8-.6z"/></svg>
+                  Thumbnail
+                </span>
+              {% endif %}
+            </div>
+            <div class="flex items-center justify-between gap-1 border-t border-outline/15 px-1.5 py-1.5">
+              <div class="flex items-center gap-1">
+                <form action="/admin/products/{{ product.id }}/images/{{ img.id }}/move" method="post">
+                  <input type="hidden" name="_csrf" value="{{ csrfToken }}" /><input type="hidden" name="dir" value="up" />
+                  <button class="grid h-8 w-8 place-items-center rounded text-on-surface-variant hover:bg-surface-container hover:text-primary disabled:opacity-30" aria-label="Move earlier" {% if loop.first %}disabled{% endif %}>
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                </form>
+                <form action="/admin/products/{{ product.id }}/images/{{ img.id }}/move" method="post">
+                  <input type="hidden" name="_csrf" value="{{ csrfToken }}" /><input type="hidden" name="dir" value="down" />
+                  <button class="grid h-8 w-8 place-items-center rounded text-on-surface-variant hover:bg-surface-container hover:text-primary disabled:opacity-30" aria-label="Move later" {% if loop.last %}disabled{% endif %}>
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                </form>
+                {% if not loop.first %}
+                  <form action="/admin/products/{{ product.id }}/images/{{ img.id }}/primary" method="post">
+                    <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+                    <button class="rounded px-2 py-1.5 text-[11px] font-medium uppercase tracking-wide text-on-surface-variant hover:text-primary" title="Use as thumbnail">Make&nbsp;thumb</button>
+                  </form>
+                {% endif %}
+              </div>
+              <form action="/admin/products/{{ product.id }}/images/{{ img.id }}/delete" method="post" data-confirm="Delete this image?">
+                <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+                <button class="grid h-8 w-8 place-items-center rounded text-error hover:bg-error-container" aria-label="Delete image">
+                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+              </form>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="mt-3 text-sm text-on-surface-variant">No images yet — add some below.</p>
+    {% endif %}
+
+    {# Uploader: drag-and-drop file picking + live previews (CSP-safe: Alpine + data: URLs) #}
+    <form action="/admin/products/{{ product.id }}/images?_csrf={{ csrfToken }}" method="post" enctype="multipart/form-data" class="mt-5 border-t border-outline/20 pt-5"
+          x-data="{ over:false, items:[], add(list){ this.items=[]; Array.from(list).forEach((f)=>{ const i=this.items.push({name:f.name,url:''})-1; const r=new FileReader(); r.onload=e=>{ this.items[i].url=e.target.result; }; r.readAsDataURL(f); }); } }">
+      <label class="block cursor-pointer rounded-xl border-2 border-dashed px-6 py-8 text-center transition-colors"
+             :class="over ? 'border-primary bg-primary-container/30' : 'border-outline/40 hover:border-primary/60 hover:bg-surface-container-low/40'"
+             @dragover.prevent="over=true" @dragleave.prevent="over=false"
+             @drop.prevent="over=false; $refs.input.files=$event.dataTransfer.files; add($event.dataTransfer.files)">
+        <input x-ref="input" type="file" name="images" accept="image/jpeg,image/png,image/webp,image/avif" multiple required class="sr-only" @change="add($event.target.files)" />
+        <svg class="mx-auto h-8 w-8 text-on-surface-variant/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 16V4m0 0L8 8m4-4l4 4M4 20h16" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <p class="mt-2 text-sm text-on-surface"><span class="font-medium text-primary">Click to choose</span> or drag &amp; drop images here</p>
+        <p class="mt-1 text-xs text-on-surface-variant">JPEG/PNG/WebP/AVIF · up to 12 files · max 5 MB each · auto-converted to WebP</p>
+      </label>
+
+      <div x-show="items.length" x-cloak class="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-5">
+        <template x-for="(it, i) in items" :key="i">
+          <div class="overflow-hidden rounded-lg border border-outline/20 bg-surface">
+            <div class="aspect-square"><img :src="it.url" alt="" class="h-full w-full object-cover" x-show="it.url" /></div>
+          </div>
+        </template>
+      </div>
+      <div class="mt-4 flex items-center gap-3">
+        <button class="rounded bg-primary px-4 py-2 font-label-md text-label-md uppercase tracking-widest text-on-primary hover:bg-on-primary-fixed-variant">
+          Upload image<span x-show="items.length > 1">s</span><span x-show="items.length" x-cloak> (<span x-text="items.length"></span>)</span>
+        </button>
+        <span class="text-xs text-on-surface-variant">New images are added to the end of the order.</span>
+      </div>
     </form>
   </div>
 
-  {# ---- Images ---- #}
-  <div class="mt-8 max-w-3xl rounded-lg bg-white p-6 shadow-sm">
-    <h2 class="text-base font-medium">Images</h2>
-    <div class="mt-3 grid grid-cols-3 gap-3 md:grid-cols-5">
-      {% for img in product.images %}
-        <div class="relative">
-          <img src="{{ img.url }}" alt="" class="aspect-square w-full rounded object-cover" />
-          <form action="/admin/products/{{ product.id }}/images/{{ img.id }}/delete" method="post" class="absolute right-1 top-1">
+  {# ---- Variants ---- #}
+  <div class="mt-8 max-w-3xl rounded-lg border border-outline/10 bg-surface-container-lowest p-6">
+    <h2 class="font-headline-md text-headline-md text-on-surface">Variants</h2>
+    <p class="mt-1 text-sm text-on-surface-variant">Each sellable option (size, colour, …) with its own SKU, price and stock. Leave price blank to inherit the base price.</p>
+
+    <div class="mt-4 space-y-3">
+      {% for v in product.variants %}
+      <div class="rounded-xl border border-outline/20 bg-surface p-4">
+        <form action="/admin/products/{{ product.id }}/variants/{{ v.id }}" method="post" class="grid grid-cols-2 gap-3 sm:grid-cols-12 sm:items-end">
+          <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+          <label class="sm:col-span-3 block text-xs uppercase tracking-wider text-on-surface-variant">SKU<input name="sku" value="{{ v.sku }}" class="mt-1 w-full rounded border border-outline/30 bg-surface-container-lowest px-2.5 py-2 text-sm text-on-surface focus:border-primary focus:ring-0" /></label>
+          <label class="sm:col-span-3 block text-xs uppercase tracking-wider text-on-surface-variant">Name<input name="name" value="{{ v.name }}" class="mt-1 w-full rounded border border-outline/30 bg-surface-container-lowest px-2.5 py-2 text-sm text-on-surface focus:border-primary focus:ring-0" /></label>
+          <label class="sm:col-span-3 block text-xs uppercase tracking-wider text-on-surface-variant">Size<input name="size" maxlength="64" value="{{ v.size or '' }}" placeholder="e.g. M" class="mt-1 w-full rounded border border-outline/30 bg-surface-container-lowest px-2.5 py-2 text-sm text-on-surface focus:border-primary focus:ring-0" /></label>
+          <label class="sm:col-span-3 block text-xs uppercase tracking-wider text-on-surface-variant">Colour<input name="color" maxlength="64" value="{{ v.color or '' }}" placeholder="Blue or #3366cc" class="mt-1 w-full rounded border border-outline/30 bg-surface-container-lowest px-2.5 py-2 text-sm text-on-surface focus:border-primary focus:ring-0" /></label>
+          <label class="sm:col-span-3 block text-xs uppercase tracking-wider text-on-surface-variant">Price<input name="price" type="number" step="0.01" value="{{ v.price or '' }}" placeholder="base" class="mt-1 w-full rounded border border-outline/30 bg-surface-container-lowest px-2.5 py-2 text-sm text-on-surface focus:border-primary focus:ring-0" /></label>
+          <label class="sm:col-span-3 block text-xs uppercase tracking-wider text-on-surface-variant">Sale<input name="salePrice" type="number" step="0.01" value="{{ v.salePrice or '' }}" placeholder="—" class="mt-1 w-full rounded border border-outline/30 bg-surface-container-lowest px-2.5 py-2 text-sm text-on-surface focus:border-primary focus:ring-0" /></label>
+          <label class="sm:col-span-3 block text-xs uppercase tracking-wider text-on-surface-variant">Stock<input name="stock" type="number" value="{{ v.stock }}" class="mt-1 w-full rounded border border-outline/30 bg-surface-container-lowest px-2.5 py-2 text-sm text-on-surface focus:border-primary focus:ring-0" /></label>
+          <div class="col-span-2 flex items-center gap-2 sm:col-span-3 sm:justify-end">
+            <button class="rounded border border-outline px-3 py-2 font-label-md text-label-md uppercase tracking-widest text-on-surface hover:border-primary hover:text-primary">Save</button>
+          </div>
+        </form>
+        <div class="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-outline/10 pt-3">
+          <div class="flex items-center gap-3">
+            <div class="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-lg border border-outline/20 bg-surface-container-lowest">
+              {% if v.images.length %}
+                <img src="{{ v.images[0].url }}" alt="{{ v.name }}" class="h-full w-full object-cover" />
+              {% else %}
+                <svg class="h-5 w-5 text-on-surface-variant/40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M3 17l5-5 4 4 3-3 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              {% endif %}
+            </div>
+            <div>
+              <form action="/admin/products/{{ product.id }}/variants/{{ v.id }}/image?_csrf={{ csrfToken }}" method="post" enctype="multipart/form-data" class="inline-flex items-center gap-2" x-data="{ picked: '' }">
+                <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+                <label class="inline-flex cursor-pointer items-center gap-1.5 rounded border border-outline px-3 py-1.5 text-xs font-medium uppercase tracking-wide text-on-surface hover:border-primary hover:text-primary">
+                  <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 16V4m0 0L8 8m4-4l4 4M4 20h16" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <span x-text="picked || '{{ 'Replace photo' if v.images.length else 'Add photo' }}'">{{ 'Replace photo' if v.images.length else 'Add photo' }}</span>
+                  <input type="file" name="image" accept="image/jpeg,image/png,image/webp,image/avif" required class="sr-only" @change="picked = $el.files.length ? $el.files[0].name : ''" />
+                </label>
+                <button x-show="picked" x-cloak class="rounded bg-primary px-3 py-1.5 text-xs font-medium uppercase tracking-wide text-on-primary hover:bg-on-primary-fixed-variant">Upload</button>
+              </form>
+              {% if v.images.length %}
+                <form action="/admin/products/{{ product.id }}/variants/{{ v.id }}/image/delete" method="post" class="inline">
+                  <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+                  <button class="ml-1 text-xs text-on-surface-variant hover:text-error">Remove</button>
+                </form>
+              {% endif %}
+              <p class="mt-1 text-[11px] text-on-surface-variant/70">Shown when this option is selected.</p>
+            </div>
+          </div>
+          <form action="/admin/products/{{ product.id }}/variants/{{ v.id }}/delete" method="post" data-confirm="Delete this variant?">
             <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-            <button class="rounded bg-white/90 px-1.5 text-xs text-red-600">✕</button>
+            <button class="text-xs font-medium text-error hover:underline">Delete variant</button>
           </form>
         </div>
+      </div>
       {% endfor %}
+      {% if not product.variants.length %}<p class="rounded-lg border border-dashed border-outline/30 px-4 py-3 text-sm text-on-surface-variant">No variants yet — add one below.</p>{% endif %}
     </div>
-    <form action="/admin/products/{{ product.id }}/images?_csrf={{ csrfToken }}" method="post" enctype="multipart/form-data" class="mt-4 flex items-center gap-3 border-t border-stone-200 pt-4">
-      <input type="file" name="image" accept="image/jpeg,image/png,image/webp,image/avif" required class="text-sm" />
-      <button class="rounded bg-stone-900 px-3 py-2 text-xs text-white">Upload</button>
-      <span class="text-xs text-stone-400">JPEG/PNG/WebP/AVIF, max 5 MB</span>
+
+    <form action="/admin/products/{{ product.id }}/variants" method="post" class="mt-5 grid grid-cols-2 gap-3 rounded-xl border border-primary/20 bg-primary-container/20 p-4 sm:grid-cols-12 sm:items-end">
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+      <label class="sm:col-span-3 block text-xs uppercase tracking-wider text-on-surface-variant">SKU<input name="sku" required class="mt-1 w-full rounded border border-outline/30 bg-surface px-2.5 py-2 text-sm text-on-surface focus:border-primary focus:ring-0" /></label>
+      <label class="sm:col-span-3 block text-xs uppercase tracking-wider text-on-surface-variant">Name<input name="name" required value="Default" class="mt-1 w-full rounded border border-outline/30 bg-surface px-2.5 py-2 text-sm text-on-surface focus:border-primary focus:ring-0" /></label>
+      <label class="sm:col-span-3 block text-xs uppercase tracking-wider text-on-surface-variant">Size<input name="size" maxlength="64" placeholder="e.g. M" class="mt-1 w-full rounded border border-outline/30 bg-surface px-2.5 py-2 text-sm text-on-surface focus:border-primary focus:ring-0" /></label>
+      <label class="sm:col-span-3 block text-xs uppercase tracking-wider text-on-surface-variant">Colour<input name="color" maxlength="64" placeholder="Blue or #3366cc" class="mt-1 w-full rounded border border-outline/30 bg-surface px-2.5 py-2 text-sm text-on-surface focus:border-primary focus:ring-0" /></label>
+      <label class="sm:col-span-3 block text-xs uppercase tracking-wider text-on-surface-variant">Price<input name="price" type="number" step="0.01" placeholder="base" class="mt-1 w-full rounded border border-outline/30 bg-surface px-2.5 py-2 text-sm text-on-surface focus:border-primary focus:ring-0" /></label>
+      <label class="sm:col-span-3 block text-xs uppercase tracking-wider text-on-surface-variant">Sale<input name="salePrice" type="number" step="0.01" placeholder="—" class="mt-1 w-full rounded border border-outline/30 bg-surface px-2.5 py-2 text-sm text-on-surface focus:border-primary focus:ring-0" /></label>
+      <label class="sm:col-span-3 block text-xs uppercase tracking-wider text-on-surface-variant">Stock<input name="stock" type="number" value="0" class="mt-1 w-full rounded border border-outline/30 bg-surface px-2.5 py-2 text-sm text-on-surface focus:border-primary focus:ring-0" /></label>
+      <div class="col-span-2 sm:col-span-3 sm:flex sm:justify-end">
+        <button class="w-full rounded bg-primary px-4 py-2 font-label-md text-label-md uppercase tracking-widest text-on-primary hover:bg-on-primary-fixed-variant sm:w-auto">Add variant</button>
+      </div>
     </form>
   </div>
 {% endif %}
+
+{# ---- Sticky primary action bar (submits the product form via form= so it sits at the very bottom) ---- #}
+<div class="sticky bottom-0 z-20 mt-8 max-w-3xl border-t border-outline/20 bg-surface/90 py-4 backdrop-blur">
+  <div class="flex items-center justify-between gap-3">
+    <a href="/admin/products" class="rounded border border-outline px-4 py-2 font-label-md text-label-md uppercase tracking-widest text-on-surface hover:border-primary hover:text-primary">Cancel</a>
+    <button type="submit" form="product-form" class="rounded bg-primary px-6 py-2.5 font-label-md text-label-md uppercase tracking-widest text-on-primary shadow-luxe hover:bg-on-primary-fixed-variant">
+      {{ 'Save changes' if product.id else 'Create product' }}
+    </button>
+  </div>
+</div>
 {% endblock %}

@@ -1,8 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { existsSync, mkdirSync } from 'fs';
 import { writeFile } from 'fs/promises';
 import { join } from 'path';
+import sharp from 'sharp';
 
 interface Signature {
   ext: string;
@@ -48,12 +49,18 @@ const SIGNATURES: Signature[] = [
 export const UPLOAD_MAX_BYTES = 5 * 1024 * 1024;
 export const UPLOAD_ALLOWED_MIME = SIGNATURES.map((s) => s.mime);
 
+// Re-encode target: cap the long edge and convert to WebP. Big visual win for
+// almost no quality loss, and keeps disk/bandwidth small on shared hosting.
+const MAX_EDGE = 1600;
+const WEBP_QUALITY = 80;
+
 @Injectable()
 export class UploadsService {
+  private readonly logger = new Logger(UploadsService.name);
   private readonly baseDir = join(process.cwd(), 'public', 'uploads');
 
   constructor() {
-    for (const sub of ['products', 'avatars']) {
+    for (const sub of ['products', 'categories', 'avatars']) {
       const dir = join(this.baseDir, sub);
       if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
     }
@@ -63,11 +70,19 @@ export class UploadsService {
     return this.save(file, 'products');
   }
 
+  saveCategoryImage(file: Express.Multer.File): Promise<{ url: string }> {
+    return this.save(file, 'categories');
+  }
+
   saveAvatar(file: Express.Multer.File): Promise<{ url: string }> {
     return this.save(file, 'avatars');
   }
 
-  /** Validates magic bytes, writes with a randomized name, returns the public URL. */
+  /**
+   * Validates magic bytes, re-encodes to a resized WebP (honouring EXIF
+   * orientation, stripping metadata), writes with a randomized name, and returns
+   * the public URL. The on-disk file is always `.webp`.
+   */
   private async save(
     file: Express.Multer.File,
     subdir: string,
@@ -84,8 +99,21 @@ export class UploadsService {
         'Unsupported image type (allowed: JPEG, PNG, WebP, AVIF)',
       );
     }
-    const name = `${randomUUID()}.${sig.ext}`;
-    await writeFile(join(this.baseDir, subdir, name), file.buffer);
+
+    let webp: Buffer;
+    try {
+      webp = await sharp(file.buffer)
+        .rotate() // apply EXIF orientation, then drop metadata
+        .resize(MAX_EDGE, MAX_EDGE, { fit: 'inside', withoutEnlargement: true })
+        .webp({ quality: WEBP_QUALITY })
+        .toBuffer();
+    } catch (e) {
+      this.logger.warn(`Image processing failed: ${(e as Error).message}`);
+      throw new BadRequestException('Could not process that image — try another file');
+    }
+
+    const name = `${randomUUID()}.webp`;
+    await writeFile(join(this.baseDir, subdir, name), webp);
     return { url: `/uploads/${subdir}/${name}` };
   }
 }

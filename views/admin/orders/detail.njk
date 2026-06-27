@@ -5,30 +5,36 @@
 {% macro actionButton(id, action, label, color, token) %}
 <form action="/admin/orders/{{ id }}/{{ action }}" method="post">
   <input type="hidden" name="_csrf" value="{{ token }}" />
-  <button class="w-full rounded px-3 py-2 text-sm text-white {{ color }} hover:opacity-90">{{ label }}</button>
+  <button class="w-full rounded px-4 py-2 font-label-md text-label-md uppercase tracking-widest {{ color }} hover:opacity-90">{{ label }}</button>
 </form>
 {% endmacro %}
 
-<a href="/admin/orders" class="text-sm text-stone-500 hover:text-amber-700">← All orders</a>
+<a href="/admin/orders" class="text-sm text-on-surface-variant hover:text-primary">← All orders</a>
 
 <div class="mt-3 flex items-center gap-3">
-  <h2 class="font-serif text-2xl">{{ order.orderNumber }}</h2>
+  <h2 class="font-headline-md text-headline-md text-on-surface">{{ order.orderNumber }}</h2>
   {{ statusBadge(order.status) }}
-  <span class="text-sm text-stone-400">{{ order.createdAt | date }}</span>
+  <span class="text-sm text-on-surface-variant">{{ order.createdAt | date }}</span>
 </div>
+
+{% if notice %}
+<div class="mt-4 rounded-lg border px-4 py-3 text-sm {% if notice.kind == 'ok' %}border-secondary/40 bg-secondary-container text-on-secondary-container{% else %}border-error/40 bg-error-container text-on-error-container{% endif %}">
+  {{ notice.text }}
+</div>
+{% endif %}
 
 <div class="mt-5 grid gap-6 lg:grid-cols-3">
   <div class="space-y-6 lg:col-span-2">
     {# Items #}
-    <div class="rounded-lg bg-white p-6 shadow-sm">
-      <h3 class="text-base font-medium">Items</h3>
-      <table class="mt-3 w-full text-left text-sm">
-        <thead class="text-xs uppercase text-stone-500"><tr><th class="py-2">Product</th><th>SKU</th><th>Qty</th><th>Unit</th><th class="text-right">Total</th></tr></thead>
+    <div class="rounded-lg border border-outline/10 bg-surface-container-lowest p-6">
+      <h3 class="font-headline-md text-headline-md text-on-surface">Items</h3>
+      <table class="mt-3 w-full text-left text-sm text-on-surface">
+        <thead class="text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider"><tr><th class="py-2">Product</th><th>SKU</th><th>Qty</th><th>Unit</th><th class="text-right">Total</th></tr></thead>
         <tbody>
           {% for i in order.items %}
-          <tr class="border-t border-stone-100">
-            <td class="py-2">{{ i.productName }} <span class="text-stone-400">({{ i.variantName }})</span></td>
-            <td class="text-stone-500">{{ i.sku }}</td>
+          <tr class="border-t border-outline/10">
+            <td class="py-2">{{ i.productName }} <span class="text-on-surface-variant">({{ i.variantName }})</span></td>
+            <td class="text-on-surface-variant">{{ i.sku }}</td>
             <td>{{ i.quantity }}</td>
             <td>{{ i.unitPrice | money(order.currency) }}</td>
             <td class="text-right">{{ i.lineTotal | money(order.currency) }}</td>
@@ -36,26 +42,26 @@
           {% endfor %}
         </tbody>
       </table>
-      <div class="mt-4 space-y-1 border-t border-stone-200 pt-4 text-sm">
-        <div class="flex justify-between"><span class="text-stone-500">Subtotal</span><span>{{ order.subtotal | money(order.currency) }}</span></div>
-        {% if order.discountTotal and order.discountTotal > 0 %}<div class="flex justify-between text-green-700"><span>Discount {% if order.couponCode %}({{ order.couponCode }}){% endif %}</span><span>−{{ order.discountTotal | money(order.currency) }}</span></div>{% endif %}
-        <div class="flex justify-between"><span class="text-stone-500">Shipping</span><span>{{ order.shippingTotal | money(order.currency) }}</span></div>
+      <div class="mt-4 space-y-1 border-t border-outline/20 pt-4 text-sm text-on-surface">
+        <div class="flex justify-between"><span class="text-on-surface-variant">Subtotal</span><span>{{ order.subtotal | money(order.currency) }}</span></div>
+        {% if order.discountTotal and order.discountTotal > 0 %}<div class="flex justify-between text-on-secondary-container"><span>Discount {% if order.couponCode %}({{ order.couponCode }}){% endif %}</span><span>−{{ order.discountTotal | money(order.currency) }}</span></div>{% endif %}
+        <div class="flex justify-between"><span class="text-on-surface-variant">Shipping</span><span>{{ order.shippingTotal | money(order.currency) }}</span></div>
         <div class="flex justify-between text-base font-medium"><span>Total</span><span>{{ order.grandTotal | money(order.currency) }}</span></div>
       </div>
     </div>
 
     {# Customer + shipping #}
-    <div class="rounded-lg bg-white p-6 shadow-sm">
-      <h3 class="text-base font-medium">Customer &amp; shipping</h3>
-      <div class="mt-3 grid gap-4 text-sm md:grid-cols-2">
+    <div class="rounded-lg border border-outline/10 bg-surface-container-lowest p-6">
+      <h3 class="font-headline-md text-headline-md text-on-surface">Customer &amp; shipping</h3>
+      <div class="mt-3 grid gap-4 text-sm text-on-surface md:grid-cols-2">
         <div>
-          <p class="text-stone-500">Contact</p>
+          <p class="text-on-surface-variant">Contact</p>
           <p>{{ order.customer.name or order.shipName }}</p>
           <p>{{ order.email }}</p>
           {% if order.phone %}<p>{{ order.phone }}</p>{% endif %}
         </div>
         <div>
-          <p class="text-stone-500">Ship to</p>
+          <p class="text-on-surface-variant">Ship to</p>
           <p>{{ order.shipName }}</p>
           <p>{{ order.shipLine1 }}{% if order.shipLine2 %}, {{ order.shipLine2 }}{% endif %}</p>
           <p>{{ order.shipCity }}{% if order.shipDistrict %}, {{ order.shipDistrict }}{% endif %} {{ order.shipPostalCode }}</p>
@@ -67,57 +73,64 @@
 
   <div class="space-y-6">
     {# Actions #}
-    <div class="rounded-lg bg-white p-6 shadow-sm">
-      <h3 class="text-base font-medium">Actions</h3>
+    <div class="rounded-lg border border-outline/10 bg-surface-container-lowest p-6">
+      <h3 class="font-headline-md text-headline-md text-on-surface">Actions</h3>
       <div class="mt-3 flex flex-col gap-2">
         {% if order.status == 'PAYMENT_REVIEW' %}
-          {{ actionButton(order.id, 'approve-review', 'Approve payment', 'bg-green-700', csrfToken) }}
+          {{ actionButton(order.id, 'approve-review', 'Approve payment', 'bg-secondary-container text-on-secondary-container', csrfToken) }}
         {% endif %}
         {% if order.status == 'PAID' %}
-          {{ actionButton(order.id, 'processing', 'Mark processing', 'bg-stone-900', csrfToken) }}
+          {{ actionButton(order.id, 'processing', 'Mark processing', 'bg-primary text-on-primary', csrfToken) }}
         {% endif %}
         {% if order.status == 'PROCESSING' %}
-          {{ actionButton(order.id, 'shipped', 'Mark shipped', 'bg-stone-900', csrfToken) }}
+          {{ actionButton(order.id, 'shipped', 'Mark shipped', 'bg-primary text-on-primary', csrfToken) }}
         {% endif %}
         {% if order.status == 'SHIPPED' %}
-          {{ actionButton(order.id, 'delivered', 'Mark delivered', 'bg-stone-900', csrfToken) }}
+          {{ actionButton(order.id, 'delivered', 'Mark delivered', 'bg-primary text-on-primary', csrfToken) }}
         {% endif %}
         {% if order.status not in ['CANCELLED', 'REFUNDED', 'PARTIALLY_REFUNDED', 'FAILED', 'EXPIRED', 'DELIVERED'] %}
-          <form action="/admin/orders/{{ order.id }}/cancel" method="post" onsubmit="return confirm('Cancel this order and restock its items?')">
+          <form action="/admin/orders/{{ order.id }}/cancel" method="post" data-confirm="Cancel this order and restock its items?">
             <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-            <button class="w-full rounded border border-red-300 px-3 py-2 text-sm text-red-700 hover:bg-red-50">Cancel &amp; restock</button>
+            <button class="w-full rounded border border-error px-4 py-2 font-label-md text-label-md uppercase tracking-widest text-error hover:bg-error-container hover:text-on-error-container">Cancel &amp; restock</button>
+          </form>
+        {% endif %}
+        {% if canRefund and order.status in ['PAID', 'PROCESSING', 'SHIPPED', 'DELIVERED'] %}
+          <form action="/admin/orders/{{ order.id }}/refund" method="post" data-confirm="Refund the full amount to the customer's bKash account and restock the items?">
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+            <button class="w-full rounded border border-error px-4 py-2 font-label-md text-label-md uppercase tracking-widest text-error hover:bg-error-container hover:text-on-error-container">Refund via bKash</button>
           </form>
         {% endif %}
         {% if order.status in ['CANCELLED', 'DELIVERED', 'REFUNDED'] %}
-          <p class="text-sm text-stone-400">No further actions.</p>
+          <p class="text-sm text-on-surface-variant">No further actions.</p>
         {% endif %}
       </div>
     </div>
 
     {# Payments #}
-    <div class="rounded-lg bg-white p-6 shadow-sm">
-      <h3 class="text-base font-medium">Payments</h3>
+    <div class="rounded-lg border border-outline/10 bg-surface-container-lowest p-6">
+      <h3 class="font-headline-md text-headline-md text-on-surface">Payments</h3>
       {% for p in order.payments %}
-        <div class="mt-3 border-t border-stone-100 pt-3 text-sm first:border-t-0 first:pt-0">
-          <div class="flex justify-between"><span>{{ statusBadge(p.status) }}</span><span>{{ p.amount | money(p.currency) }}</span></div>
-          <p class="mt-1 text-xs text-stone-500">tran: {{ p.tranId }}</p>
-          {% if p.valId %}<p class="text-xs text-stone-500">val: {{ p.valId }}</p>{% endif %}
-          {% if p.riskLevel != null %}<p class="text-xs text-stone-500">risk: {{ p.riskLevel }} {{ p.riskTitle }}</p>{% endif %}
+        <div class="mt-3 border-t border-outline/10 pt-3 text-sm text-on-surface first:border-t-0 first:pt-0">
+          <div class="flex items-center justify-between gap-2"><span class="flex items-center gap-2">{{ statusBadge(p.status) }}<span class="rounded-full border border-outline/40 px-2 py-0.5 text-[10px] uppercase tracking-wider text-on-surface-variant">{% if p.provider == 'cod' %}Cash on Delivery{% else %}bKash{% endif %}</span></span><span>{{ p.amount | money(p.currency) }}</span></div>
+          <p class="mt-1 text-xs text-on-surface-variant">ref: {{ p.tranId }}</p>
+          {% if p.bkashTrxID %}<p class="text-xs text-on-surface-variant">bKash trxID: {{ p.bkashTrxID }}</p>{% endif %}
+          {% if p.bkashPaymentID %}<p class="text-xs text-on-surface-variant">paymentID: {{ p.bkashPaymentID }}</p>{% endif %}
+          {% if p.payerAccount %}<p class="text-xs text-on-surface-variant">payer: {{ p.payerAccount }}</p>{% endif %}
         </div>
       {% else %}
-        <p class="mt-2 text-sm text-stone-400">No payments.</p>
+        <p class="mt-2 text-sm text-on-surface-variant">No payments.</p>
       {% endfor %}
     </div>
 
     {# Reservations + shipments #}
-    <div class="rounded-lg bg-white p-6 shadow-sm">
-      <h3 class="text-base font-medium">Inventory &amp; shipments</h3>
+    <div class="rounded-lg border border-outline/10 bg-surface-container-lowest p-6">
+      <h3 class="font-headline-md text-headline-md text-on-surface">Inventory &amp; shipments</h3>
       <div class="mt-2 text-sm">
         {% for r in order.reservations %}
-          <p class="text-xs text-stone-500">{{ r.variant.sku }} × {{ r.quantity }} — {{ r.status }}</p>
+          <p class="text-xs text-on-surface-variant">{{ r.variant.sku }} × {{ r.quantity }} — {{ r.status }}</p>
         {% endfor %}
         {% for s in order.shipments %}
-          <p class="mt-1 text-xs text-stone-500">Shipment: {{ s.status }}{% if s.shippedAt %} · shipped {{ s.shippedAt | date }}{% endif %}</p>
+          <p class="mt-1 text-xs text-on-surface-variant">Shipment: {{ s.status }}{% if s.shippedAt %} · shipped {{ s.shippedAt | date }}{% endif %}</p>
         {% endfor %}
       </div>
     </div>

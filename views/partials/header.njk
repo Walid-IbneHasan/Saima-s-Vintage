@@ -1,90 +1,141 @@
-<header class="border-b border-stone-200 bg-white" x-data="{ open: false }">
-  <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4">
-    <a href="/" class="font-serif text-2xl tracking-tight text-stone-900">
-      {{ appName }}
-    </a>
+{# ── Announcement ribbon (deep red; scrolls away, nav below stays sticky) ── #}
+<div class="marquee bg-brand-red-deep text-brand-cream">
+  <div class="marquee-track gap-0 py-2.5" style="--marquee-dur: 42s" aria-hidden="true">
+    {% for _ in range(0, 2) %}
+      <div class="flex shrink-0 items-center">
+        {% set bites = ['Handcrafted Lippan mirror art & Mughal Jharoka decor', 'Complimentary gift wrapping on every order', 'One-of-a-kind heritage pieces', 'Shipped with care across Bangladesh'] %}
+        {% for b in bites %}
+          <span class="px-6 font-brand-sans text-[11px] uppercase tracking-[0.22em] text-brand-cream/90">{{ b }}</span>
+          <svg class="h-1.5 w-1.5 text-brand-gold-bright" viewBox="0 0 8 8" fill="currentColor" aria-hidden="true"><path d="M4 0l1.4 2.6L8 4 5.4 5.4 4 8 2.6 5.4 0 4l2.6-1.4z"/></svg>
+        {% endfor %}
+      </div>
+    {% endfor %}
+  </div>
+</div>
 
-    <nav class="hidden items-center gap-6 text-sm md:flex" aria-label="Primary">
-      <a href="/" class="hover:text-amber-700">Home</a>
-      <div class="relative" x-data="{ shop: false }" @mouseenter="shop = true" @mouseleave="shop = false">
-        <a href="/products" class="inline-flex items-center gap-1 hover:text-amber-700" @click="shop = !shop">
-          Shop <span class="text-xs">▾</span>
-        </a>
-        {# pt-2 (not mt-2) keeps the hover area continuous so the menu doesn't close in the gap #}
-        <div x-show="shop" x-cloak class="absolute left-0 top-full z-30 pt-2">
-          <div class="w-[36rem] rounded-xl border border-stone-200 bg-white p-5 shadow-xl">
-            <div class="grid grid-cols-3 gap-x-6 gap-y-4">
-              {% for cat in navCategories() %}
-                <div>
-                  <a href="/c/{{ cat.slug }}" class="block text-sm font-medium text-stone-900 hover:text-amber-700">{{ cat.name }}</a>
-                  {% if cat.children.length %}
-                    <div class="mt-1.5 space-y-1">
-                      {% for sub in cat.children %}
-                        <a href="/c/{{ sub.slug }}" class="block text-xs text-stone-500 hover:text-amber-700">{{ sub.name }}</a>
-                      {% endfor %}
-                    </div>
-                  {% endif %}
-                </div>
-              {% endfor %}
+<header x-data="{ open: false, scrolled: false }"
+        @scroll.window="scrolled = window.scrollY > 12"
+        :class="scrolled ? 'border-brand-gold/30 bg-white/95 shadow-[0_10px_34px_-20px_rgba(58,10,14,0.22)]' : 'border-transparent bg-white/75'"
+        class="sticky top-0 z-50 border-b backdrop-blur-xl transition-[background-color,border-color,box-shadow] duration-500 ease-lux">
+  <div :class="scrolled ? 'h-16 md:h-[4.5rem]' : 'h-20 md:h-24'"
+       class="mx-auto flex max-w-container-max items-center justify-between gap-4 px-margin-mobile transition-[height] duration-500 ease-lux md:px-margin-desktop">
+    <div class="flex items-center gap-9">
+      {# Wordmark with a small red/gold mirror-plate mark. #}
+      <a href="/" class="group flex items-center gap-2.5" aria-label="{{ appName }} — home">
+        <span class="grid h-8 w-8 shrink-0 place-items-center text-brand-red transition-transform duration-700 ease-lux group-hover:rotate-90" aria-hidden="true">
+          <svg class="h-full w-full" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.4">
+            <circle cx="20" cy="20" r="18" stroke-dasharray="1 4" />
+            <circle cx="20" cy="20" r="12.5" />
+            <circle cx="20" cy="20" r="4.5" fill="currentColor" stroke="none" />
+            <path d="M20 2v6M20 32v6M2 20h6M32 20h6" stroke-linecap="round" />
+          </svg>
+        </span>
+        <span class="flex flex-col leading-none">
+          <span class="font-brand-serif text-xl font-medium text-brand-ink md:text-[1.6rem]">{{ appName }}</span>
+          <span class="mt-1 hidden font-brand-sans text-[9px] uppercase tracking-[0.42em] text-brand-bronze sm:block">Maison Rouge</span>
+        </span>
+      </a>
+
+      <nav class="hidden items-center gap-8 lg:flex" aria-label="Primary">
+        <div class="relative" x-data="{ shop: false }" @mouseenter="shop = true" @mouseleave="shop = false">
+          <a href="/products" class="ul-grow inline-flex items-center gap-1.5 font-brand-sans text-[13px] font-semibold uppercase tracking-[0.18em] text-brand-ink transition-colors hover:text-brand-red" @click="shop = !shop">
+            Shop
+            <svg class="h-3 w-3 transition-transform duration-300" :class="shop && 'rotate-180'" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 8l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          {# pt-4 keeps the hover area continuous so the menu doesn't close in the gap. #}
+          <div x-show="shop" x-cloak x-transition.opacity.duration.200ms class="absolute left-1/2 top-full z-30 -translate-x-1/2 pt-4">
+            <div class="w-[40rem] overflow-hidden rounded-2xl border border-brand-gold/25 bg-white p-7 shadow-[0_30px_70px_-30px_rgba(58,10,14,0.3)]">
+              <p class="mb-5 font-brand-sans text-[11px] font-semibold uppercase tracking-[0.3em] text-brand-bronze">Browse the collection</p>
+              <div class="grid grid-cols-3 gap-x-8 gap-y-5">
+                {% for cat in navCategories() %}
+                  <div>
+                    <a href="/c/{{ cat.slug }}" class="ul-grow inline-block font-brand-serif text-base text-brand-ink transition-colors hover:text-brand-red">{{ cat.name }}</a>
+                    {% if cat.children.length %}
+                      <div class="mt-2 space-y-1.5">
+                        {% for sub in cat.children %}
+                          <a href="/c/{{ sub.slug }}" class="block font-brand-sans text-sm text-brand-ink-soft transition-colors hover:text-brand-red">{{ sub.name }}</a>
+                        {% endfor %}
+                      </div>
+                    {% endif %}
+                  </div>
+                {% endfor %}
+              </div>
+              <a href="/products" class="mt-6 flex items-center justify-between border-t border-brand-gold/20 pt-4 font-brand-sans text-[13px] font-semibold uppercase tracking-[0.18em] text-brand-red transition-colors hover:text-brand-red-deep">
+                <span>Shop all pieces</span>
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </a>
             </div>
-            <a href="/products" class="mt-4 block border-t border-stone-100 pt-3 text-sm font-medium text-amber-700 hover:underline">Shop all products →</a>
           </div>
         </div>
-      </div>
-      <a href="/products?onSale=1" class="font-medium text-amber-700 hover:text-amber-800">Sale</a>
-      <a href="/pages/about" class="hover:text-amber-700">About</a>
-    </nav>
+        <a href="/products?onSale=1" class="ul-grow font-brand-sans text-[13px] font-semibold uppercase tracking-[0.18em] text-brand-red transition-colors hover:text-brand-red-deep">Flash Deals</a>
+        <a href="/pages/about" class="ul-grow font-brand-sans text-[13px] font-semibold uppercase tracking-[0.18em] text-brand-ink transition-colors hover:text-brand-red">Our Story</a>
+      </nav>
+    </div>
 
-    <div class="flex items-center gap-4">
-      <form action="/search" method="get" class="hidden md:block">
-        <input
-          type="search"
-          name="q"
-          placeholder="Search vintage…"
-          class="w-48 rounded-full border border-stone-300 px-4 py-1.5 text-sm focus:border-amber-600 focus:outline-none"
-        />
+    <div class="flex items-center gap-3 text-brand-ink md:gap-5">
+      {# Inline search (desktop): plain GET form, works without JS. #}
+      <form action="/search" method="get" class="group hidden items-center gap-2 border-b border-brand-ink/15 pb-1.5 transition-colors focus-within:border-brand-red lg:flex">
+        <svg class="h-5 w-5 text-brand-ink-soft transition-colors group-focus-within:text-brand-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3" stroke-linecap="round"/></svg>
+        <input type="search" name="q" placeholder="Search the collection…"
+               class="w-44 border-none bg-transparent p-0 font-brand-sans text-sm text-brand-ink placeholder:text-brand-ink-soft/60 focus:ring-0" />
       </form>
-      <a href="/cart" class="relative text-sm hover:text-amber-700" aria-label="Cart">Cart</a>
+
+      <a href="/search" class="grid h-10 w-10 place-items-center rounded-full transition-colors duration-300 hover:bg-brand-paper hover:text-brand-red lg:hidden" aria-label="Search">
+        <svg class="h-[1.35rem] w-[1.35rem]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3" stroke-linecap="round"/></svg>
+      </a>
+
+      <a href="/cart" class="relative grid h-10 w-10 place-items-center rounded-full transition-colors duration-300 hover:bg-brand-paper hover:text-brand-red" aria-label="Cart{% if cartCount %} ({{ cartCount }} item{% if cartCount != 1 %}s{% endif %}){% endif %}">
+        <svg class="h-[1.35rem] w-[1.35rem]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="21" r="1.2"/><circle cx="19" cy="21" r="1.2"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+        {% if cartCount %}<span class="absolute right-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-red px-1 text-[10px] font-bold leading-none text-white">{{ cartCount }}</span>{% endif %}
+      </a>
+
       {% if currentCustomer %}
-        <a href="/account" class="hidden text-sm hover:text-amber-700 sm:inline">Account</a>
+        {# Profile button — a monogram avatar so the account is easy to find. #}
+        <a href="/account" class="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-brand-gold/40 bg-brand-paper font-brand-serif text-[15px] font-semibold leading-none text-brand-red transition-colors duration-300 hover:border-brand-red hover:bg-brand-red hover:text-white" aria-label="My account — {{ currentCustomer.name }}" title="My account">
+          {{ (currentCustomer.name or 'A')[0] | upper }}
+        </a>
         <form action="/logout" method="post" class="hidden sm:block">
           <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-          <button class="text-sm text-stone-500 hover:text-amber-700">Log out</button>
+          <button class="ul-grow font-brand-sans text-[13px] font-semibold uppercase tracking-[0.18em] text-brand-ink-soft transition-colors hover:text-brand-red">Log out</button>
         </form>
       {% else %}
-        <a href="/login" class="hidden text-sm hover:text-amber-700 sm:inline">Log in</a>
-        <a href="/register" class="hidden rounded-full bg-stone-900 px-3 py-1.5 text-sm text-white hover:bg-stone-700 sm:inline-block">Register</a>
+        <a href="/login" class="grid h-10 w-10 place-items-center rounded-full transition-colors duration-300 hover:bg-brand-paper hover:text-brand-red" aria-label="Log in">
+          <svg class="h-[1.35rem] w-[1.35rem]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6" stroke-linecap="round"/></svg>
+        </a>
+        <a href="/register" class="hidden items-center rounded-full bg-brand-red px-5 py-2.5 font-brand-sans text-[13px] font-semibold uppercase tracking-[0.16em] text-white transition-colors duration-300 hover:bg-brand-red-deep sm:inline-flex">Register</a>
       {% endif %}
-      <button
-        type="button"
-        class="md:hidden"
-        @click="open = !open"
-        aria-label="Toggle menu"
-      >☰</button>
+
+      <button type="button" class="grid h-10 w-10 place-items-center rounded-full transition-colors hover:bg-brand-paper hover:text-brand-red lg:hidden" @click="open = !open" aria-label="Toggle menu" aria-controls="mobile-menu" :aria-expanded="open ? 'true' : 'false'">
+        <svg x-show="!open" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/></svg>
+        <svg x-show="open" x-cloak class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"/></svg>
+      </button>
     </div>
   </div>
 
-  <div x-show="open" x-cloak class="max-h-[70vh] overflow-y-auto border-t border-stone-200 bg-white md:hidden">
-    <nav class="flex flex-col gap-1 px-4 py-3 text-sm">
-      <a href="/" class="py-1">Home</a>
-      <a href="/products" class="py-1">Shop all</a>
-      <a href="/products?onSale=1" class="py-1 font-medium text-amber-700">Sale</a>
+  <div id="mobile-menu" x-show="open" x-cloak x-transition.opacity.duration.200ms class="max-h-[78vh] overflow-y-auto border-t border-brand-gold/20 bg-white lg:hidden">
+    <nav class="flex flex-col px-margin-mobile py-4 font-brand-sans text-sm">
+      <a href="/" class="border-b border-black/5 py-3 text-[13px] font-semibold uppercase tracking-[0.16em] text-brand-ink">Home</a>
+      <a href="/products" class="border-b border-black/5 py-3 text-[13px] font-semibold uppercase tracking-[0.16em] text-brand-ink">Shop all</a>
+      <a href="/products?onSale=1" class="border-b border-black/5 py-3 text-[13px] font-semibold uppercase tracking-[0.16em] text-brand-red">Flash Deals</a>
+      <p class="pb-2 pt-5 text-[11px] font-semibold uppercase tracking-[0.3em] text-brand-bronze">Categories</p>
       {% for cat in navCategories() %}
-        <a href="/c/{{ cat.slug }}" class="py-1 font-medium">{{ cat.name }}</a>
+        <a href="/c/{{ cat.slug }}" class="py-2 font-brand-serif text-base text-brand-ink">{{ cat.name }}</a>
         {% for sub in cat.children %}
-          <a href="/c/{{ sub.slug }}" class="py-0.5 pl-4 text-stone-500">{{ sub.name }}</a>
+          <a href="/c/{{ sub.slug }}" class="py-1 pl-4 text-brand-ink-soft">{{ sub.name }}</a>
         {% endfor %}
       {% endfor %}
-      <a href="/pages/about" class="mt-1 py-1">About</a>
+      <a href="/pages/about" class="mt-2 border-t border-black/5 py-3 text-[13px] font-semibold uppercase tracking-[0.16em] text-brand-ink">Our Story</a>
       {% if currentCustomer %}
-        <a href="/account" class="border-t border-stone-100 pt-2 py-1 font-medium">My account</a>
+        <a href="/account" class="py-3 text-[13px] font-semibold uppercase tracking-[0.16em] text-brand-ink">My account</a>
         <form action="/logout" method="post">
           <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-          <button class="py-1 text-left text-stone-500">Log out</button>
+          <button class="py-2 text-left text-brand-ink-soft">Log out</button>
         </form>
       {% else %}
-        <a href="/login" class="border-t border-stone-100 pt-2 py-1">Log in</a>
-        <a href="/register" class="py-1 font-medium text-amber-700">Register</a>
+        <div class="mt-4 grid grid-cols-2 gap-3">
+          <a href="/login" class="inline-flex items-center justify-center rounded-full border border-brand-ink/20 px-5 py-3 text-[13px] font-semibold uppercase tracking-[0.16em] text-brand-ink">Log in</a>
+          <a href="/register" class="inline-flex items-center justify-center rounded-full bg-brand-red px-5 py-3 text-[13px] font-semibold uppercase tracking-[0.16em] text-white">Register</a>
+        </div>
       {% endif %}
     </nav>
   </div>

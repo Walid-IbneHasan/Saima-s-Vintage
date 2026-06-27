@@ -1,0 +1,23 @@
+{% from "partials/order-status.njk" import statusBadge %}
+
+{# A single order row, linking to its detail. Shared by the account dashboard
+   and the full order-history page. #}
+{% macro orderCard(order) %}
+<a href="/account/orders/{{ order.orderNumber }}" class="group flex items-center justify-between gap-4 rounded-xl border border-outline/30 bg-surface-container-lowest p-5 transition-colors hover:border-accent/50">
+  <div class="min-w-0">
+    <div class="flex flex-wrap items-center gap-2.5">
+      <span class="font-display-lg text-lg text-on-surface">{{ order.orderNumber }}</span>
+      {{ statusBadge(order.status) }}
+      {% set isCod = order.payments.length > 0 and order.payments[0].provider == 'cod' %}
+      <span class="rounded-full border border-outline/40 px-2.5 py-0.5 text-[10px] uppercase tracking-wider text-on-surface-variant">{% if isCod %}Cash on Delivery{% else %}bKash{% endif %}</span>
+    </div>
+    <p class="mt-1.5 truncate text-sm text-on-surface-variant">
+      {{ order.createdAt | date }} · {{ order._count.items }} item{% if order._count.items != 1 %}s{% endif %}{% if order.items.length %} — {% for i in order.items %}{{ i.productName }}{% if not loop.last %}, {% endif %}{% endfor %}{% if order._count.items > order.items.length %}…{% endif %}{% endif %}
+    </p>
+  </div>
+  <div class="flex shrink-0 items-center gap-3">
+    <span class="font-display-lg text-lg text-primary">{{ order.grandTotal | money(order.currency) }}</span>
+    <svg class="h-4 w-4 text-on-surface-variant transition-transform duration-300 ease-lux group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+</a>
+{% endmacro %}

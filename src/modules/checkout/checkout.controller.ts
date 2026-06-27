@@ -43,6 +43,7 @@ export class CheckoutController {
     // Prefill from the logged-in account (email, name, phone, default address).
     const me = res.locals.currentCustomer as SessionCustomer | undefined;
     let prefill: Record<string, string> = {};
+    let hasSavedAddress = false;
     if (me) {
       const customer = await this.prisma.customer.findUnique({
         where: { id: me.id },
@@ -52,10 +53,12 @@ export class CheckoutController {
         where: { customerId: me.id },
         orderBy: { isDefault: 'desc' },
       });
+      // A saved address the customer can reuse (or override) for this order.
+      hasSavedAddress = !!(address && address.line1 && address.city);
       prefill = {
         email: customer?.email ?? me.email,
         name: customer?.name ?? me.name,
-        phone: customer?.phone ?? '',
+        phone: address?.phone || customer?.phone || '',
         shipPhone: address?.phone || customer?.phone || '',
         line1: address?.line1 ?? '',
         line2: address?.line2 ?? '',
@@ -70,6 +73,7 @@ export class CheckoutController {
       cart: view,
       idempotencyKey: randomUUID(),
       loggedIn: !!me,
+      hasSavedAddress,
       prefill,
     });
   }
@@ -88,13 +92,40 @@ export class CheckoutController {
     const key = dto.idempotencyKey || randomUUID();
 
     // If logged in, link the order to the account and trust the account email
-    // (not the submitted field) so the order shows in their history.
+    // (not the submitted field) so the order shows in their history. Verify the
+    // customer still exists first — a stale session (e.g. after the account was
+    // removed/reseeded) would otherwise fail the order's customerId foreign key
+    // with a 500. Missing → fall back to a guest order with the submitted email.
     const me = res.locals.currentCustomer as SessionCustomer | undefined;
-    if (me) dto.email = me.email;
+    let customerId: string | null = null;
+    if (me) {
+      const exists = await this.prisma.customer.findUnique({
+        where: { id: me.id },
+        select: { id: true },
+      });
+      if (exists) {
+        customerId = me.id;
+        dto.email = me.email;
+      }
+    }
 
-    const order = await this.checkout.placeOrder(cart, dto, key, me?.id);
+    const order = await this.checkout.placeOrder(
+      cart,
+      dto,
+      key,
+      customerId,
+      dto.paymentMethod,
+    );
 
-    // Create the SSLCOMMERZ hosted-checkout session and send the customer there.
+    // Cash on Delivery: the order is already confirmed — no gateway. Send the
+    // confirmation and land on the order-complete page.
+    if (dto.paymentMethod === 'cod') {
+      await this.payments.confirmCodOrder(order.id);
+      res.redirect(`/checkout/complete/${order.orderNumber}`);
+      return;
+    }
+
+    // bKash: create the hosted-checkout payment and send the customer there.
     const gatewayUrl = await this.payments.createPaymentSession(order.id);
     if (gatewayUrl) {
       res.redirect(gatewayUrl);

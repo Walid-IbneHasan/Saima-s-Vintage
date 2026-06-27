@@ -103,7 +103,9 @@ export class CustomerAuthService {
     const subject =
       type === VerificationType.EMAIL_VERIFY
         ? "Verify your Saima's Vintage account"
-        : "Reset your Saima's Vintage password";
+        : type === VerificationType.PASSWORD_CHANGE
+          ? "Confirm your Saima's Vintage password change"
+          : "Reset your Saima's Vintage password";
     await this.notifications.send(
       customer.email,
       subject,
@@ -206,21 +208,44 @@ export class CustomerAuthService {
     });
   }
 
-  async changePassword(
+  /**
+   * Step 1 of the logged-in password change: validate the current password (if the
+   * account has one) BEFORE any email is sent, then email a PASSWORD_CHANGE code.
+   */
+  async requestPasswordChangeOtp(
     customerId: string,
     currentPassword: string | undefined,
-    newPassword: string,
   ): Promise<void> {
     const customer = await this.prisma.customer.findUnique({ where: { id: customerId } });
     if (!customer) throw new UnauthorizedException();
 
-    // If the account already has a password, the current one must match.
     if (customer.passwordHash) {
       const ok = await bcrypt.compare(currentPassword ?? '', customer.passwordHash);
       if (!ok) throw new BadRequestException('Your current password is incorrect.');
     }
+    await this.issueOtp(customer, VerificationType.PASSWORD_CHANGE);
+  }
+
+  /**
+   * Step 2: re-check the current password (defends a direct step-2 POST and a password
+   * changed between steps), verify the emailed code, then set the new password.
+   */
+  async changePasswordWithOtp(
+    customerId: string,
+    currentPassword: string | undefined,
+    newPassword: string,
+    code: string,
+  ): Promise<void> {
+    const customer = await this.prisma.customer.findUnique({ where: { id: customerId } });
+    if (!customer) throw new UnauthorizedException();
+
+    if (customer.passwordHash) {
+      const ok = await bcrypt.compare(currentPassword ?? '', customer.passwordHash);
+      if (!ok) throw new BadRequestException('Your current password is incorrect.');
+    }
+    await this.verifyOtp(customer.email, code, VerificationType.PASSWORD_CHANGE);
     await this.prisma.customer.update({
-      where: { id: customerId },
+      where: { id: customer.id },
       data: { passwordHash: await bcrypt.hash(newPassword, 10) },
     });
   }

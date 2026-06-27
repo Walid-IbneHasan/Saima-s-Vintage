@@ -6,8 +6,10 @@ import * as express from 'express';
 import helmet from 'helmet';
 import { join } from 'path';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import { createCartContextMiddleware } from './common/middleware/cart-context.middleware';
 import { createCsrfMiddleware } from './common/middleware/csrf.middleware';
 import { createCustomerContextMiddleware } from './common/middleware/customer-context.middleware';
+import { CartService } from './modules/cart/cart.service';
 import { configureViews } from './common/view-engine';
 import { CategoryNavService } from './modules/catalog/category-nav.service';
 
@@ -60,6 +62,8 @@ export function setupApp(app: NestExpressApplication): void {
   app.use(createCsrfMiddleware());
   // Expose the logged-in customer (from the JWT cookie) to every page.
   app.use(createCustomerContextMiddleware(() => app.get(JwtService, { strict: false })));
+  // Expose the cart item count (from the cart cookie) for the header badge.
+  app.use(createCartContextMiddleware(() => app.get(CartService, { strict: false })));
 
   const njk = configureViews(app, isProd);
   // Category menu available to every server-rendered page (cached).
@@ -79,7 +83,12 @@ export function setupApp(app: NestExpressApplication): void {
     new ValidationPipe({
       whitelist: true,
       transform: true,
-      transformOptions: { enableImplicitConversion: true },
+      // NOTE: implicit conversion is intentionally OFF. With it on, empty form
+      // fields (e.g. an untouched maxPerOrder/flashPrice) get coerced to 0,
+      // overriding the explicit @ToNumber transforms (which map '' → undefined)
+      // and breaking @Min validation. Every DTO already declares explicit
+      // @ToNumber/@ToBool/@ToArray transforms, so implicit conversion is both
+      // redundant and harmful here.
     }),
   );
   app.useGlobalFilters(new AllExceptionsFilter(isProd));

@@ -2,7 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { PageParams } from '../../common/pagination';
-import { PriceView, productPriceView } from '../../common/pricing';
+import {
+  PriceView,
+  isFlashActive,
+  onSaleWhere,
+  productPriceView,
+  resolveProductPricing,
+} from '../../common/pricing';
 import { ProductFilters } from '../../common/product-filters';
 
 // Shared card projection — keeps listing queries to a constant number of
@@ -13,6 +19,9 @@ const cardSelect = {
   slug: true,
   basePrice: true,
   salePrice: true,
+  flashPrice: true,
+  flashStartAt: true,
+  flashEndAt: true,
   currency: true,
   images: {
     take: 1,
@@ -35,6 +44,8 @@ export interface ProductCard {
   image: { url: string; alt: string | null } | null;
   inStock: boolean;
   pricing: PriceView;
+  /** End time of a live flash deal (null when no flash is currently active). */
+  flashEndsAt: Date | null;
 }
 
 @Injectable()
@@ -46,6 +57,7 @@ export class ProductsService {
     opts: { categoryId?: string; filters?: ProductFilters } = {},
   ): Promise<{ items: ProductCard[]; total: number }> {
     const f = opts.filters;
+    const now = new Date();
 
     const where: Prisma.ProductWhereInput = {
       isActive: true,
@@ -63,7 +75,9 @@ export class ProductsService {
           ...(f.priceMax !== undefined ? { lte: f.priceMax } : {}),
         };
       }
-      if (f.onSale) where.salePrice = { not: null };
+      // "On sale now" = a standing salePrice OR a live flash deal. Expired flash
+      // deals are excluded by onSaleWhere, so they drop off automatically.
+      if (f.onSale) where.OR = onSaleWhere(now).OR;
       if (f.inStock) {
         where.variants = { some: { isActive: true, stock: { gt: 0 } } };
       }
@@ -89,7 +103,7 @@ export class ProductsService {
       this.prisma.product.count({ where }),
     ]);
 
-    return { items: rows.map(toCard), total };
+    return { items: rows.map((r) => toCard(r, now)), total };
   }
 
   /**
@@ -123,7 +137,7 @@ export class ProductsService {
       orderBy: [{ featuredOrder: 'asc' }, { createdAt: 'desc' }],
       take: limit,
     });
-    return rows.map(toCard);
+    return rows.map((r) => toCard(r, new Date()));
   }
 
   /** Full product detail for the storefront PDP. Returns null if not found/inactive. */
@@ -137,14 +151,16 @@ export class ProductsService {
         sku: true,
         shortDescription: true,
         description: true,
-        brand: true,
-        condition: true,
         basePrice: true,
         salePrice: true,
+        flashPrice: true,
+        flashStartAt: true,
+        flashEndAt: true,
         currency: true,
         seoTitle: true,
         seoDescription: true,
         images: {
+          where: { variantId: null },
           orderBy: [{ isPrimary: 'desc' }, { position: 'asc' }],
           select: { url: true, alt: true, width: true, height: true },
         },
@@ -155,10 +171,17 @@ export class ProductsService {
             id: true,
             name: true,
             sku: true,
+            size: true,
+            color: true,
             price: true,
             salePrice: true,
             stock: true,
             lowStockThreshold: true,
+            images: {
+              take: 1,
+              orderBy: { position: 'asc' },
+              select: { url: true, alt: true },
+            },
             attributeValues: {
               select: {
                 attributeValue: {
@@ -191,7 +214,7 @@ export class ProductsService {
   }
 }
 
-export function toCard(row: CardRow): ProductCard {
+export function toCard(row: CardRow, now: Date = new Date()): ProductCard {
   return {
     id: row.id,
     name: row.name,
@@ -199,6 +222,7 @@ export function toCard(row: CardRow): ProductCard {
     currency: row.currency,
     image: row.images[0] ?? null,
     inStock: row.variants.some((v) => v.stock > 0),
-    pricing: productPriceView({ basePrice: row.basePrice, salePrice: row.salePrice }),
+    pricing: productPriceView(resolveProductPricing(row, now)),
+    flashEndsAt: isFlashActive(row, now) ? row.flashEndAt : null,
   };
 }

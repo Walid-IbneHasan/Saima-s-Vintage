@@ -1,23 +1,43 @@
 {% extends "layouts/base.njk" %}
 
 {% block content %}
-<div class="mx-auto max-w-md px-4 py-16">
-  <h1 class="font-serif text-3xl">Reset password</h1>
-  {% if sent %}<p class="mt-4 rounded bg-amber-50 px-3 py-2 text-sm text-amber-800">If an account exists for <strong>{{ email }}</strong>, a reset code has been sent. Enter it below.</p>{% endif %}
-  {% if error %}<p class="mt-4 rounded bg-red-50 px-3 py-2 text-sm text-red-700">{{ error }}</p>{% endif %}
+<section class="relative flex min-h-[78vh] items-center justify-center overflow-hidden px-margin-mobile py-16 md:px-margin-desktop md:py-24">
+  <div class="pointer-events-none absolute -left-32 top-1/4 -z-10 h-[26rem] w-[26rem] rounded-full bg-accent/10 blur-3xl" aria-hidden="true"></div>
+  <div class="pointer-events-none absolute -right-24 bottom-0 -z-10 h-72 w-72 rounded-full bg-accent/[0.07] blur-3xl" aria-hidden="true"></div>
 
-  <form action="/reset" method="post" class="mt-6 space-y-4">
-    <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-    <label class="block text-sm font-medium">Email
-      <input name="email" type="email" required value="{{ email }}" class="mt-1 w-full rounded border-stone-300" />
-    </label>
-    <label class="block text-sm font-medium">Reset code
-      <input name="code" inputmode="numeric" maxlength="6" required class="mt-1 w-full rounded border-stone-300 tracking-[0.4em]" />
-    </label>
-    <label class="block text-sm font-medium">New password
-      <input name="password" type="password" required minlength="8" class="mt-1 w-full rounded border-stone-300" />
-    </label>
-    <button class="w-full rounded-full bg-stone-900 px-6 py-3 text-white hover:bg-stone-700">Reset password</button>
-  </form>
-</div>
+  <div class="w-full max-w-md" data-reveal>
+    <div class="mb-8 text-center">
+      <p class="eyebrow text-accent-deep">Account recovery</p>
+      <h1 class="mt-4 font-display-lg text-headline-lg text-on-surface">Reset password</h1>
+      <p class="mt-3 text-body-md text-on-surface-variant">Enter the code we sent you, then choose a new password.</p>
+    </div>
+
+    <div class="rounded-2xl border border-outline/30 bg-surface-container-lowest p-8 shadow-luxe">
+      {% if sent %}<p class="mb-5 rounded-lg border border-accent/30 bg-accent/5 px-4 py-3 text-sm text-on-surface">If an account exists for <strong>{{ email }}</strong>, a reset code has been sent. Enter it below.</p>{% endif %}
+      {% if error %}<p class="mb-5 rounded-lg border border-error/20 bg-error-container px-4 py-3 text-sm text-on-error-container">{{ error }}</p>{% endif %}
+
+      <form action="/reset" method="post" class="space-y-5">
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+        <label class="block">
+          <span class="block font-label-sm text-label-sm uppercase tracking-[0.12em] text-on-surface-variant">Email</span>
+          <input name="email" type="email" required value="{{ email }}" autocomplete="email"
+                 class="mt-2 w-full rounded-lg border border-outline bg-surface-container-lowest px-4 py-3 text-body-md text-on-surface placeholder:text-on-surface-variant/50 transition-colors focus:border-accent-deep focus:ring-0" />
+        </label>
+        <label class="block">
+          <span class="block text-center font-label-sm text-label-sm uppercase tracking-[0.12em] text-on-surface-variant">Reset code</span>
+          <input name="code" inputmode="numeric" maxlength="6" required placeholder="000000"
+                 class="mt-2 w-full rounded-lg border border-outline bg-surface-container-low px-4 py-4 text-center font-display-lg text-3xl tracking-[0.4em] text-on-surface placeholder:text-on-surface-variant/30 transition-colors focus:border-accent-deep focus:ring-0" />
+        </label>
+        <label class="block">
+          <span class="block font-label-sm text-label-sm uppercase tracking-[0.12em] text-on-surface-variant">New password</span>
+          <input name="password" type="password" required minlength="8" autocomplete="new-password"
+                 class="mt-2 w-full rounded-lg border border-outline bg-surface-container-lowest px-4 py-3 text-body-md text-on-surface placeholder:text-on-surface-variant/50 transition-colors focus:border-accent-deep focus:ring-0" />
+        </label>
+        <button class="w-full rounded-full bg-primary px-6 py-3.5 font-label-md text-label-md uppercase tracking-[0.16em] text-on-primary shadow-luxe transition-colors duration-300 hover:bg-on-primary-fixed-variant">Reset password</button>
+      </form>
+    </div>
+
+    <p class="mt-7 text-center text-sm text-on-surface-variant"><a href="/login" class="link-underline text-accent-deep">Back to login</a></p>
+  </div>
+</section>
 {% endblock %}

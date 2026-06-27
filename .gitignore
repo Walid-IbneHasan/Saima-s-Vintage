@@ -4,6 +4,8 @@ node_modules/
 # build output
 dist/
 public/build/
+deploy.zip
+deploy.tar.gz
 
 # env & secrets
 .env
@@ -31,3 +33,6 @@ Thumbs.db
 
 # tests
 coverage/
+
+# Local responsive-QA screenshots
+_shots/

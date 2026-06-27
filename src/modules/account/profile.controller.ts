@@ -3,6 +3,8 @@ import {
   Body,
   Controller,
   Get,
+  NotFoundException,
+  Param,
   Post,
   Query,
   Res,
@@ -11,8 +13,10 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Throttle } from '@nestjs/throttler';
 import { Response } from 'express';
 import { memoryStorage } from 'multer';
+import { buildPageMeta, parsePage } from '../../common/pagination';
 import {
   AuthCustomer,
   CurrentCustomer,
@@ -24,7 +28,11 @@ import {
   UploadsService,
 } from '../admin/uploads.service';
 import { CustomerAuthService } from '../customer-auth/customer-auth.service';
-import { ChangePasswordDto, ProfileDto } from '../customer-auth/dto';
+import {
+  ConfirmPasswordChangeDto,
+  ProfileDto,
+  RequestPasswordChangeDto,
+} from '../customer-auth/dto';
 import { AccountService } from './account.service';
 
 @Controller('account')
@@ -43,14 +51,48 @@ export class ProfileController {
     @Res() res: Response,
   ): Promise<void> {
     const { customer, hasPassword, address } = await this.account.getProfile(me.id);
+    const recentOrders = await this.account.recentOrders(me.id, 3);
     res.render('account/profile', {
       title: 'My account',
       customer,
       hasPassword,
       address,
+      recentOrders,
       welcome: q.welcome === '1',
       saved: q.saved === '1',
       pwSaved: q.pw === '1',
+    });
+  }
+
+  /** Full order history. */
+  @Get('orders')
+  async orders(
+    @CurrentCustomer() me: AuthCustomer,
+    @Query('page') page: string,
+    @Res() res: Response,
+  ): Promise<void> {
+    const params = parsePage(page, undefined, 10, 50);
+    const { items, total } = await this.account.listOrders(me.id, params);
+    res.render('account/orders', {
+      title: 'My orders',
+      orders: items,
+      meta: buildPageMeta(params.page, params.limit, total),
+      basePath: '/account/orders?',
+    });
+  }
+
+  /** A single order's detail, scoped to the signed-in customer. */
+  @Get('orders/:orderNumber')
+  async orderDetail(
+    @CurrentCustomer() me: AuthCustomer,
+    @Param('orderNumber') orderNumber: string,
+    @Res() res: Response,
+  ): Promise<void> {
+    const order = await this.account.getOrder(me.id, orderNumber);
+    if (!order) throw new NotFoundException('Order not found');
+    res.render('account/order-detail', {
+      title: `Order ${order.orderNumber}`,
+      order,
     });
   }
 
@@ -80,24 +122,59 @@ export class ProfileController {
     res.redirect('/account?saved=1');
   }
 
-  @Post('password')
-  async changePassword(
+  /** Step 1: validate current password and email a verification code. */
+  @Post('password/request')
+  @Throttle({ default: { limit: 15, ttl: 60_000 } })
+  async requestPasswordChange(
     @CurrentCustomer() me: AuthCustomer,
-    @Body() dto: ChangePasswordDto,
+    @Body() dto: RequestPasswordChangeDto,
     @Res() res: Response,
   ): Promise<void> {
     try {
-      await this.auth.changePassword(me.id, dto.currentPassword, dto.newPassword);
+      await this.auth.requestPasswordChangeOtp(me.id, dto.currentPassword);
+      await this.renderProfile(me.id, res, 200, { pwOtpStage: 'confirm', pwSent: true });
+    } catch (e) {
+      await this.renderProfile(me.id, res, 400, { pwError: (e as Error).message });
+    }
+  }
+
+  /** Step 2: verify the code (+ current password) and set the new password. */
+  @Post('password')
+  async changePassword(
+    @CurrentCustomer() me: AuthCustomer,
+    @Body() dto: ConfirmPasswordChangeDto,
+    @Res() res: Response,
+  ): Promise<void> {
+    try {
+      await this.auth.changePasswordWithOtp(
+        me.id,
+        dto.currentPassword,
+        dto.newPassword,
+        dto.code,
+      );
       res.redirect('/account?pw=1');
     } catch (e) {
-      const { customer, hasPassword, address } = await this.account.getProfile(me.id);
-      res.status(400).render('account/profile', {
-        title: 'My account',
-        customer,
-        hasPassword,
-        address,
+      await this.renderProfile(me.id, res, 400, {
         pwError: (e as Error).message,
+        pwOtpStage: 'confirm',
       });
     }
+  }
+
+  /** Re-render the account page in its current state (shared by both password steps). */
+  private async renderProfile(
+    meId: string,
+    res: Response,
+    status: number,
+    extra: Record<string, unknown> = {},
+  ): Promise<void> {
+    const { customer, hasPassword, address } = await this.account.getProfile(meId);
+    res.status(status).render('account/profile', {
+      title: 'My account',
+      customer,
+      hasPassword,
+      address,
+      ...extra,
+    });
   }
 }

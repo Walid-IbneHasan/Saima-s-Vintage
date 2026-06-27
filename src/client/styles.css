@@ -2,9 +2,298 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Self-hosted fonts (Heritage Atelier design system). Served from /public so
+ * they satisfy the strict CSP (font-src 'self'); no dependency on Google Fonts.
+ * Latin subset only. Libre Caslon Text = display/headlines, Inter = body/UI.
+ */
+@font-face {
+  font-family: 'Libre Caslon Text';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/libre-caslon-text-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Libre Caslon Text';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/libre-caslon-text-700.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Libre Caslon Text';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/libre-caslon-text-italic-400.woff2') format('woff2');
+}
+/* "Maison Rouge" brand faces — Bodoni Moda (display) + Hanken Grotesk (UI).
+   Self-hosted, latin; available site-wide so the navbar/footer can use them. */
+@font-face { font-family: 'Bodoni Moda'; font-style: normal; font-weight: 500; font-display: swap; src: url('/fonts/bodoni-moda-500.woff2') format('woff2'); }
+@font-face { font-family: 'Bodoni Moda'; font-style: normal; font-weight: 600; font-display: swap; src: url('/fonts/bodoni-moda-600.woff2') format('woff2'); }
+@font-face { font-family: 'Bodoni Moda'; font-style: normal; font-weight: 700; font-display: swap; src: url('/fonts/bodoni-moda-700.woff2') format('woff2'); }
+@font-face { font-family: 'Bodoni Moda'; font-style: italic; font-weight: 500; font-display: swap; src: url('/fonts/bodoni-moda-italic-500.woff2') format('woff2'); }
+@font-face { font-family: 'Hanken Grotesk'; font-style: normal; font-weight: 400; font-display: swap; src: url('/fonts/hanken-grotesk-400.woff2') format('woff2'); }
+@font-face { font-family: 'Hanken Grotesk'; font-style: normal; font-weight: 500; font-display: swap; src: url('/fonts/hanken-grotesk-500.woff2') format('woff2'); }
+@font-face { font-family: 'Hanken Grotesk'; font-style: normal; font-weight: 600; font-display: swap; src: url('/fonts/hanken-grotesk-600.woff2') format('woff2'); }
+@font-face { font-family: 'Hanken Grotesk'; font-style: normal; font-weight: 700; font-display: swap; src: url('/fonts/hanken-grotesk-700.woff2') format('woff2'); }
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/inter-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/inter-500.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/inter-600.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/inter-700.woff2') format('woff2');
+}
+
+:root {
+  /* Premium easing curve reused across the storefront. */
+  --lux: cubic-bezier(0.22, 1, 0.36, 1);
+  /* "Maison Rouge" — warm ink + champagne gold (drives focus ring, underline,
+     selection, slider). */
+  --ink: #2a1410;
+  --gold: #b08d3f;
+  --gold-deep: #8a6d2e;
+}
+
 /* Hide Alpine-controlled elements until Alpine initializes. */
 [x-cloak] {
   display: none !important;
+}
+
+html {
+  scroll-behavior: smooth;
+  /* Keep anchor targets clear of the sticky header. */
+  scroll-padding-top: 7rem;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Warm, on-brand text selection (soft red). */
+::selection {
+  background: rgba(163, 22, 33, 0.15);
+  color: #2a1410;
+}
+
+/*
+ * Visible keyboard focus across interactive elements (accessibility). Applies
+ * only to keyboard focus (:focus-visible), so mouse clicks stay clean. CSP-safe
+ * (pure CSS) and global, so no per-template churn. Antique-gold ring.
+ */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--gold-deep);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/*
+ * Brand the native form controls — @tailwindcss/forms defaults focus rings and
+ * checked checkboxes/radios to blue, which clashes with the red/gold theme.
+ * Kept in the base layer so per-input utilities (focus:border-primary, etc.)
+ * still win where templates set them; this only recolours the defaults.
+ */
+@layer base {
+  [type='text']:focus,
+  [type='email']:focus,
+  [type='password']:focus,
+  [type='search']:focus,
+  [type='tel']:focus,
+  [type='number']:focus,
+  [type='url']:focus,
+  [type='date']:focus,
+  [type='datetime-local']:focus,
+  [type='time']:focus,
+  [type='month']:focus,
+  [type='week']:focus,
+  textarea:focus,
+  select:focus {
+    border-color: var(--gold-deep);
+    --tw-ring-color: var(--gold-deep);
+  }
+  [type='checkbox'],
+  [type='radio'] {
+    color: #a31621; /* brand red — checked fill */
+  }
+  [type='checkbox']:focus,
+  [type='radio']:focus {
+    --tw-ring-color: #a31621;
+  }
+}
+
+/* Skip-link: hidden until focused, then pinned top-left over the header. */
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 200;
+  transform: translateY(-150%);
+  transition: transform 0.25s var(--lux);
+  background: #2a1410;
+  color: #f6ece0;
+  padding: 0.6rem 1.1rem;
+  border-radius: 0.5rem;
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+/*
+ * Heritage Atelier component utilities.
+ *  - ambient-shadow: soft, diffused, neutral lift used across cards/panels.
+ *  - jharoka-arch: arched top edge echoing the architectural heritage motif.
+ *  - hero-shader: WebGL canvas behind hero content; painted only when JS is
+ *    present, so no-JS shows the surface colour underneath.
+ */
+.ambient-shadow {
+  box-shadow:
+    0 1px 2px rgba(36, 28, 20, 0.04),
+    0 22px 44px -24px rgba(36, 28, 20, 0.2);
+}
+.jharoka-arch {
+  border-top-left-radius: 50%;
+  border-top-right-radius: 50%;
+}
+.hero-shader {
+  display: none;
+}
+.js .hero-shader {
+  display: block;
+}
+
+/* Hairline rule with a gold-fade centre — premium section divider. */
+.hairline-gold {
+  height: 1px;
+  border: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(168, 124, 50, 0.55),
+    transparent
+  );
+}
+
+/* Animated underline that draws in from the left (gold). Pair on links/labels. */
+.link-underline {
+  position: relative;
+}
+.link-underline::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -3px;
+  height: 1px;
+  background: var(--gold);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.45s var(--lux);
+}
+.link-underline:hover::after,
+.link-underline:focus-visible::after {
+  transform: scaleX(1);
+}
+
+/*
+ * Refined underline-on-hover in the element's own colour (currentColor), so it
+ * matches whatever the link recolours to on hover. Used by the redesigned
+ * navbar/footer. 300ms — within the micro-interaction budget.
+ */
+.ul-grow {
+  position: relative;
+}
+.ul-grow::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -4px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s var(--lux);
+}
+.ul-grow:hover::after,
+.ul-grow:focus-visible::after {
+  transform: scaleX(1);
+}
+
+/* Small uppercase tracked eyebrow label. */
+.eyebrow {
+  font-family: 'Hanken Grotesk', ui-sans-serif, system-ui, sans-serif;
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+/*
+ * Infinite marquee ticker (trust/announcement strip). The track holds the
+ * content twice and slides by -50% for a seamless loop. Motion runs ONLY when
+ * the user has not requested reduced motion; otherwise it sits static.
+ */
+.marquee {
+  overflow: hidden;
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  flex-wrap: nowrap;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .marquee-track {
+    animation: marquee-scroll var(--marquee-dur, 38s) linear infinite;
+  }
+  .marquee:hover .marquee-track {
+    animation-play-state: paused;
+  }
+}
+@keyframes marquee-scroll {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
 }
 
 /*
@@ -19,6 +308,68 @@
 }
 .js .price-fallback {
   display: none;
+}
+
+/*
+ * Filters auto-apply on change when JS is present; the Apply button is a no-JS
+ * fallback only.
+ */
+.js .filter-apply {
+  display: none;
+}
+
+/*
+ * Mobile filter drawer — progressive enhancement.
+ * Default / no-JS: the filter form is a normal in-flow column (stacked on
+ * mobile, sidebar on desktop). With JS on narrow screens it becomes a slide-in
+ * drawer toggled by Alpine via `.is-open`. The trigger/scrim/close affordances
+ * exist only in that mode.
+ */
+.filter-trigger,
+.filter-scrim,
+.filter-close {
+  display: none;
+}
+
+@media (max-width: 1023.98px) {
+  .js .filter-trigger {
+    display: block;
+  }
+  .js .filter-close {
+    display: grid;
+  }
+  .js .filter-panel {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 60;
+    width: min(88vw, 23rem);
+    padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    transform: translateX(-100%);
+    transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+    box-shadow: 0 24px 60px -20px rgb(42 20 16 / 0.5);
+  }
+  .js .filter-panel.is-open {
+    transform: translateX(0);
+  }
+  .js .filter-scrim.is-open {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 55;
+    background: rgb(42 20 16 / 0.45);
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .filter-panel {
+    transition: none !important;
+  }
 }
 
 /*
@@ -50,56 +401,82 @@
   -webkit-appearance: none;
   appearance: none;
   pointer-events: auto;
-  height: 1rem;
-  width: 1rem;
+  height: 1.05rem;
+  width: 1.05rem;
   border-radius: 9999px;
-  background: #ffffff;
-  border: 2px solid #b45309; /* amber-700 */
-  box-shadow: 0 1px 2px rgb(0 0 0 / 0.2);
+  background: #2a1410;
+  border: 2px solid #b08d3f;
+  box-shadow: 0 1px 3px rgb(36 28 20 / 0.3);
   cursor: pointer;
   margin-top: 0;
 }
 .price-range::-moz-range-thumb {
   pointer-events: auto;
-  height: 1rem;
-  width: 1rem;
+  height: 1.05rem;
+  width: 1.05rem;
   border-radius: 9999px;
-  background: #ffffff;
-  border: 2px solid #b45309;
-  box-shadow: 0 1px 2px rgb(0 0 0 / 0.2);
+  background: #2a1410;
+  border: 2px solid #b08d3f;
+  box-shadow: 0 1px 3px rgb(36 28 20 / 0.3);
   cursor: pointer;
 }
 .price-range:focus-visible::-webkit-slider-thumb {
-  outline: 2px solid #b45309;
+  outline: 2px solid #8a6d2e;
   outline-offset: 2px;
 }
 
 /*
- * Motion & 3D polish — progressive and accessible:
+ * Motion & polish — progressive and accessible:
  *  - Animations apply ONLY when JS is present (`.js` on <html>) AND the user
  *    has not requested reduced motion. Without JS, all content is fully
  *    visible (SSR-first), so the storefront works with JavaScript disabled.
  */
 @media (prefers-reduced-motion: no-preference) {
-  /* Scroll-reveal: hidden only once JS opts in, then revealed on intersection. */
+  /* Scroll-reveal: hidden once JS opts in, then revealed on intersection. */
   .js [data-reveal] {
     opacity: 0;
-    transform: translateY(16px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
+    transform: translateY(22px);
+    transition:
+      opacity 0.8s var(--lux),
+      transform 0.8s var(--lux);
   }
   .js [data-reveal].is-visible {
     opacity: 1;
     transform: none;
   }
 
+  /* Staggered children inside a revealed container (bento tiles, grids). */
+  .js [data-reveal-stagger] > * {
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+      opacity 0.7s var(--lux),
+      transform 0.7s var(--lux);
+  }
+  .js [data-reveal-stagger].is-visible > * {
+    opacity: 1;
+    transform: none;
+  }
+  .js [data-reveal-stagger].is-visible > *:nth-child(1) { transition-delay: 0.05s; }
+  .js [data-reveal-stagger].is-visible > *:nth-child(2) { transition-delay: 0.12s; }
+  .js [data-reveal-stagger].is-visible > *:nth-child(3) { transition-delay: 0.19s; }
+  .js [data-reveal-stagger].is-visible > *:nth-child(4) { transition-delay: 0.26s; }
+  .js [data-reveal-stagger].is-visible > *:nth-child(5) { transition-delay: 0.33s; }
+  .js [data-reveal-stagger].is-visible > *:nth-child(6) { transition-delay: 0.4s; }
+  .js [data-reveal-stagger].is-visible > *:nth-child(7) { transition-delay: 0.47s; }
+  .js [data-reveal-stagger].is-visible > *:nth-child(8) { transition-delay: 0.54s; }
+
   /* Hero entrance (pure CSS — runs even without JS, harmless). */
   .hero-fade {
-    animation: hero-fade-up 0.8s ease both;
+    animation: hero-fade-up 0.9s var(--lux) both;
   }
+  .hero-fade-delay-1 { animation-delay: 0.12s; }
+  .hero-fade-delay-2 { animation-delay: 0.24s; }
+  .hero-fade-delay-3 { animation-delay: 0.36s; }
   @keyframes hero-fade-up {
     from {
       opacity: 0;
-      transform: translateY(14px);
+      transform: translateY(18px);
     }
     to {
       opacity: 1;
@@ -107,13 +484,59 @@
     }
   }
 
+  /* Gentle hover lift for cards/tiles. */
+  .hover-lift {
+    transition:
+      transform 0.5s var(--lux),
+      box-shadow 0.5s var(--lux);
+    will-change: transform;
+  }
+  .hover-lift:hover {
+    transform: translateY(-5px);
+  }
+
   /* Lightweight CSS 3D tilt on hover (no Three.js, no JS). */
   .tilt-3d {
-    transition: transform 0.45s ease, box-shadow 0.45s ease;
+    transition:
+      transform 0.55s var(--lux),
+      box-shadow 0.55s var(--lux);
     will-change: transform;
   }
   .tilt-3d:hover {
-    transform: perspective(900px) rotateY(-6deg) rotateX(3deg) scale(1.02);
-    box-shadow: 0 30px 60px -20px rgb(0 0 0 / 0.25);
+    transform: perspective(1100px) rotateY(-5deg) rotateX(3deg) scale(1.015);
+    box-shadow: 0 40px 80px -28px rgb(36 28 20 / 0.32);
+  }
+}
+
+/*
+ * Hero decorative motifs (Lippan mandalas / Jharoka arches). Compositor-only
+ * animation: the outer .hero-motif drifts (translate) while the inner .hero-spin
+ * rotates — split across two elements so the transforms never conflict, and
+ * both run on the GPU. Per-element variety comes from inline CSS custom
+ * properties. Runs ONLY when the user has not requested reduced motion.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .hero-motif {
+    animation: hero-drift var(--dur, 24s) ease-in-out infinite;
+    animation-delay: var(--delay, 0s);
+    will-change: transform;
+  }
+  @keyframes hero-drift {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0);
+    }
+    50% {
+      transform: translate3d(var(--dx, 10px), var(--dy, -16px), 0);
+    }
+  }
+  .hero-spin {
+    animation: hero-spin var(--spin, 80s) linear infinite;
+    will-change: transform;
+  }
+  @keyframes hero-spin {
+    to {
+      transform: rotate(360deg);
+    }
   }
 }

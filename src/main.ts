@@ -6,8 +6,8 @@ import { AppModule } from './app.module';
 import { setupApp } from './app-setup';
 
 async function bootstrap(): Promise<void> {
-  // bodyParser:false → setupApp attaches parsers explicitly so the SSLCOMMERZ
-  // IPN (application/x-www-form-urlencoded) is parsed predictably.
+  // bodyParser:false → setupApp attaches the JSON + urlencoded parsers explicitly
+  // and in a known order before CSRF/static middleware.
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     bodyParser: false,
   });

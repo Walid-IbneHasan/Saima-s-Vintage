@@ -164,6 +164,7 @@ model Customer {
 enum VerificationType {
   EMAIL_VERIFY
   PASSWORD_RESET
+  PASSWORD_CHANGE
 }
 
 // One-time codes for email verification and password reset (code is hashed).
@@ -240,6 +241,13 @@ model Product {
   condition        String?  @db.VarChar(64) // vintage condition: e.g. Excellent / Good / Fair
   basePrice        Decimal  @db.Decimal(12, 2) // regular price
   salePrice        Decimal? @db.Decimal(12, 2) // optional discounted price (when set & lower, this is charged)
+  // Time-bound "Flash Deal": while now is within [flashStartAt, flashEndAt] and
+  // flashPrice is set & lower than basePrice, flashPrice is charged and the item
+  // shows under Flash Deals. After flashEndAt it automatically reverts (evaluated
+  // at read/charge time — no background job required).
+  flashPrice       Decimal?  @db.Decimal(12, 2)
+  flashStartAt     DateTime? // null = active immediately once flashPrice is set
+  flashEndAt       DateTime? // required for a flash deal; deal disappears after this
   currency         String   @default("BDT") @db.VarChar(8)
   isActive         Boolean  @default(true)
   isFeatured       Boolean  @default(false)
@@ -265,6 +273,7 @@ model Product {
   @@index([basePrice])
   @@index([createdAt])
   @@index([publishedAt])
+  @@index([flashEndAt])
   @@fulltext([name, shortDescription])
 }
 
@@ -302,6 +311,8 @@ model ProductVariant {
   productId         String
   sku               String   @unique @db.VarChar(191)
   name              String   @db.VarChar(191) // e.g. "Size M / Blue" or "Default"
+  size              String?  @db.VarChar(64) // optional, e.g. "S", "M", "42"
+  color             String?  @db.VarChar(64) // optional label or CSS colour/hex, e.g. "Blue", "#3366cc"
   price             Decimal? @db.Decimal(12, 2) // null → inherits Product.basePrice
   salePrice         Decimal? @db.Decimal(12, 2) // optional discounted price for this variant
   stock             Int      @default(0) // mutate ONLY under SELECT ... FOR UPDATE
@@ -510,7 +521,6 @@ model Order {
   items        OrderItem[]
   payments     Payment[]
   paymentEvents PaymentEvent[]
-  sessions     SslcommerzSession[]
   reservations InventoryReservation[]
   shipments    Shipment[]
   redemptions  CouponRedemption[]
@@ -603,19 +613,22 @@ model Shipment {
 model Payment {
   id              String        @id @default(cuid())
   orderId         String
-  provider        String        @default("sslcommerz") @db.VarChar(32)
+  provider        String        @default("bkash") @db.VarChar(32)
   status          PaymentStatus @default(PENDING)
   amount          Decimal       @db.Decimal(12, 2)
   currency        String        @default("BDT") @db.VarChar(8)
+  // Our own reference, sent to bKash as merchantInvoiceNumber.
   tranId          String        @unique @db.VarChar(191)
-  valId           String?       @db.VarChar(191)
-  bankTranId      String?       @db.VarChar(191)
-  cardType        String?       @db.VarChar(120)
-  cardIssuer      String?       @db.VarChar(191)
-  riskLevel       Int?
-  riskTitle       String?       @db.VarChar(191)
-  storeAmount     Decimal?      @db.Decimal(12, 2)
+  // bKash's paymentID (returned by Create Payment). The redirect callback only
+  // echoes this, so it is how we correlate the callback back to this row.
+  bkashPaymentID  String?       @unique @db.VarChar(191)
+  // bKash's customer-facing transaction id (returned by Execute) and the masked
+  // payer wallet number — both set once the payment is confirmed.
+  bkashTrxID      String?       @db.VarChar(191)
+  payerAccount    String?       @db.VarChar(32)
+  // Holds bKash's hosted-checkout `bkashURL` (the redirect target).
   gatewayPageURL  String?       @db.Text
+  // When Execute/Query confirmed the charge.
   validatedAt     DateTime?
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
@@ -625,7 +638,6 @@ model Payment {
 
   @@index([orderId])
   @@index([status])
-  @@index([valId])
   @@index([createdAt])
 }
 
@@ -648,23 +660,6 @@ model PaymentEvent {
   @@index([tranId])
   @@index([type])
   @@index([createdAt])
-}
-
-model SslcommerzSession {
-  id             String   @id @default(cuid())
-  orderId        String
-  tranId         String   @unique @db.VarChar(191)
-  sessionkey     String?  @db.VarChar(191)
-  storeAmount    Decimal? @db.Decimal(12, 2)
-  gatewayPageURL String?  @db.Text
-  status         String?  @db.VarChar(64) // SUCCESS / FAILED from init response
-  rawResponse    Json
-  expiresAt      DateTime?
-  createdAt      DateTime @default(now())
-
-  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
-
-  @@index([orderId])
 }
 
 // ─────────────────────────────── Engagement ──────────────────────────────

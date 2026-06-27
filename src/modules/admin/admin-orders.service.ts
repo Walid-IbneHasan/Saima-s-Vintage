@@ -7,12 +7,14 @@ import {
 import { PrismaService } from '../../prisma/prisma.service';
 import { PageParams } from '../../common/pagination';
 import { InventoryService } from '../inventory/inventory.service';
+import { PaymentsService } from '../payments/payments.service';
 
 @Injectable()
 export class AdminOrdersService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly inventory: InventoryService,
+    private readonly payments: PaymentsService,
   ) {}
 
   async list(params: PageParams, status?: OrderStatus) {
@@ -79,6 +81,22 @@ export class AdminOrdersService {
         where: { orderId: id },
         data: { status: ShipmentStatus.DELIVERED, deliveredAt: new Date() },
       });
+      // Cash on Delivery: cash is collected on delivery, so settle the pending
+      // COD payment now (bKash orders are already PAID, so this no-ops them).
+      const cod = await this.prisma.payment.updateMany({
+        where: {
+          orderId: id,
+          provider: 'cod',
+          status: PaymentStatus.PENDING,
+        },
+        data: { status: PaymentStatus.PAID, validatedAt: new Date() },
+      });
+      if (cod.count > 0) {
+        await this.prisma.order.update({
+          where: { id },
+          data: { paidAt: new Date() },
+        });
+      }
     }
   }
 
@@ -108,6 +126,20 @@ export class AdminOrdersService {
       },
       data: { status: PaymentStatus.CANCELLED },
     });
+  }
+
+  /**
+   * Refund an order's captured bKash payment (full refund). The actual gateway
+   * call + state transition (payment/order → REFUNDED, restock) lives in
+   * PaymentsService so it stays the single owner of payment-state writes.
+   */
+  async refund(id: string): Promise<{ ok: boolean; message: string }> {
+    const order = await this.prisma.order.findUnique({
+      where: { id },
+      select: { id: true },
+    });
+    if (!order) throw new NotFoundException('Order not found');
+    return this.payments.refund(id);
   }
 
   /** Approve a PAYMENT_REVIEW order: commit its reservations and mark it paid. */

@@ -59,6 +59,6 @@ describe('SEO + sitemap (e2e)', () => {
     // Content is present in the HTML regardless of JS (no reveal-hidden gating
     // server-side); the animation hooks are progressive enhancements.
     expect(res.text).toContain('hero-fade');
-    expect(res.text).toContain('Timeless pieces');
+    expect(res.text).toContain('Curated vintage treasures');
   });
 });

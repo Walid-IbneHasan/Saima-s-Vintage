@@ -1,7 +1,7 @@
 # Saima's Vintage
 
 Server-rendered e-commerce for vintage one-of-a-kind items.
-**NestJS (Express adapter) + Prisma + MySQL/MariaDB + SSLCOMMERZ**, rendered with
+**NestJS (Express adapter) + Prisma + MySQL/MariaDB + bKash**, rendered with
 Nunjucks and progressively enhanced with Alpine.js / HTMX. Built to deploy on
 **HostSeba cPanel** (CloudLinux + LiteSpeed + Phusion Passenger).
 
@@ -21,7 +21,7 @@ Nunjucks and progressively enhanced with Alpine.js / HTMX. Built to deploy on
 | Views | Nunjucks (autoescaped) | SSR, SEO, works without JS |
 | Assets | Vite + Tailwind CSS | hashed build into `public/build` |
 | Interactivity | Alpine.js + HTMX | lightweight progressive enhancement |
-| Payments | SSLCOMMERZ | server-to-server validated |
+| Payments | bKash PGW (Tokenized Checkout) | server-to-server validated (Execute/Query) |
 | Auth hashing | bcryptjs (pure JS) | avoids node-gyp build on shared hosting |
 | Queue | DB `Job` table + cPanel cron | no Redis/worker assumed |
 
@@ -70,7 +70,7 @@ node dist/main.js             # listens on process.env.PORT (injected by Passeng
    only the matching `binaryTargets` entry in `prisma/schema.prisma`
    (`rhel-openssl-1.1.x` for AlmaLinux 8 / CentOS 7, `rhel-openssl-3.0.x` for AlmaLinux 9).
 3. **LVE memory** ≥ 1 GB and adequate entry processes for Node + Prisma.
-4. Outbound HTTPS to `securepay.sslcommerz.com` is allowed; the IPN URL is publicly reachable.
+4. Outbound HTTPS to `tokenized.pay.bka.sh` (sandbox: `tokenized.sandbox.bka.sh`) is allowed; the bKash callback URL is publicly reachable.
 
 ### 1. Create the database
 cPanel → *MySQL Databases* → create DB + user, grant all privileges. Note the
@@ -99,7 +99,7 @@ npx prisma migrate deploy
 
 ### 4. Environment variables
 Add every key from `.env.example` in the Node.js App **Environment variables**
-panel. Do **not** upload a real `.env` into the web root. `SSLCOMMERZ_IS_LIVE=true`
+panel. Do **not** upload a real `.env` into the web root. `BKASH_IS_LIVE=true`
 only in production.
 
 ### 5. Restart / logs
@@ -132,7 +132,7 @@ All hit token-guarded internal endpoints (added in Phase 5). Send header
 0. ✅ Foundation (this scaffold)
 1. Catalog + Admin (products/categories/variants/images, admin CRUD, auth/guards/audit, storefront browse/detail/search)
 2. Cart + Checkout + Inventory locking (transactional, `SELECT … FOR UPDATE`, reservations)
-3. SSLCOMMERZ (session, success/fail/cancel, IPN, Order Validation API, idempotency, payment_review)
+3. bKash (Tokenized Checkout create, GET callback, server-side Execute/Query, cron reconciliation, idempotency, payment_review, refund)
 4. SEO + sitemap + performance (JSON-LD, meta, sitemap, robots, N+1 guards, pagination, cache)
 5. Analytics + notifications + DB-queue/cron (sales aggregates, Nodemailer, low-stock, abandoned cart)
 6. 3D polish + animations (lightweight, lazy, JS-optional) — **last**

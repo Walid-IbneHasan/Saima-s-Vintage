@@ -2,22 +2,22 @@
 
 {% block content %}
 <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
-  <div class="rounded-lg bg-white p-5 shadow-sm">
-    <p class="text-sm text-stone-500">Products</p>
-    <p class="mt-1 text-3xl font-semibold">{{ stats.products }}</p>
+  <div class="rounded-lg border border-outline/10 bg-surface-container-lowest p-6">
+    <p class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Products</p>
+    <p class="mt-1 font-display-lg text-headline-lg text-on-surface">{{ stats.products }}</p>
   </div>
-  <div class="rounded-lg bg-white p-5 shadow-sm">
-    <p class="text-sm text-stone-500">Categories</p>
-    <p class="mt-1 text-3xl font-semibold">{{ stats.categories }}</p>
+  <div class="rounded-lg border border-outline/10 bg-surface-container-lowest p-6">
+    <p class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Categories</p>
+    <p class="mt-1 font-display-lg text-headline-lg text-on-surface">{{ stats.categories }}</p>
   </div>
-  <div class="rounded-lg bg-white p-5 shadow-sm">
-    <p class="text-sm text-stone-500">Orders</p>
-    <p class="mt-1 text-3xl font-semibold">{{ stats.orders }}</p>
+  <div class="rounded-lg border border-outline/10 bg-surface-container-lowest p-6">
+    <p class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Orders</p>
+    <p class="mt-1 font-display-lg text-headline-lg text-on-surface">{{ stats.orders }}</p>
   </div>
-  <div class="rounded-lg bg-white p-5 shadow-sm">
-    <p class="text-sm text-stone-500">Low stock variants</p>
-    <p class="mt-1 text-3xl font-semibold">{{ stats.lowStock }}</p>
+  <div class="rounded-lg border border-outline/10 bg-surface-container-lowest p-6">
+    <p class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Low stock variants</p>
+    <p class="mt-1 font-display-lg text-headline-lg text-on-surface">{{ stats.lowStock }}</p>
   </div>
 </div>
-<p class="mt-6 text-sm text-stone-500">Signed in as {{ user.name }} ({{ user.role }})</p>
+<p class="mt-6 text-sm text-on-surface-variant">Signed in as {{ user.name }} ({{ user.role }})</p>
 {% endblock %}
