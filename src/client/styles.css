@@ -319,6 +319,17 @@ summary:focus-visible,
 }
 
 /*
+ * In-place filtering (htmx): the product results fade slightly while the new
+ * set is fetched, then swap in — no full-page reload, no scroll jump.
+ */
+#product-results {
+  transition: opacity 0.2s ease;
+}
+#product-results.htmx-request {
+  opacity: 0.5;
+}
+
+/*
  * Mobile filter drawer — progressive enhancement.
  * Default / no-JS: the filter form is a normal in-flow column (stacked on
  * mobile, sidebar on desktop). With JS on narrow screens it becomes a slide-in

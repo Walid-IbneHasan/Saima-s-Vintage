@@ -23,7 +23,7 @@ const DEMO_TABLES = [
   'ProductVariantAttributeValue', 'AttributeValue', 'ProductAttribute',
   'ProductImage', 'ProductVariant', 'ProductTranslation', 'CategoryProduct',
   'Product', 'Category', 'Redirect', 'Address', 'Customer',
-  'NewsletterSubscriber', 'PageContent', 'SeoMeta', 'Job',
+  'PageContent', 'SeoMeta', 'Job',
 ];
 
 const CATEGORY_TREE = [
@@ -392,16 +392,6 @@ async function main(): Promise<void> {
       },
     });
   }
-
-  // --- Newsletter --------------------------------------------------------
-  await prisma.newsletterSubscriber.createMany({
-    data: [
-      { email: 'subscriber1@example.com', isConfirmed: true },
-      { email: 'subscriber2@example.com', isConfirmed: true },
-      { email: 'subscriber3@example.com', isConfirmed: false },
-      { email: 'subscriber4@example.com', isConfirmed: true },
-    ],
-  });
 
   // --- CMS pages + blog --------------------------------------------------
   await prisma.pageContent.createMany({

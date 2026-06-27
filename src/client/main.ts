@@ -16,6 +16,11 @@ window.htmx = htmx;
 
 Alpine.start();
 
+// The ESM build of htmx doesn't always auto-process when imported after
+// DOMContentLoaded (module scripts are deferred), so wire up hx-* attributes
+// explicitly. Idempotent — safe even if htmx already initialised.
+htmx.process(document.body);
+
 // ── Progressive polish (Phase 6) ──────────────────────────────────────────
 // Signal JS availability so CSS can opt into animations; without this class
 // everything stays visible (the storefront is fully usable with JS disabled).

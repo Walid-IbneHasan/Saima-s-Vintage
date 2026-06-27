@@ -41,7 +41,7 @@
       {% include "partials/filter-shell.njk" %}
     </aside>
 
-    <div class="lg:col-span-9">
+    <div id="product-results" class="lg:col-span-9">
       {% if products.length %}
         <div class="grid grid-cols-2 gap-6 md:grid-cols-3" data-reveal-stagger>
           {% for p in products %}{% include "partials/product-card.njk" %}{% endfor %}

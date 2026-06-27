@@ -1,4 +1,11 @@
 <form method="get" action="{{ formAction }}"
+      hx-get="{{ formAction }}"
+      hx-trigger="change delay:300ms"
+      hx-target="#product-results"
+      hx-select="#product-results"
+      hx-swap="outerHTML"
+      hx-push-url="true"
+      hx-indicator="#product-results"
       class="overflow-hidden rounded-2xl border border-outline/30 bg-surface-container-lowest shadow-luxe">
   <div class="border-b border-outline/30 px-6 py-5">
     <h2 class="font-headline-md text-xl text-on-surface">Refine</h2>
@@ -94,7 +101,7 @@
        fallback only (hidden via `.js .filter-apply`). #}
     <div class="space-y-3 pt-1">
       <button type="submit" class="filter-apply w-full items-center justify-center rounded-full bg-primary px-5 py-3 font-label-md text-label-md uppercase tracking-[0.16em] text-on-primary shadow-luxe transition-colors duration-300 hover:bg-on-primary-fixed-variant">Apply filters</button>
-      <a href="{{ formAction }}" @click="if (typeof sessionStorage !== 'undefined') sessionStorage.removeItem('svFiltersOpen')"
+      <a href="{{ formAction }}"
          class="flex w-full items-center justify-center gap-2 rounded-full border border-outline/50 px-5 py-3 font-label-md text-label-md uppercase tracking-[0.14em] text-on-surface-variant transition-colors duration-300 hover:border-accent hover:text-accent-deep">
         <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 3v5h5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Clear all
