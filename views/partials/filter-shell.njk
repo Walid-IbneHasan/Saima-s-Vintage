@@ -2,20 +2,19 @@
    FILTER SHELL — wraps the product filter form.
    · Desktop (lg+): a normal sticky sidebar column.
    · Mobile (<lg) + JS: a slide-in drawer toggled by a "Filter & Sort" bar,
-     with scrim, Escape-to-close, and body-scroll lock. Because filters now
-     auto-apply (no Apply button), the open state is remembered across the
-     auto-apply reload so several filters can be changed in a row.
+     with scrim, Escape-to-close, and body-scroll lock.
    · Mobile + no JS: the form renders in-flow with its no-JS Apply button.
-   Drawer visuals live in styles.css (`.filter-trigger/.filter-scrim/.filter-
-   panel/.filter-close`), gated on the `.js` class for graceful degradation.
+   Filters apply in place via htmx (see the form's hx-* attributes) — no page
+   reload, so the slider keeps its position and the drawer stays open while you
+   refine. Drawer visuals live in styles.css (`.filter-trigger/.filter-scrim/
+   .filter-panel/.filter-close`), gated on the `.js` class for graceful
+   degradation.
    ════════════════════════════════════════════════════════════════════════════ #}
 {% set activeCount = (1 if filters.inStock else 0) + (1 if filters.onSale else 0) + (1 if (filters.priceMin or filters.priceMax) else 0) %}
 
 <div x-data="{ drawer: false }"
-     x-init="if (sessionStorage.getItem('svFiltersOpen') === '1' && window.innerWidth < 1024) drawer = true; $watch('drawer', v => { if (!v) sessionStorage.removeItem('svFiltersOpen') })"
      @keydown.escape.window="drawer = false"
      x-effect="document.body.classList.toggle('overflow-hidden', drawer)"
-     @change.debounce.350ms="if (drawer) sessionStorage.setItem('svFiltersOpen', '1'); if ($event.target.form) { $event.target.form.requestSubmit ? $event.target.form.requestSubmit() : $event.target.form.submit(); }"
      class="lg:sticky lg:top-28">
 
   {# Mobile trigger bar — shown only on narrow screens with JS #}

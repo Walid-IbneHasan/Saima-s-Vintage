@@ -35,8 +35,8 @@
       {% include "partials/filter-shell.njk" %}
     </aside>
 
-    {# Product canvas #}
-    <section class="min-w-0 flex-grow">
+    {# Product canvas — htmx swaps this in place when filters change (no reload). #}
+    <section id="product-results" class="min-w-0 flex-grow">
       {% if products.length %}
         <div class="mb-8 flex items-center justify-between border-b border-outline/30 pb-4">
           <p class="font-label-sm text-label-sm uppercase tracking-[0.14em] text-on-surface-variant">
